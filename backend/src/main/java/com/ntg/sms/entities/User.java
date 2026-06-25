@@ -1,18 +1,26 @@
 package com.ntg.sms.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.Check;
+import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "USERS")
 public class User {
     @Id
@@ -55,14 +63,14 @@ public class User {
     @Column(name = "ISDELETED")
     private Boolean isDeleted;
 
-    @Size(max = 50)
     @Column(name = "CREATED_AT", length = 50)
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "LAST_LOGIN")
-    private LocalDate lastLogin;
+    private LocalDateTime lastLogin;
 
-    @Column(name = "GENDER")
+    @Column(name = "GENDER", nullable = false)
+    @Check(constraints = "gender in ('M', 'F')")
     private Character gender;
 
     @Size(max = 100)

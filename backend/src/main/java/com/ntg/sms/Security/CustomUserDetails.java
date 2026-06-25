@@ -49,4 +49,7 @@ public class CustomUserDetails  implements UserDetails{
         return !Boolean.TRUE.equals(user.getIsDeleted());
     }
 
+    public Long getId() {
+        return user.getId();
+    }
 }

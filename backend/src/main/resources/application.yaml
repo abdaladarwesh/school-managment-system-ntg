@@ -8,3 +8,6 @@ spring:
       ddl-auto: update
   application:
     name: sms
+jwt:
+  secret: yNcWGArQWpoh4lHACl/cbhnWdgCv9ML92Rq+SMnl3zc=
+  expiry: 8640000

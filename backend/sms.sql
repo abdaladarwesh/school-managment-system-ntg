@@ -55,7 +55,7 @@ CREATE TABLE Users
     Last_name_in_arabic     VARCHAR2 (150),
     Password                VARCHAR2 (150) NOT NULL,
     isDeleted               NUMBER (1) CHECK (isDeleted IN (0, 1)),
-    Created_at              VARCHAR2 (50),
+    Created_at              DATE,
     last_login              DATE,
     Gender                  CHAR (1) CHECK (Gender IN ('M', 'F')),
     Nationality             VARCHAR2 (100),
