@@ -47,5 +47,8 @@ public class Mark {
     @Column(name = "NOTES")
     private String notes;
 
+    @Column(name = "IS_APPROVED")
+    private Boolean isApproved;
+
 
 }

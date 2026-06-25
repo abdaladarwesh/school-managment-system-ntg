@@ -53,7 +53,7 @@ public class User {
     private String password;
 
     @Column(name = "ISDELETED")
-    private Boolean isdeleted;
+    private Boolean isDeleted;
 
     @Size(max = 50)
     @Column(name = "CREATED_AT", length = 50)

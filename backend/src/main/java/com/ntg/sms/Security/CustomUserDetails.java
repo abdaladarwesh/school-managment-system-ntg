@@ -9,7 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 @RequiredArgsConstructor
-
 public class CustomUserDetails  implements UserDetails{
     private final  User user;
 
@@ -47,7 +46,7 @@ public class CustomUserDetails  implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return !Boolean.TRUE.equals(user.getIsdeleted());
+        return !Boolean.TRUE.equals(user.getIsDeleted());
     }
 
 }
