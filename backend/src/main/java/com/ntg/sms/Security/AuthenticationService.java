@@ -1,6 +1,7 @@
 package com.ntg.sms.Security;
 
 import com.ntg.sms.entities.User;
+import com.ntg.sms.exceptions.ForbiddenException;
 import com.ntg.sms.repositories.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,8 +36,11 @@ public class AuthenticationService {
     
 
     public UserDetails authenticate(String email, String password) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        if (!user.getUser().getRole().getRoleName().equals("STUDENT_AFFAIRS") ){
+            throw new ForbiddenException("User with role " + user.getUser().getRole().getRoleName() +" doesnt have access to this module");
+        }
         return userDetailsService.loadUserByUsername(email);
     }
 

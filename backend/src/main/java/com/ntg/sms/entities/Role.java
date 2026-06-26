@@ -20,7 +20,7 @@ public class Role {
 
     @Size(max = 100)
     @NotNull
-    @Column(name = "ROLE_NAME", nullable = false, length = 100)
+    @Column(name = "ROLE_NAME", nullable = false, length = 100, unique = true)
     private String roleName;
 
 
