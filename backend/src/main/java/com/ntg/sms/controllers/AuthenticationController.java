@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,12 +27,17 @@ public class AuthenticationController {
         UserDetails user = authenticationService.authenticate(request.getEmail(), request.getPassword());
 
         String token = authenticationService.generateToken(user);
+        String role = user.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse(null);
 
         return ResponseEntity.ok(
                 AuthenticationResponse.builder()
                         .token(token)
+                        .role(role)
                         .expiresAt(expiresAt)
-                        .build()
-        );
+                        .build());
     }
 }

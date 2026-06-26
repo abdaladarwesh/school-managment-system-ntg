@@ -13,16 +13,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthenticationRequest {
 
-    private final String EMAIL_REQUIRED_ERROR_MESSAGE = "Email is required!";
-    private final String PASSWORD_REQUIRED_ERROR_MESSAGE = "Password is required!";
-
-
-
-    @NotBlank(message =  EMAIL_REQUIRED_ERROR_MESSAGE )
-    @NotNull(message =  EMAIL_REQUIRED_ERROR_MESSAGE )
+    @NotBlank(message =  "Email is required!" )
+    @NotNull(message =  "Email is required!" )
     private String email;
-    @NotBlank(message =  PASSWORD_REQUIRED_ERROR_MESSAGE )
-    @NotNull(message =  PASSWORD_REQUIRED_ERROR_MESSAGE )
+    @NotBlank(message =  "Password is required!" )
+    @NotNull(message =  "Password is required!" )
     private String password;
 
 
