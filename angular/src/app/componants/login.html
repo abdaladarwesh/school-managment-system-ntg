@@ -1,0 +1,47 @@
+<section class="login">
+
+    <div class="big">
+        <div class="text">
+            <h1>Welcome Back</h1>
+            <p>Please login to your account</p>
+        </div>
+
+    </div>
+    <div class="mid"></div>
+    <div class="small"></div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+
+        <h1>Login</h1>
+        <div class="input">
+            <input 
+            type="email" 
+            placeholder="Enter Your Email"
+            formControlName="email">
+            
+            <input 
+            type="password" 
+            placeholder="Enter Your Password"
+            formControlName="password">
+
+        </div>
+        <div class="forgot">
+            <div>
+                <input type="checkbox" id="check" style="margin-right: 5px;">
+                <label for="check" style="font-weight: 600; user-select: none;">Remember Me</label>
+            </div>
+            <a href="#">
+                Forgot Password?
+            </a>
+
+        </div>
+
+        <button type="submit">
+            Login
+        </button>
+    </form>
+
+    <div class="image">
+        <img src="Ntg2.jpeg" alt="Ntg">
+    </div>
+</section>

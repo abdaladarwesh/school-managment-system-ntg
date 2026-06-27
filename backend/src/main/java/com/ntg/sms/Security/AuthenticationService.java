@@ -37,10 +37,6 @@ public class AuthenticationService {
 
     public UserDetails authenticate(String email, String password) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        if (!user.getUser().getRole().getRoleName().equals("STUDENT_AFFAIRS") ){
-            throw new ForbiddenException("User with role " + user.getUser().getRole().getRoleName() +" doesnt have access to this module");
-        }
         return userDetailsService.loadUserByUsername(email);
     }
 
