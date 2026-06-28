@@ -2,7 +2,7 @@ package com.ntg.sms.Security;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import com.ntg.sms.entities.User;
+import com.ntg.sms.Entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -18,11 +18,24 @@
             type="email" 
             placeholder="Enter Your Email"
             formControlName="email">
+            @if (loginForm.controls.email.invalid  && loginForm.controls.email.touched ) {
+                @if(loginForm.controls.email.hasError("email")){
+                    <p class="err">Please enter a valid email format example@company.com</p>
+                }
+                @if(loginForm.controls.email.hasError("required")){
+                    <p class="err">The email field is required</p>
+                }
+            }
             
             <input 
             type="password" 
             placeholder="Enter Your Password"
             formControlName="password">
+            @if (loginForm.controls.password.invalid  && loginForm.controls.password.touched ) {
+                @if(loginForm.controls.password.hasError("required")){
+                    <p class="err">The password field is required</p>
+                }
+            }
 
         </div>
         <div class="forgot">

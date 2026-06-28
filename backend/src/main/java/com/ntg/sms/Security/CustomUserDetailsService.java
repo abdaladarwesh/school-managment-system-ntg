@@ -1,8 +1,7 @@
 package com.ntg.sms.Security;
 
-import  com.ntg.sms.entities.User;
-import com.ntg.sms.exceptions.ForbiddenException;
-import com.ntg.sms.repositories.UserRepository;
+import  com.ntg.sms.Entities.User;
+import com.ntg.sms.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
