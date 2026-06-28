@@ -1,8 +1,7 @@
-package com.ntg.sms.repositories;
+package com.ntg.sms.Repositories;
 
-import com.ntg.sms.entities.Student;
+import com.ntg.sms.Entities.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 public interface StudentRepository extends JpaRepository<Student,Long> {
 }

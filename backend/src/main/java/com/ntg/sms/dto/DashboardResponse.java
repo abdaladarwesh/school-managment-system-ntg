@@ -15,6 +15,6 @@ public class DashboardResponse {
     private long totalClasses;
     private Double todayAttendance;
     private long totalViolations;
-    private long LeaveRequests;
+    private long leaveRequests;
     private long totalComplaints;
 }
