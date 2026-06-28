@@ -1,12 +1,13 @@
-package com.ntg.sms.services;
+package com.ntg.sms.Service.impl;
 
-import com.ntg.sms.dto.DashboardResponse;
-import com.ntg.sms.repositories.AttendanceRepository;
-import com.ntg.sms.repositories.ClassRepository;
-import com.ntg.sms.repositories.StudentRepository;
-import com.ntg.sms.repositories.PermissionRepository;
-import com.ntg.sms.repositories.ComplaintsRepository;
-import com.ntg.sms.repositories.ViolationRepository;
+import com.ntg.sms.Entities.Dtos.Response.DashboardResponse;
+import com.ntg.sms.Repositories.AttendanceRepository;
+import com.ntg.sms.Repositories.ClassRepository;
+import com.ntg.sms.Repositories.StudentRepository;
+import com.ntg.sms.Repositories.PermissionRepository;
+import com.ntg.sms.Repositories.ComplaintsRepository;
+import com.ntg.sms.Repositories.ViolationRepository;
+import com.ntg.sms.Service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .totalStudents(studentRepository.count())
                 .totalClasses(classRepository.count())
                 .totalViolations(violationRepository.count())
-                .todayAttendance(0.0)
+                .todayAttendance((double) attendanceRepository.countToday())
                 .LeaveRequests(permissionRepository.count())
                 .totalComplaints(complaintsRepository.count())
                 .build();

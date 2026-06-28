@@ -1,8 +1,8 @@
 package com.ntg.sms.Controllers;
 
 import com.ntg.sms.Security.AuthenticationService;
-import com.ntg.sms.Entities.Dtos.request.AuthenticationRequest;
-import com.ntg.sms.Entities.Dtos.response.AuthenticationResponse;
+import com.ntg.sms.Entities.Dtos.Request.AuthenticationRequest;
+import com.ntg.sms.Entities.Dtos.Response.AuthenticationResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -5,12 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
 @Table(name = "ATTENDANCE")
 public class Attendance {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ATTENDANCE_ID", nullable = false)
     private Long id;
 
@@ -25,6 +28,11 @@ public class Attendance {
 
     @Column(name = "STATUS")
     private Character status;
+
+    @Column(name = "DATE_TIME")
+    private LocalDateTime dateTime;
+
+
 
 
 }

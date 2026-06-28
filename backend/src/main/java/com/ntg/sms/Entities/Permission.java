@@ -15,6 +15,7 @@ import java.time.LocalDate;
 @Table(name = "PERMISSIONS")
 public class Permission {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PERMISSION_ID", nullable = false)
     private Long id;
 

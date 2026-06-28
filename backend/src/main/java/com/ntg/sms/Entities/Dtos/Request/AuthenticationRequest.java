@@ -1,4 +1,4 @@
-package com.ntg.sms.Entities.Dtos.request;
+package com.ntg.sms.Entities.Dtos.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

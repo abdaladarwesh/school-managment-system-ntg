@@ -1,4 +1,4 @@
-package com.ntg.sms.Entities.Dtos.response;
+package com.ntg.sms.Entities.Dtos.Response;
 
 import lombok.*;
 

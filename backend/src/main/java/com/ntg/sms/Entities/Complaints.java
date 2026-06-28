@@ -1,4 +1,4 @@
-package com.ntg.sms.entities;
+package com.ntg.sms.Entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,8 +12,6 @@ import java.time.LocalDate;
 @Entity
 @Builder
 @Table(name = "COMPLAINTS")
-
-
 public class Complaints {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

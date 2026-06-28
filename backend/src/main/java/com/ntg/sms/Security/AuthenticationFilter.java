@@ -46,6 +46,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
+            log.warn(e.getMessage());
             log.warn("An unauthenticated user");
         }
 
