@@ -1,0 +1,56 @@
+<section class="login">
+
+    <div class="big">
+        <div class="text">
+            <h1 class="display-4 fw-bold">Welcome Back</h1>
+            <p>Please login to your account</p>
+        </div>
+
+    </div>
+    <div class="mid"></div>
+    <div class="small"></div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+
+        <h1 class="form-control-lg fw-bold">Login</h1>
+        <div class="input">
+            <input type="email" placeholder="Enter Your Email" formControlName="email">
+            @if (loginForm.controls.email.invalid && loginForm.controls.email.touched ) {
+            @if(loginForm.controls.email.hasError("email")){
+            <p class="err">Please enter a valid email format example@company.com</p>
+            }
+            @if(loginForm.controls.email.hasError("required")){
+            <p class="err">The email field is required</p>
+            }
+            }
+
+            <input type="password" placeholder="Enter Your Password" formControlName="password">
+            @if (loginForm.controls.password.invalid && loginForm.controls.password.touched ) {
+            @if(loginForm.controls.password.hasError("required")){
+            <p class="err">The password field is required</p>
+            }
+            }
+
+        </div>
+        <div class="forgot">
+            <div class="form-check m-0 pt-1 ms-1">
+                <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                <label class="form-check-label fw-bold" for="rememberMe">
+                    Remember me
+                </label>
+            </div>
+            <a href="#">
+                Forgot Password?
+            </a>
+
+        </div>
+
+        <button type="submit">
+            Login
+        </button>
+    </form>
+
+    <div class="image">
+        <img src="Ntg2.jpeg" alt="Ntg">
+    </div>
+</section>

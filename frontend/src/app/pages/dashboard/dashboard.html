@@ -1,0 +1,204 @@
+<body>
+
+    <!-- ════════════════════ SIDEBAR ════════════════════ -->
+
+    <!-- ════════════════════ MAIN ════════════════════ -->
+    <div id="main">
+
+        <!-- Top bar -->
+        <div id="topbar">
+            <div class="topbar-search">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search students, cases…" />
+            </div>
+            <div class="topbar-date">
+                <i class="bi bi-calendar3"></i>
+                Sunday, June 28, 2026
+            </div>
+            <div class="topbar-user">
+                AD NTG <i class="bi bi-chevron-down" style="font-size:11px;"></i>
+            </div>
+        </div>
+
+        <!-- Page content -->
+        <div id="content">
+
+            <!-- Welcome banner -->
+            <div class="welcome-banner">
+                <div>
+                    <h4>Welcome to Student Affairs</h4>
+                    <p>NTG School · Student Affairs Management System</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button class="btn-semester">
+                        <i class="bi bi-calendar3"></i> This Semester <i class="bi bi-chevron-down"
+                            style="font-size:10px;"></i>
+                    </button>
+                    <button class="btn-export">
+                        <i class="bi bi-download"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section header -->
+            <div class="section-eyebrow">Dashboard Overview</div>
+            <div class="section-title">Key Statistics</div>
+            <div class="section-sub">Overview of student wellness, conduct, and attendance</div>
+
+            <!-- Stat cards row -->
+            <div class="row g-3 mb-4">
+
+                <!-- Total Students -->
+                <div class="col-xl-2 col-lg-4 col-sm-6">
+                    <div class="stat-card">
+                        <span class="stat-badge badge-up">+4.2%</span>
+                        <div class="stat-icon icon-blue"><i class="bi bi-people-fill"></i></div>
+                        <div class="stat-value">2,847</div>
+                        <div class="stat-label">Total Students</div>
+                        <div class="stat-sub">Enrolled this semester</div>
+                    </div>
+                </div>
+
+                <!-- Total Classes -->
+                <div class="col-xl-2 col-lg-4 col-sm-6">
+                    <div class="stat-card">
+                        <span class="stat-badge badge-stable">Stable</span>
+                        <div class="stat-icon icon-purple"><i class="bi bi-book-fill"></i></div>
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Total Classes</div>
+                        <div class="stat-sub">Across 6 grade levels</div>
+                    </div>
+                </div>
+
+                <!-- Today's Attendance -->
+                <div class="col-xl-2 col-lg-4 col-sm-6">
+                    <div class="stat-card">
+                        <span class="stat-badge badge-up">+1.3%</span>
+                        <div class="stat-icon icon-green"><i class="bi bi-clock-fill"></i></div>
+                        <div class="stat-value">94.2%</div>
+                        <div class="stat-label">Today's Attendance</div>
+                        <div class="stat-sub">2,681 of 2,847 present</div>
+                    </div>
+                </div>
+
+                <!-- Total Violations -->
+                <div class="col-xl-2 col-lg-4 col-sm-6">
+                    <div class="stat-card">
+                        <span class="stat-badge badge-down">-8.1%</span>
+                        <div class="stat-icon icon-orange"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                        <div class="stat-value">146</div>
+                        <div class="stat-label">Total Violations</div>
+                        <div class="stat-sub">38 resolved · 108 open</div>
+                    </div>
+                </div>
+
+                <!-- Leave Requests -->
+                <div class="col-xl-2 col-lg-4 col-sm-6">
+                    <div class="stat-card">
+                        <span class="stat-badge badge-today">+2 today</span>
+                        <div class="stat-icon icon-yellow"><i class="bi bi-file-earmark-check-fill"></i></div>
+                        <div class="stat-value">23</div>
+                        <div class="stat-label">Leave Requests</div>
+                        <div class="stat-sub">Pending review</div>
+                    </div>
+                </div>
+
+                <!-- Complaints -->
+                <div class="col-xl-2 col-lg-4 col-sm-6">
+                    <div class="stat-card">
+                        <span class="stat-badge badge-new">4 new</span>
+                        <div class="stat-icon icon-purple"><i class="bi bi-chat-dots-fill"></i></div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Complaints</div>
+                        <div class="stat-sub">6 awaiting reply</div>
+                    </div>
+                </div>
+
+            </div><!-- /row -->
+
+            <!-- Charts row -->
+            <div class="row g-3">
+
+                <!-- Attendance line chart -->
+                <div class="col-lg-7">
+                    <div class="chart-card">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div>
+                                <div class="chart-card-title">Attendance Overview</div>
+                                <div class="chart-card-sub">Weekly attendance rate — Current Semester</div>
+                            </div>
+                            <span class="chart-badge">Sem 1 · 2025–26</span>
+                        </div>
+                        <app-attendance-chart [weeks]="['Wk 1','Wk 2','Wk 3','Wk 4','Wk 5','Wk 6','Wk 7','Wk 8']"
+                            [data]="[91, 93, 92.5, 94, 95, 94.5, 95.5, 94.2]">
+                        </app-attendance-chart>
+                    </div>
+                </div>
+
+                <!-- Avg absence per class -->
+                <div class="col-lg-5">
+                    <div class="chart-card">
+                        <div class="chart-card-title">Avg. Absence per Class</div>
+                        <div class="chart-card-sub">Days absent per student — this month</div>
+
+                        <div class="absence-row">
+                            <span class="grade-label">Grade 7</span>
+                            <div class="absence-bar-wrap">
+                                <div class="absence-bar bar-dark" style="width:64%"></div>
+                            </div>
+                            <span class="absence-val">3.2d</span>
+                        </div>
+                        <div class="absence-row">
+                            <span class="grade-label">Grade 8</span>
+                            <div class="absence-bar-wrap">
+                                <div class="absence-bar bar-dark" style="width:56%"></div>
+                            </div>
+                            <span class="absence-val">2.8d</span>
+                        </div>
+                        <div class="absence-row">
+                            <span class="grade-label">Grade 9</span>
+                            <div class="absence-bar-wrap">
+                                <div class="absence-bar bar-dark" style="width:82%"></div>
+                            </div>
+                            <span class="absence-val">4.1d</span>
+                        </div>
+                        <div class="absence-row">
+                            <span class="grade-label">Grade 10</span>
+                            <div class="absence-bar-wrap">
+                                <div class="absence-bar bar-blue" style="width:38%"></div>
+                            </div>
+                            <span class="absence-val">1.9d</span>
+                        </div>
+                        <div class="absence-row">
+                            <span class="grade-label">Grade 11</span>
+                            <div class="absence-bar-wrap">
+                                <div class="absence-bar bar-dark" style="width:70%"></div>
+                            </div>
+                            <span class="absence-val">3.5d</span>
+                        </div>
+                        <div class="absence-row">
+                            <span class="grade-label">Grade 12</span>
+                            <div class="absence-bar-wrap">
+                                <div class="absence-bar bar-blue" style="width:48%"></div>
+                            </div>
+                            <span class="absence-val">2.4d</span>
+                        </div>
+
+                        <div class="absence-footer">
+                            <div>
+                                <div class="avg-label">School Average</div>
+                                <div class="avg-val">3.0 days</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="avg-label">Best Class</div>
+                                <div class="best-val">Grade 10 · 1.9d</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /row -->
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+</body>

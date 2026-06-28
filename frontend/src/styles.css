@@ -1,7 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
-
-*{
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+:root {
+  --sidebar-bg: #7a0a0a;
+  --sidebar-hover: #5e0808;
+  --sidebar-active: #4a0606;
+  --accent: #c0392b;
+  --accent-light: #e74c3c;
+  --top-bar: #ffffff;
+  --body-bg: #f4f6f9;
+  --card-bg: #ffffff;
+  --text-main: #1a1a2e;
+  --text-muted: #6c757d;
+  --border: #e9ecef;
 }

@@ -7,6 +7,7 @@
     width: 100%;
     height: 100vh;
     overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .big{
@@ -127,6 +128,7 @@ img{
 }
 .forgot{
     display: flex;
+    align-items: center;
     justify-content: space-between;
     padding-left:15px;
     padding-right:10px;

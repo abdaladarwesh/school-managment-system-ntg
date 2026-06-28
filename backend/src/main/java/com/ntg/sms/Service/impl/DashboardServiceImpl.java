@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-
 public class DashboardServiceImpl implements DashboardService {
     private final StudentRepository studentRepository;
     private final ComplaintsRepository complaintsRepository;
@@ -33,6 +32,4 @@ public class DashboardServiceImpl implements DashboardService {
                 .totalComplaints(complaintsRepository.count())
                 .build();
     }
-
-
 }
