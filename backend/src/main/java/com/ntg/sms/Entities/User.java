@@ -52,8 +52,7 @@ public class User {
     private String lastNameInArabic;
 
     @Size(max = 150)
-    @NotNull
-    @Column(name = "PASSWORD", nullable = false, length = 150)
+    @Column(name = "PASSWORD", length = 150)
     private String password;
 
     @Column(name = "ISDELETED")

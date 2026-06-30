@@ -1,0 +1,215 @@
+:host {
+  --maroon: #620000;
+  --blue: #2563eb;
+  --purple: #7c3aed;
+  --green: #16a34a;
+  display: block;
+}
+
+/* Page background */
+.page-bg {
+  background: #f3f1f2;
+}
+
+/* Heading accent */
+.eyebrow-bar {
+  width: 4px;
+  height: 14px;
+  background: var(--maroon);
+  display: inline-block;
+  border-radius: 1px;
+}
+
+.text-maroon {
+  color: var(--maroon) !important;
+}
+
+/* Section card headers */
+.section-header {
+  border-radius: 0.5rem 0.5rem 0 0;
+  padding: 1rem 1.25rem;
+}
+
+.student-header {
+  background: linear-gradient(135deg, #fef2f2, #fde8e8);
+}
+
+.parent-header {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+
+.additional-header {
+  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+}
+
+.medical-header {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+/* Section icons */
+.section-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.student-icon {
+  background: var(--maroon);
+}
+
+.parent-icon {
+  background: var(--blue);
+}
+
+.additional-icon {
+  background: var(--purple);
+}
+
+.medical-icon {
+  background: var(--green);
+}
+
+/* Section titles */
+.section-title {
+  font-size: 1.05rem;
+  color: var(--maroon);
+}
+
+.section-subtitle {
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+/* Field labels */
+.field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--maroon);
+  margin-bottom: 0.35rem;
+}
+
+.field-icon {
+  margin-right: 3px;
+  font-size: 0.85rem;
+}
+
+/* Form fields */
+.form-field {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.9rem;
+  color: #1a1a2e;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-field:focus {
+  background-color: #fff;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  outline: none;
+}
+
+.form-field::placeholder {
+  color: #9ca3af;
+}
+
+/* Field hint */
+.field-hint {
+  color: #6b7280;
+  font-size: 0.78rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Parent labels */
+.parent-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px dashed #e5e7eb;
+}
+
+.father-label {
+  color: var(--blue);
+}
+
+.mother-label {
+  color: var(--maroon);
+}
+
+/* Cards */
+.card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Cancel button */
+.btn-outline-secondary {
+  border-radius: 0.5rem;
+  border-color: #d1d5db;
+  color: #4b5563;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+  color: #1a1a2e;
+}
+
+/* Primary button */
+.btn-primary {
+  border-radius: 0.5rem;
+  background-color: var(--blue);
+  border-color: var(--blue);
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+/* Danger button (remove phone) */
+.btn-outline-danger {
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+}
+
+/* Add phone link */
+.btn-link {
+  color: var(--blue);
+  font-size: 0.82rem;
+}
+
+.btn-link:hover {
+  color: #1d4ed8;
+}
+
+/* Validation error text */
+.text-danger {
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+  display: block;
+}
+
+/* select arrow fix for Bootstrap */
+select.form-field {
+  appearance: auto;
+}
+
+/* textarea */
+textarea.form-field {
+  resize: vertical;
+  min-height: 100px;
+}

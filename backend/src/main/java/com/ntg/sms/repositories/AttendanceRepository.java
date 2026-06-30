@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
@@ -21,12 +21,33 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("startOfNextDay") LocalDateTime startOfNextDay
     );
 
-    default long countToday() {
-        LocalDate today = LocalDate.now();
+    /**
+     * Count attendance records falling in a specific week
+     * (from weekStart inclusive to weekEnd exclusive).
+     */
+    @Query("""
+                SELECT COUNT(a)
+                FROM Attendance a
+                WHERE a.dateTime >= :weekStart
+                  AND a.dateTime < :weekEnd
+            """)
+    long countByWeek(
+            @Param("weekStart") LocalDateTime weekStart,
+            @Param("weekEnd")   LocalDateTime weekEnd
+    );
 
-        return countByDateBetween(
-                today.atStartOfDay(),
-                today.plusDays(1).atStartOfDay()
-        );
-    }
+    /**
+     * Absence count grouped by class name (student.class.name).
+     * Returns Object[]{className, absentCount}.
+     */
+    @Query("""
+    SELECT g.name, COUNT(a)
+    FROM Attendance a
+    JOIN a.student s
+    JOIN s.studentClass c
+    JOIN c.grade g
+    WHERE a.status = 'A'
+    GROUP BY g.name
+""")
+    List<Object[]> countAbsenceByGrade();
 }

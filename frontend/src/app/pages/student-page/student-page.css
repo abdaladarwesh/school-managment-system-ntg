@@ -1,0 +1,133 @@
+.search{
+background-color: rgb(233,227,230);
+padding: 10px;
+border-radius:10px ;
+}
+
+:host {
+  --maroon: #620000;
+  --maroon-dark: #620000;
+  --blue: #2563eb;
+  display: block;
+}
+
+/* Top bar */
+.topbar {
+  background: #232323;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+}
+
+.sidebar-link {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.sidebar-link.active {
+  background: var(--blue);
+  color: #fff;
+}
+
+.sidebar-divider {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Pagination */
+.page-link {
+  color: var(--maroon);
+}
+
+.page-item.active .page-link {
+  background-color: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+/* Page background */
+.page-bg {
+  background: #f3f1f2;
+}
+
+/* Heading accent */
+.eyebrow-bar {
+  width: 4px;
+  height: 14px;
+  background: var(--maroon);
+  display: inline-block;
+  border-radius: 1px;
+}
+
+.text-maroon {
+  color: var(--maroon) !important;
+}
+
+/* Status filter tabs */
+.status-tab.active {
+  background: var(--blue) !important;
+  color: #fff !important;
+  border-color: var(--blue) !important;
+}
+
+/* Table header row */
+.table-header-row th {
+  color: var(--maroon);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  background: #eef3fb;
+}
+
+/* Avatar */
+.avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Class chip */
+.class-chip {
+  background: #eef2ff;
+  color: var(--blue);
+}
+
+/* Status badges */
+.status-badge--active {
+  background: #e7f7ee;
+  color: #1f9254;
+}
+
+.status-badge--probation {
+  background: #fdf0e2;
+  color: #c2670f;
+}
+
+.status-badge--suspended {
+  background: #fbe7e7;
+  color: #9c1c1c;
+}
+/* .b .btn{
+  box-shadow: 0 0 8px black;
+} */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+}

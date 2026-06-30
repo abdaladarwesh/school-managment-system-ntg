@@ -1,0 +1,201 @@
+<div class="d-flex flex-column min-vh-100">
+  <div class="d-flex flex-grow-1">
+    <!-- Sidebar -->
+
+    <!-- Main content -->
+    <main class="flex-grow-1 p-4 page-bg">
+      <!-- Search row -->
+      <!-- <div class="search d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div class="input-group" style="max-width: 480px;">
+          <span class="input-group-text bg-white border-end-0">🔍</span>
+          <input type="text" class="form-control border-start-0" placeholder="Search students, cases..." />
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span class="small">📅 Sunday, June 28, 2026</span>
+          <span class="small fw-semibold">AD NTG ▾</span>
+        </div>
+      </div> -->
+
+      <!-- Page heading -->
+      <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+          <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
+            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          </p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Students</h1>
+          <p class="text-muted mb-0">Manage and review all enrolled students</p>
+        </div>
+        <div class="d-flex gap-2 align-items-end justify-content-end" style="height: 100%;">
+          <button class="btn btn-outline-secondary" (click)="exportStudents()"> Export</button>
+          <button class="btn btn-primary fw-semibold" (click)="addStudent()">+ Add Student</button>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">Total Enrolled</p>
+              <p class="fs-3 fw-bold mb-0">{{ totalEnrolled() }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">Active</p>
+              <p class="fs-3 fw-bold mb-0 text-success">{{ activeCount() }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">On Probation</p>
+              <p class="fs-3 fw-bold mb-0 text-warning-emphasis">{{ probationCount() }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">Suspended</p>
+              <p class="fs-3 fw-bold mb-0 text-maroon">{{ suspendedCount() }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table card -->
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <!-- Filter row 1 -->
+          <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
+            <div class="input-group" style="max-width: 300px;">
+              <span class="input-group-text bg-white border-end-0">🔍</span>
+              <input
+                type="text"
+                class="form-control border-start-0"
+                placeholder="Search by student name or grade..."
+                [ngModel]="searchTerm()"
+                (ngModelChange)="onSearchChange($event)"
+              />
+            </div>
+
+            <div class="btn-group" role="group">
+              <button
+                *ngFor="let tab of statusTabs"
+                type="button"
+                class="btn btn-light status-tab"
+                [class.active]="statusFilter() === tab"
+                (click)="setStatusFilter(tab)"
+              >
+                {{ tab }}
+              </button>
+            </div>
+
+            <span class="ms-auto border rounded px-3 py-2 small text-muted">
+              {{ resultCount() }} results
+            </span>
+          </div>
+
+          <!-- Filter row 2 -->
+          <div class="d-flex gap-2 flex-wrap mb-3">
+            <select
+              class="form-select form-select-sm w-auto"
+              [ngModel]="gradeFilter()"
+              (ngModelChange)="onGradeFilterChange($event)"
+            >
+              <option *ngFor="let g of grades()" [value]="g">{{ g }}</option>
+            </select>
+            <select
+              class="form-select form-select-sm w-auto"
+              [ngModel]="classFilter()"
+              (ngModelChange)="onClassFilterChange($event)"
+            >
+              <option *ngFor="let c of classes()" [value]="c">{{ c }}</option>
+            </select>
+            <select
+              class="form-select form-select-sm w-auto"
+              [ngModel]="yearFilter()"
+              (ngModelChange)="onYearFilterChange($event)"
+            >
+              <option *ngFor="let y of years()" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+                <tr class="table-header-row">
+                  <th>Student <span class="small">▾</span></th>
+                  <th>Grade</th>
+                  <th>Class</th>
+                  <th>Academic Year</th>
+                  <th>Gender</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let student of pagedStudents()">
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="avatar-circle">{{ student.initials }}</span>
+                      <div>
+                        <p class="mb-0 fw-semibold small">{{ student.name }}</p>
+                        <p class="mb-0 text-muted" style="font-size: 0.775rem;">{{ student.email }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge class-chip fw-semibold">{{ student.grade === "" ? "Not Assigned" : ""}}</span></td>
+                  <td><span class="badge class-chip fw-semibold">{{ student.class === "" ? "Not Assigned" : ""}}</span></td>
+                  <td>{{ student.academicYear === "" ? "Not Assigned" : ""}}</td>
+                  <td>{{ student.gender }}</td>
+                  <td><span [class]="statusBadgeClass(student.status)">{{ student.status }}</span></td>
+                </tr>
+                <tr *ngIf="pagedStudents().length === 0">
+                  <td colspan="8" class="text-center text-muted py-4">
+                    No students match the current filters.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination footer -->
+          <div class="d-flex justify-content-between align-items-center pt-3 mt-2 border-top flex-wrap gap-2">
+            <span class="text-muted small">
+              Showing {{ rangeStart() }}-{{ rangeEnd() }} of {{ resultCount() }} students
+            </span>
+
+            <nav aria-label="Students table pagination">
+              <ul class="pagination pagination-sm mb-0">
+                <li class="page-item" [class.disabled]="currentPage() === 1">
+                  <button class="page-link" (click)="previousPage()" aria-label="Previous">‹</button>
+                </li>
+                <li
+                  class="page-item"
+                  *ngFor="let p of pageNumbers()"
+                  [class.active]="currentPage() === p"
+                >
+                  <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+                </li>
+                <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                  <button class="page-link" (click)="nextPage()" aria-label="Next">›</button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page footer -->
+      <footer class="d-flex justify-content-between align-items-center mt-4 px-1 small text-muted flex-wrap gap-2">
+        <span>NTG School - Student Affairs System © 2026</span>
+        <span>Last updated: {{ lastUpdated }}</span>
+      </footer>
+    </main>
+  </div>
+</div>

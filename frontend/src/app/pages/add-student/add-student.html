@@ -1,0 +1,949 @@
+<div class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1 p-4 page-bg">
+    <!-- Page heading -->
+    <div class="mb-4">
+      <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
+        <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+      </p>
+      <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Add New Student</h1>
+      <p class="text-muted mb-0">Fill in the form below to register a new student in the system</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <!-- ===================== SECTION 1: Student Information ===================== -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header section-header student-header d-flex align-items-center gap-3 border-0">
+          <div class="section-icon student-icon">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold section-title">Student Information</h5>
+            <small class="section-subtitle">Personal identification and contact details</small>
+          </div>
+        </div>
+        <div class="card-body" [formGroup]="form">
+          <div class="row g-3">
+            <!-- Student Name Arabic -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-person field-icon"></i> STUDENT NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="Student full name in Arabic"
+                  formControlName="firstNameInArabic">
+                @if (getError(studentUser.get('firstNameInArabic'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Student Name English -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-person field-icon"></i> STUDENT NAME (ENGLISH) <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="Full name in English"
+                  formControlName="firstName">
+                @if (getError(studentUser.get('firstName'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Last Name Arabic -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-person field-icon"></i> LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="Last name in Arabic"
+                  formControlName="lastNameInArabic">
+                @if (getError(studentUser.get('lastNameInArabic'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Last Name English -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-person field-icon"></i> LAST NAME (ENGLISH) <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="Last name in English"
+                  formControlName="lastName">
+                @if (getError(studentUser.get('lastName'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-geo-alt field-icon"></i> ADDRESS <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="Full residential address"
+                  formControlName="address">
+                @if (getError(studentUser.get('address'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Student Phone Number -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-telephone field-icon"></i> STUDENT PHONE NUMBER <span class="text-danger d-inline">*</span>
+                </label>
+                <div formArrayName="phoneNumbers">
+                  @for (ctrl of studentPhoneNumbers.controls; track $index; let i = $index) {
+                    <div class="d-flex gap-2 mb-2">
+                      <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
+                        [formControlName]="i"
+                        (input)="formatPhoneInput($event, studentPhoneNumbers.at(i))">
+                      @if (studentPhoneNumbers.length > 1) {
+                        <button type="button" class="btn btn-outline-danger btn-sm px-2" (click)="removePhoneNumber('student', i)">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('student')">
+                  <i class="bi bi-plus-circle"></i> Add another number
+                </button>
+                @if (getError(studentPhoneNumbers.at(0), 'pattern')) {
+                  <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
+                }
+              </div>
+            </div>
+
+            <!-- Student Email -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-envelope field-icon"></i> STUDENT EMAIL <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="email" class="form-control form-field" placeholder="student@email.com"
+                  formControlName="email">
+                @if (getError(studentUser.get('email'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+                @if (getError(studentUser.get('email'), 'email')) {
+                  <small class="text-danger">Please enter a valid email</small>
+                }
+              </div>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-calendar field-icon"></i> DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                </label>
+                <div class="d-flex gap-2">
+                  <select class="form-select form-field text-black" formControlName="birthDay">
+                    <option value="" disabled selected>Day</option>
+                    @for (d of days; track d) {
+                      <option class="text-black" [value]="d">{{ d }}</option>
+                    }
+                  </select>
+                  <select class="form-select form-field" formControlName="birthMonth">
+                    <option value="" disabled selected>Month</option>
+                    @for (m of months; track m) {
+                      <option [value]="m">{{ m }}</option>
+                    }
+                  </select>
+                  <select class="form-select form-field" formControlName="birthYear">
+                    <option value="" disabled selected>Year</option>
+                    @for (y of years; track y) {
+                      <option [value]="y">{{ y }}</option>
+                    }
+                  </select>
+                </div>
+                @if ((getError(studentUser.get('birthDay'), 'required') || getError(studentUser.get('birthMonth'), 'required') || getError(studentUser.get('birthYear'), 'required'))) {
+                  <small class="text-danger">Date of birth is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- National ID Number -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-credit-card field-icon"></i> NATIONAL ID NUMBER <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
+                  formControlName="nationalNumber">
+                <small class="field-hint">14-digit national identification number</small>
+                @if (getError(studentUser.get('nationalNumber'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+                @if (getError(studentUser.get('nationalNumber'), 'minlength') || getError(studentUser.get('nationalNumber'), 'maxlength')) {
+                  <small class="text-danger">Must be exactly 14 digits</small>
+                }
+              </div>
+            </div>
+
+            <!-- Preparatory School Total Score -->
+            <div class="col-md-6">
+              <div formGroupName="student">
+                <label class="form-label field-label">
+                  <i class="bi bi-mortarboard field-icon"></i> PREPARATORY SCHOOL TOTAL SCORE <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="number" class="form-control form-field" placeholder="e.g. 285"
+                  formControlName="academicScoreInMiddleSchool">
+                @if (getError(student.get('academicScoreInMiddleSchool'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Nationality -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-globe field-icon"></i> NATIONALITY <span class="text-danger d-inline">*</span>
+                </label>
+                <select class="form-select form-field" formControlName="nationality">
+                  <option value="" disabled selected>Select nationality</option>
+                  @for (nat of nationalities; track nat) {
+                    <option [value]="nat">{{ nat }}</option>
+                  }
+                </select>
+                @if (getError(studentUser.get('nationality'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Governorate -->
+            <div class="col-md-6">
+              <div formGroupName="student">
+                <label class="form-label field-label">
+                  <i class="bi bi-building field-icon"></i> GOVERNORATE <span class="text-danger d-inline">*</span>
+                </label>
+                <select class="form-select form-field" formControlName="governorate">
+                  <option value="" disabled selected>Select governorate</option>
+                  @for (gov of governorates; track gov) {
+                    <option [value]="gov">{{ gov }}</option>
+                  }
+                </select>
+                @if (getError(student.get('governorate'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Parents' Marital Status -->
+            <div class="col-md-6">
+              <div formGroupName="student">
+                <label class="form-label field-label">
+                  <i class="bi bi-people field-icon"></i> PARENTS' MARITAL STATUS <span class="text-danger d-inline">*</span>
+                </label>
+                <select class="form-select form-field" formControlName="martialParentsStatus">
+                  <option value="" disabled selected>Select marital status</option>
+                  @for (s of maritalStatuses; track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+                </select>
+                @if (getError(student.get('martialParentsStatus'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Place of Birth -->
+            <div class="col-md-6">
+              <div formGroupName="student">
+                <label class="form-label field-label">
+                  <i class="bi bi-geo-alt field-icon"></i> PLACE OF BIRTH <span class="text-danger d-inline">*</span>
+                </label>
+                <input type="text" class="form-control form-field" placeholder="City / District of birth"
+                  formControlName="placeOfBirth">
+                @if (getError(student.get('placeOfBirth'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== SECTION 2: Parent Information ===================== -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header section-header parent-header d-flex align-items-center gap-3 border-0">
+          <div class="section-icon parent-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold section-title">Parent Information</h5>
+            <small class="section-subtitle">Father and mother contact and identification details</small>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <!-- Father Column -->
+            <div class="col-md-6" formGroupName="father">
+              <h6 class="parent-label father-label mb-3">
+                <i class="bi bi-person-fill"></i> FATHER
+              </h6>
+              <div formGroupName="user">
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> FATHER'S NAME <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="Full name"
+                    formControlName="firstName">
+                  @if (getError(father.get('user.firstName'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> FATHER'S LAST NAME <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="Last name"
+                    formControlName="lastName">
+                  @if (getError(father.get('user.lastName'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> FATHER'S NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="الاسم بالعربي"
+                    formControlName="firstNameInArabic">
+                  @if (getError(father.get('user.firstNameInArabic'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> FATHER'S LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="اللقب بالعربي"
+                    formControlName="lastNameInArabic">
+                  @if (getError(father.get('user.lastNameInArabic'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-envelope field-icon"></i> FATHER'S EMAIL <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="email" class="form-control form-field" placeholder="email@example.com"
+                    formControlName="email">
+                  @if (getError(father.get('user.email'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                  @if (getError(father.get('user.email'), 'email')) {
+                    <small class="text-danger">Please enter a valid email</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-building field-icon"></i> FATHER'S OCCUPATION <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="e.g. Engineer, Teacher..."
+                    [formControl]="fatherJobName">
+                  @if (getError(father.get('jobName'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-geo-alt field-icon"></i> FATHER'S ADDRESS <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="Full address"
+                    formControlName="address">
+                  @if (getError(father.get('user.address'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-globe field-icon"></i> FATHER'S NATIONALITY <span class="text-danger d-inline">*</span>
+                  </label>
+                  <select class="form-select form-field" formControlName="nationality">
+                    <option value="" disabled selected>Select nationality</option>
+                    @for (nat of nationalities; track nat) {
+                      <option [value]="nat">{{ nat }}</option>
+                    }
+                  </select>
+                  @if (getError(father.get('user.nationality'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-heart field-icon"></i> FATHER'S RELIGION <span class="text-danger d-inline">*</span>
+                  </label>
+                  <select class="form-select form-field" formControlName="religion">
+                    <option value="" disabled selected>Select religion</option>
+                    @for (r of religions; track r) {
+                      <option [value]="r">{{ r }}</option>
+                    }
+                  </select>
+                  @if (getError(father.get('user.religion'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-calendar field-icon"></i> FATHER'S DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                  </label>
+                  <div class="d-flex gap-2">
+                    <select class="form-select form-field" formControlName="birthDay">
+                      <option value="" disabled selected>Day</option>
+                      @for (d of days; track d) {
+                        <option [value]="d">{{ d }}</option>
+                      }
+                    </select>
+                    <select class="form-select form-field" formControlName="birthMonth">
+                      <option value="" disabled selected>Month</option>
+                      @for (m of months; track m) {
+                        <option [value]="m">{{ m }}</option>
+                      }
+                    </select>
+                    <select class="form-select form-field" formControlName="birthYear">
+                      <option value="" disabled selected>Year</option>
+                      @for (y of years; track y) {
+                        <option [value]="y">{{ y }}</option>
+                      }
+                    </select>
+                  </div>
+                  @if ((getError(father.get('user.birthDay'), 'required') || getError(father.get('user.birthMonth'), 'required') || getError(father.get('user.birthYear'), 'required'))) {
+                    <small class="text-danger">Date of birth is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-credit-card field-icon"></i> FATHER'S NATIONAL ID <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
+                    formControlName="nationalNumber">
+                  @if (getError(father.get('user.nationalNumber'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                  @if (getError(father.get('user.nationalNumber'), 'minlength') || getError(father.get('user.nationalNumber'), 'maxlength')) {
+                    <small class="text-danger">Must be exactly 14 digits</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-telephone field-icon"></i> FATHER'S PHONE NUMBER <span class="text-danger d-inline">*</span>
+                  </label>
+                  <div formArrayName="phoneNumbers">
+                    @for (ctrl of fatherPhoneNumbers.controls; track $index; let i = $index) {
+                      <div class="d-flex gap-2 mb-2">
+                        <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
+                          [formControlName]="i"
+                          (input)="formatPhoneInput($event, fatherPhoneNumbers.at(i))">
+                        @if (fatherPhoneNumbers.length > 1) {
+                          <button type="button" class="btn btn-outline-danger btn-sm px-2" (click)="removePhoneNumber('father', i)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('father')">
+                    <i class="bi bi-plus-circle"></i> Add another number
+                  </button>
+                  @if (getError(fatherPhoneNumbers.at(0), 'pattern')) {
+                    <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Mother Column -->
+            <div class="col-md-6" formGroupName="mother">
+              <h6 class="parent-label mother-label mb-3">
+                <i class="bi bi-person-fill"></i> MOTHER
+              </h6>
+              <div formGroupName="user">
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> MOTHER'S NAME <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="Full name"
+                    formControlName="firstName">
+                  @if (getError(mother.get('user.firstName'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> MOTHER'S LAST NAME <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="Last name"
+                    formControlName="lastName">
+                  @if (getError(mother.get('user.lastName'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> MOTHER'S NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="الاسم بالعربي"
+                    formControlName="firstNameInArabic">
+                  @if (getError(mother.get('user.firstNameInArabic'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-person field-icon"></i> MOTHER'S LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="اللقب بالعربي"
+                    formControlName="lastNameInArabic">
+                  @if (getError(mother.get('user.lastNameInArabic'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-envelope field-icon"></i> MOTHER'S EMAIL <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="email" class="form-control form-field" placeholder="email@example.com"
+                    formControlName="email">
+                  @if (getError(mother.get('user.email'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                  @if (getError(mother.get('user.email'), 'email')) {
+                    <small class="text-danger">Please enter a valid email</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-building field-icon"></i> MOTHER'S OCCUPATION <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="e.g. Doctor, Housewife..."
+                    [formControl]="motherJobName">
+                  @if (getError(mother.get('jobName'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-geo-alt field-icon"></i> MOTHER'S ADDRESS <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="Full address"
+                    formControlName="address">
+                  @if (getError(mother.get('user.address'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-globe field-icon"></i> MOTHER'S NATIONALITY <span class="text-danger d-inline">*</span>
+                  </label>
+                  <select class="form-select form-field" formControlName="nationality">
+                    <option value="" disabled selected>Select nationality</option>
+                    @for (nat of nationalities; track nat) {
+                      <option [value]="nat">{{ nat }}</option>
+                    }
+                  </select>
+                  @if (getError(mother.get('user.nationality'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-heart field-icon"></i> MOTHER'S RELIGION <span class="text-danger d-inline">*</span>
+                  </label>
+                  <select class="form-select form-field" formControlName="religion">
+                    <option value="" disabled selected>Select religion</option>
+                    @for (r of religions; track r) {
+                      <option [value]="r">{{ r }}</option>
+                    }
+                  </select>
+                  @if (getError(mother.get('user.religion'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-calendar field-icon"></i> MOTHER'S DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                  </label>
+                  <div class="d-flex gap-2">
+                    <select class="form-select form-field" formControlName="birthDay">
+                      <option value="" disabled selected>Day</option>
+                      @for (d of days; track d) {
+                        <option [value]="d">{{ d }}</option>
+                      }
+                    </select>
+                    <select class="form-select form-field" formControlName="birthMonth">
+                      <option value="" disabled selected>Month</option>
+                      @for (m of months; track m) {
+                        <option [value]="m">{{ m }}</option>
+                      }
+                    </select>
+                    <select class="form-select form-field" formControlName="birthYear">
+                      <option value="" disabled selected>Year</option>
+                      @for (y of years; track y) {
+                        <option [value]="y">{{ y }}</option>
+                      }
+                    </select>
+                  </div>
+                  @if ((getError(mother.get('user.birthDay'), 'required') || getError(mother.get('user.birthMonth'), 'required') || getError(mother.get('user.birthYear'), 'required'))) {
+                    <small class="text-danger">Date of birth is required</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-credit-card field-icon"></i> MOTHER'S NATIONAL ID <span class="text-danger d-inline">*</span>
+                  </label>
+                  <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
+                    formControlName="nationalNumber">
+                  @if (getError(mother.get('user.nationalNumber'), 'required')) {
+                    <small class="text-danger">This field is required</small>
+                  }
+                  @if (getError(mother.get('user.nationalNumber'), 'minlength') || getError(mother.get('user.nationalNumber'), 'maxlength')) {
+                    <small class="text-danger">Must be exactly 14 digits</small>
+                  }
+                </div>
+                <div class="mb-3">
+                  <label class="form-label field-label">
+                    <i class="bi bi-telephone field-icon"></i> MOTHER'S PHONE NUMBER <span class="text-danger d-inline">*</span>
+                  </label>
+                  <div formArrayName="phoneNumbers">
+                    @for (ctrl of motherPhoneNumbers.controls; track $index; let i = $index) {
+                      <div class="d-flex gap-2 mb-2">
+                        <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
+                          [formControlName]="i"
+                          (input)="formatPhoneInput($event, motherPhoneNumbers.at(i))">
+                        @if (motherPhoneNumbers.length > 1) {
+                          <button type="button" class="btn btn-outline-danger btn-sm px-2" (click)="removePhoneNumber('mother', i)">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('mother')">
+                    <i class="bi bi-plus-circle"></i> Add another number
+                  </button>
+                  @if (getError(motherPhoneNumbers.at(0), 'pattern')) {
+                    <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== SECTION 3: Additional Information ===================== -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header section-header additional-header d-flex align-items-center gap-3 border-0">
+          <div class="section-icon additional-icon">
+            <i class="bi bi-person-gear"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold section-title">Additional Information</h5>
+            <small class="section-subtitle">Demographic and classification data</small>
+          </div>
+        </div>
+        <div class="card-body" [formGroup]="form">
+          <div class="row g-3">
+            <!-- Gender -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-people field-icon"></i> GENDER <span class="text-danger d-inline">*</span>
+                </label>
+                <select class="form-select form-field" formControlName="gender">
+                  <option value="" disabled selected>Select gender</option>
+                  @for (g of genders; track g.value) {
+                    <option [value]="g.value">{{ g.label }}</option>
+                  }
+                </select>
+                @if (getError(studentUser.get('gender'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Religion -->
+            <div class="col-md-6">
+              <div formGroupName="studentUser">
+                <label class="form-label field-label">
+                  <i class="bi bi-heart field-icon"></i> RELIGION <span class="text-danger d-inline">*</span>
+                </label>
+                <select class="form-select form-field" formControlName="religion">
+                  <option value="" disabled selected>Select religion</option>
+                  @for (r of religions; track r) {
+                    <option [value]="r">{{ r }}</option>
+                  }
+                </select>
+                @if (getError(studentUser.get('religion'), 'required')) {
+                  <small class="text-danger">This field is required</small>
+                }
+              </div>
+            </div>
+
+            <!-- Guardian Type -->
+            <div class="col-md-6">
+              <label class="form-label field-label">
+                <i class="bi bi-shield-lock field-icon"></i> GUARDIAN <span class="text-danger d-inline">*</span>
+              </label>
+              <select class="form-select form-field" formControlName="guardianType">
+                @for (gt of guardianTypes; track gt) {
+                  <option [value]="gt">{{ gt }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Guardian Details (shown when OTHER) -->
+          @if (showGuardian) {
+            <hr class="my-4">
+            <h6 class="parent-label mb-3">
+              <i class="bi bi-person-fill"></i> GUARDIAN DETAILS
+            </h6>
+            <div formGroupName="guardian">
+              <div formGroupName="user">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-person field-icon"></i> GUARDIAN'S FIRST NAME <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="First name"
+                      formControlName="firstName">
+                    @if (getError(guardian.get('user.firstName'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-person field-icon"></i> GUARDIAN'S LAST NAME <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="Last name"
+                      formControlName="lastName">
+                    @if (getError(guardian.get('user.lastName'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-person field-icon"></i> GUARDIAN'S NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="الاسم بالعربي"
+                      formControlName="firstNameInArabic">
+                    @if (getError(guardian.get('user.firstNameInArabic'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-person field-icon"></i> GUARDIAN'S LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="اللقب بالعربي"
+                      formControlName="lastNameInArabic">
+                    @if (getError(guardian.get('user.lastNameInArabic'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-people field-icon"></i> GUARDIAN'S GENDER <span class="text-danger d-inline">*</span>
+                    </label>
+                    <select class="form-select form-field" formControlName="gender">
+                      <option value="" disabled selected>Select gender</option>
+                      @for (g of genders; track g.value) {
+                        <option [value]="g.value">{{ g.label }}</option>
+                      }
+                    </select>
+                    @if (getError(guardian.get('user.gender'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-envelope field-icon"></i> GUARDIAN'S EMAIL <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="email" class="form-control form-field" placeholder="email@example.com"
+                      formControlName="email">
+                    @if (getError(guardian.get('user.email'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                    @if (getError(guardian.get('user.email'), 'email')) {
+                      <small class="text-danger">Please enter a valid email</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-building field-icon"></i> GUARDIAN'S OCCUPATION <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="Occupation"
+                      [formControl]="guardianJobName">
+                    @if (getError(guardian.get('jobName'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-geo-alt field-icon"></i> GUARDIAN'S ADDRESS <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="Full address"
+                      formControlName="address">
+                    @if (getError(guardian.get('user.address'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-globe field-icon"></i> GUARDIAN'S NATIONALITY <span class="text-danger d-inline">*</span>
+                    </label>
+                    <select class="form-select form-field" formControlName="nationality">
+                      <option value="" disabled selected>Select nationality</option>
+                      @for (nat of nationalities; track nat) {
+                        <option [value]="nat">{{ nat }}</option>
+                      }
+                    </select>
+                    @if (getError(guardian.get('user.nationality'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-heart field-icon"></i> GUARDIAN'S RELIGION <span class="text-danger d-inline">*</span>
+                    </label>
+                    <select class="form-select form-field" formControlName="religion">
+                      <option value="" disabled selected>Select religion</option>
+                      @for (r of religions; track r) {
+                        <option [value]="r">{{ r }}</option>
+                      }
+                    </select>
+                    @if (getError(guardian.get('user.religion'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-calendar field-icon"></i> GUARDIAN'S DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                    </label>
+                    <div class="d-flex gap-2">
+                      <select class="form-select form-field" formControlName="birthDay">
+                        <option value="" disabled selected>Day</option>
+                        @for (d of days; track d) {
+                          <option [value]="d">{{ d }}</option>
+                        }
+                      </select>
+                      <select class="form-select form-field" formControlName="birthMonth">
+                        <option value="" disabled selected>Month</option>
+                        @for (m of months; track m) {
+                          <option [value]="m">{{ m }}</option>
+                        }
+                      </select>
+                      <select class="form-select form-field" formControlName="birthYear">
+                        <option value="" disabled selected>Year</option>
+                        @for (y of years; track y) {
+                          <option [value]="y">{{ y }}</option>
+                        }
+                      </select>
+                    </div>
+                    @if ((getError(guardian.get('user.birthDay'), 'required') || getError(guardian.get('user.birthMonth'), 'required') || getError(guardian.get('user.birthYear'), 'required'))) {
+                      <small class="text-danger">Date of birth is required</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-credit-card field-icon"></i> GUARDIAN'S NATIONAL ID <span class="text-danger d-inline">*</span>
+                    </label>
+                    <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
+                      formControlName="nationalNumber">
+                    @if (getError(guardian.get('user.nationalNumber'), 'required')) {
+                      <small class="text-danger">This field is required</small>
+                    }
+                    @if (getError(guardian.get('user.nationalNumber'), 'minlength') || getError(guardian.get('user.nationalNumber'), 'maxlength')) {
+                      <small class="text-danger">Must be exactly 14 digits</small>
+                    }
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-telephone field-icon"></i> GUARDIAN'S PHONE NUMBER <span class="text-danger d-inline">*</span>
+                    </label>
+                    <div formArrayName="phoneNumbers">
+                      @for (ctrl of guardianPhoneNumbers.controls; track $index; let i = $index) {
+                        <div class="d-flex gap-2 mb-2">
+                          <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
+                            [formControlName]="i"
+                            (input)="formatPhoneInput($event, guardianPhoneNumbers.at(i))">
+                          @if (guardianPhoneNumbers.length > 1) {
+                            <button type="button" class="btn btn-outline-danger btn-sm px-2" (click)="removePhoneNumber('guardian', i)">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('guardian')">
+                      <i class="bi bi-plus-circle"></i> Add another number
+                    </button>
+                    @if (getError(guardianPhoneNumbers.at(0), 'pattern')) {
+                      <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- ===================== SECTION 4: Medical Information ===================== -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header section-header medical-header d-flex align-items-center gap-3 border-0">
+          <div class="section-icon medical-icon">
+            <i class="bi bi-heart-pulse-fill"></i>
+          </div>
+          <div>
+            <h5 class="mb-0 fw-bold section-title">Medical Information</h5>
+            <small class="section-subtitle">Optional health and medical notes</small>
+          </div>
+        </div>
+        <div class="card-body" [formGroup]="form">
+          <div class="row g-3">
+            <div class="col-12">
+              <div formGroupName="student">
+                <label class="form-label field-label">
+                  <i class="bi bi-heart field-icon"></i> HEALTH STATUS
+                </label>
+                <textarea class="form-control form-field" rows="4" formControlName="medicalHistoryText"
+                  placeholder="Describe any chronic conditions, allergies, disabilities, or relevant medical notes..."></textarea>
+                <small class="field-hint">Optional — separate multiple conditions with commas (e.g. "Diabetes, Asthma")</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== Footer Buttons ===================== -->
+      <div class="d-flex justify-content-end gap-3 mb-4">
+        <button type="button" class="btn btn-outline-secondary px-4 py-2 fw-semibold" (click)="cancel()">
+          <i class="bi bi-x-lg me-1"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+          <i class="bi bi-floppy me-1"></i> Save Student
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Page footer -->
+    <footer class="d-flex justify-content-between align-items-center mt-4 px-1 small text-muted flex-wrap gap-2">
+      <span>NTG School - Student Affairs System &copy; 2026</span>
+    </footer>
+  </main>
+</div>

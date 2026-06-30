@@ -26,6 +26,9 @@
 
             <input type="password" placeholder="Enter Your Password" formControlName="password">
             @if (loginForm.controls.password.invalid && loginForm.controls.password.touched ) {
+            @if(loginForm.controls.password.hasError("minLength")){
+            <p class="err">The password must be 6 charachters</p>
+            }
             @if(loginForm.controls.password.hasError("required")){
             <p class="err">The password field is required</p>
             }

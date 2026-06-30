@@ -2,6 +2,7 @@ package com.ntg.sms.Exceptions;
 
 import com.ntg.sms.Entities.Dtos.Response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -45,6 +46,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
         log.warn("Conflict: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
+        return build(HttpStatus.CONFLICT, "Conflict",
+                "Request conflicts with existing data or violates a database constraint.", null);
     }
 
     @ExceptionHandler(ForbiddenException.class)

@@ -1,26 +1,24 @@
 package com.ntg.sms.Entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "GRADE")
 public class Grade {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "GRADE_ID", nullable = false)
     private Long id;
 
@@ -36,6 +34,9 @@ public class Grade {
             inverseJoinColumns = @JoinColumn(name = "TERM_ID")
     )
     private Set<Term> terms = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "grade")
+    private Set<Class> classes = new HashSet<>();
 
 
 }

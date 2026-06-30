@@ -35,6 +35,20 @@ public class Student {
     @Column(name = "PLACE_OF_BIRTH", length = 90)
     private String placeOfBirth;
 
+
+    @ManyToOne
+    @JoinColumn(name = "CLASS_ID")
+    private Class studentClass;
+
+    public enum MartialParentsStatus{
+        MARRIED,
+        DIVORCED
+    }
+
+    @Column(name = "MARTIAL_PARENT_STATUS", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MartialParentsStatus martialParentsStatus;
+
     @ManyToMany
     @JoinTable(
             name = "STUDENT_IN_A_TEAM",
@@ -42,6 +56,7 @@ public class Student {
             inverseJoinColumns = @JoinColumn(name = "TEAM_ID")
     )
     private Set<Team> teams = new LinkedHashSet<>();
+
 
 
 }

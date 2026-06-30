@@ -3,12 +3,14 @@ package com.ntg.sms.Entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "CLASS")
 public class Class {
     @Id
@@ -16,9 +18,8 @@ public class Class {
     @Column(name = "CLASS_ID", nullable = false)
     private Long id;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "GRADE_ID", nullable = false)
+    @JoinColumn(name = "GRADE_ID")
     private Grade grade;
 
     @Size(max = 255)

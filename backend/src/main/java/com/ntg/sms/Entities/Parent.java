@@ -12,6 +12,7 @@ import lombok.Setter;
 @Table(name = "PARENT")
 public class Parent {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PARENT_ID", nullable = false)
     private Long id;
 

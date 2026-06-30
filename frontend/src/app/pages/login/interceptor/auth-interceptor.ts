@@ -7,7 +7,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
   const token = localStorage.getItem('token');
 
-  // Don't attach token if it doesn't exist
   if (!token) {
     
     return next(req);
@@ -18,6 +17,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       Authorization: `Bearer ${token}`
     }
   });
+  console.log(clonedRequest);
+  
 
   return next(clonedRequest);
 };

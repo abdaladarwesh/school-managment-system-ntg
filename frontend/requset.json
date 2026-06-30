@@ -1,0 +1,67 @@
+{
+    "studentUser": {
+        "firstName": "string",
+        "lastName": "string",
+        "email": "email@email.com",
+        "address": "string",
+        "firstNameInArabic": "string",
+        "lastNameInArabic": "string",
+        "gender": "M",
+        "nationality": "string",
+        "birthDate": "2026-06-30",
+        "religion": "string",
+        "nationalNumber": 0,
+        "phoneNumbers": [
+            0
+        ]
+    },
+    "student": {
+        "governorate": "string",
+        "academicScoreInMiddleSchool": 0,
+        "placeOfBirth": "string",
+        "medicalHistory" : [
+            "Diabetes"
+        ],
+        "martialParentsStatus": "MARRIED"
+    },
+    "father": {
+        "user": {
+            "firstName": "string",
+            "lastName": "string",
+            "email": "email1@email.com",
+            "address": "string",
+            "firstNameInArabic": "string",
+            "lastNameInArabic": "string",
+            "gender": "M",
+            "nationality": "string",
+            "birthDate": "2026-06-30",
+            "religion": "string",
+            "nationalNumber": 1,
+            "phoneNumbers": [
+                0
+            ]
+        },
+        "jobName": "string"
+    },
+    "mother": {
+        "user": {
+            "firstName": "string",
+            "lastName": "string",
+            "email": "email2@email.com",
+            "address": "string",
+            "firstNameInArabic": "string",
+            "lastNameInArabic": "string",
+            "gender": "F",
+            "nationality": "string",
+            "birthDate": "2026-06-30",
+            "religion": "string",
+            "nationalNumber": 2,
+            "phoneNumbers": [
+                0
+            ]
+        },
+        "jobName": "string"
+    },
+    "guardianType": "FATHER",
+    "guardian": null
+}

@@ -1,0 +1,65 @@
+<div class="card">
+
+    <h2>{{ title }}</h2>
+
+    <p class="subtitle">
+        {{ subtitle }}
+    </p>
+
+    @for(item of data; track item.name){
+
+        <div class="row">
+
+            <span class="label">
+                {{ item.name }}
+            </span>
+
+            <div class="bar">
+
+                <div
+                    class="fill"
+                    [style.width.%]="percentage(item.value)"
+                    [style.background]="item.color || '#8f0f0f'">
+                </div>
+
+            </div>
+
+            <span class="value">
+                {{ item.value }}d
+            </span>
+
+        </div>
+
+    }
+
+    <hr>
+
+    <div class="footer">
+
+        <div>
+
+            <div class="footer-label">
+                School Average
+            </div>
+
+            <div class="average">
+                {{ schoolAverage }} days
+            </div>
+
+        </div>
+
+        <div class="best">
+
+            <div class="footer-label">
+                Best Class
+            </div>
+
+            <div class="best-value">
+                {{ bestClass }} - {{ bestValue }}d
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

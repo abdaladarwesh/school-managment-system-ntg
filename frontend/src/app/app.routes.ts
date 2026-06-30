@@ -5,9 +5,13 @@ import { DashboardLayout } from './layouts/dashboard-layout/dashboard-layout';
 
 export const routes: Routes = [
   {
-    path: 'login',
+    path: '',
     component: AuthLayout,
     children: [
+        {
+            path: "login",
+            component:Login
+        },
         {
             path: "",
             component:Login
@@ -21,6 +25,14 @@ export const routes: Routes = [
         {
             path: "dashboard",
             loadComponent: () => import("../app/pages/dashboard/dashboard").then(c => c.Dashboard)
+        },
+        {
+          path:"students",
+          loadComponent: () => import("../app/pages/student-page/student-page").then(c => c.StudentPage)
+        },
+        {
+          path:"students/add",
+          loadComponent: () => import("../app/pages/add-student/add-student").then(c => c.AddStudent)
         }
     ]
   }
