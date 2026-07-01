@@ -58,14 +58,29 @@ interface UserResponse {
   birthDate: Date;
   religion: string;
   nationalNumber: number;
+  phoneNumbers: number[];
 }
 
-interface StudentResponse {
+interface ParentResponse {
+  id: number;
+  user: UserResponse;
+  jobName: string;
+}
+
+export interface StudentDetailResponse {
+  parentsResponse: ParentResponse[];
+  medicalHistories: string[];
+  studentResponse: StudentResponse;
+}
+
+export interface StudentResponse {
   id: number;
   user: UserResponse;
   governorate: string;
   academicScoreInMiddleSchool: number;
   placeOfBirth: string;
+  martialParentsStatus: string;
+  medicalHistory: string[];
   studentClass: {
     id: number;
     grade: {
@@ -80,7 +95,7 @@ interface StudentResponse {
     };
     name: string;
     capacity: number;
-  };
+  } | null;
 }
 
 @Injectable({
@@ -89,9 +104,14 @@ interface StudentResponse {
 export class StudentService {
   private http = inject(HttpClient);
   private url = 'http://localhost:8080/api/v1/student';
+  private draftPrefix = 'student-edit-draft:';
 
   getAllStudents(): Observable<StudentResponse[]> {
     return this.http.get<StudentResponse[]>(this.url);
+  }
+
+  getStudentById(id: number): Observable<StudentDetailResponse> {
+    return this.http.get<StudentDetailResponse>(`${this.url}/${id}`);
   }
 
   toStudent(student: StudentResponse): Student {
@@ -116,5 +136,32 @@ export class StudentService {
 
   createStudent(data: CreateStudentRequest): Observable<any> {
     return this.http.post(this.url, data);
+  }
+
+  updateStudent(id: number, data: CreateStudentRequest): Observable<StudentDetailResponse> {
+    return this.http.put<StudentDetailResponse>(`${this.url}/${id}`, data);
+}
+
+  getStudentDraft(id: number): Partial<CreateStudentRequest> | null {
+    const raw = localStorage.getItem(`${this.draftPrefix}${id}`);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as Partial<CreateStudentRequest>;
+    } catch {
+      return null;
+    }
+  }
+
+  saveStudentDraft(id: number, data: Partial<CreateStudentRequest>): void {
+    localStorage.setItem(`${this.draftPrefix}${id}`, JSON.stringify(data));
+  }
+
+  clearStudentDraft(id: number): void {
+    localStorage.removeItem(`${this.draftPrefix}${id}`);
+  }
+
+  deleteStudent(studentId : number): Observable<any>{
+    return this.http.delete(`${this.url}/${studentId}`);
+
   }
 }

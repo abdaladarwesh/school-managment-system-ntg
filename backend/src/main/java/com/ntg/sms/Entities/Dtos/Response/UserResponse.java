@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO for {@link com.ntg.sms.Entities.User}
@@ -32,4 +33,5 @@ public class UserResponse {
     LocalDate birthDate;
     String religion;
     Long nationalNumber;
+    List<Long> phoneNumbers;
 }

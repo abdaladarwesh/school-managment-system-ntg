@@ -6,6 +6,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req)
   }
   const token = localStorage.getItem('token');
+  console.log(req);
+  
 
   if (!token) {
     
@@ -17,7 +19,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       Authorization: `Bearer ${token}`
     }
   });
-  console.log(clonedRequest);
   
 
   return next(clonedRequest);

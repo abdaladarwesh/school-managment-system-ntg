@@ -40,7 +40,7 @@ public class DataSeeder implements CommandLineRunner {
             return roleRepository.save(role);
         });
 
-        if (userRepository.findByFirstName("Abdullah").isEmpty()) {
+        if (userRepository.findByFirstName("Ahmed").isEmpty()) {
             User admin = User.builder()
 //                    .firstName("Abdullah")
 //                    .lastName("Mohammed")
@@ -59,7 +59,7 @@ public class DataSeeder implements CommandLineRunner {
 //                    .nationalNumber(30911150101074L)
                     .firstName("Ahmed")
                     .lastName("Ali")
-                    .email("ahmed@student.com")
+                    .email("abdaladarwesh@gmail.com")
                     .address("Nasr City, Cairo")
                     .firstNameInArabic("أحمد")
                     .lastNameInArabic("علي")

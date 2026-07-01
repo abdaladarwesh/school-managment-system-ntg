@@ -126,6 +126,15 @@ border-radius:10px ;
 /* .b .btn{
   box-shadow: 0 0 8px black;
 } */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.clickable-row:hover {
+  background-color: #eef3fb;
+}
+
 @media (max-width: 900px) {
   .sidebar {
     display: none;

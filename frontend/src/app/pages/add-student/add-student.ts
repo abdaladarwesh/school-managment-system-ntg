@@ -7,10 +7,14 @@ import {
   FormArray,
   Validators,
   AbstractControl,
-  ValidationErrors,
 } from '@angular/forms';
-import { Router } from '@angular/router';
-import { StudentService, CreateStudentRequest, UserPayload } from '../student-page/service/student-service';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  StudentService,
+  CreateStudentRequest,
+  UserPayload,
+  StudentDetailResponse,
+} from '../student-page/service/student-service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -21,7 +25,10 @@ import Swal from 'sweetalert2';
 })
 export class AddStudent implements OnInit {
   private studentService = inject(StudentService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private editStudentId: number | null = null;
+  isEditMode = false;
 
   form = new FormGroup({
     studentUser: new FormGroup({
@@ -35,8 +42,14 @@ export class AddStudent implements OnInit {
       nationality: new FormControl('', Validators.required),
       birthDate: new FormControl(''),
       religion: new FormControl('', Validators.required),
-      nationalNumber: new FormControl('', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]),
-      phoneNumbers: new FormArray<FormControl>([new FormControl('', [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)])]),
+      nationalNumber: new FormControl('', [
+        Validators.required,
+        Validators.minLength(14),
+        Validators.maxLength(14),
+      ]),
+      phoneNumbers: new FormArray<FormControl>([
+        new FormControl('', [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)]),
+      ]),
       birthDay: new FormControl('', Validators.required),
       birthMonth: new FormControl('', Validators.required),
       birthYear: new FormControl('', Validators.required),
@@ -60,8 +73,14 @@ export class AddStudent implements OnInit {
         nationality: new FormControl('', Validators.required),
         birthDate: new FormControl(''),
         religion: new FormControl('', Validators.required),
-        nationalNumber: new FormControl('', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]),
-        phoneNumbers: new FormArray<FormControl>([new FormControl('', [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)])]),
+        nationalNumber: new FormControl('', [
+          Validators.required,
+          Validators.minLength(14),
+          Validators.maxLength(14),
+        ]),
+        phoneNumbers: new FormArray<FormControl>([
+          new FormControl('', [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)]),
+        ]),
         birthDay: new FormControl('', Validators.required),
         birthMonth: new FormControl('', Validators.required),
         birthYear: new FormControl('', Validators.required),
@@ -80,8 +99,14 @@ export class AddStudent implements OnInit {
         nationality: new FormControl('', Validators.required),
         birthDate: new FormControl(''),
         religion: new FormControl('', Validators.required),
-        nationalNumber: new FormControl('', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]),
-        phoneNumbers: new FormArray<FormControl>([new FormControl('', [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)])]),
+        nationalNumber: new FormControl('', [
+          Validators.required,
+          Validators.minLength(14),
+          Validators.maxLength(14),
+        ]),
+        phoneNumbers: new FormArray<FormControl>([
+          new FormControl('', [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)]),
+        ]),
         birthDay: new FormControl('', Validators.required),
         birthMonth: new FormControl('', Validators.required),
         birthYear: new FormControl('', Validators.required),
@@ -125,54 +150,333 @@ export class AddStudent implements OnInit {
   guardianTypes = ['FATHER', 'MOTHER', 'OTHER'];
 
   governorates = [
-    'Cairo', 'Alexandria', 'Giza', 'Qalyubia', 'Sharqia', 'Gharbia',
-    'Monufia', 'Beheira', 'Kafr El Sheikh', 'Dakahlia', 'Damietta',
-    'Port Said', 'Ismailia', 'Suez', 'North Sinai', 'South Sinai',
-    'Beni Suef', 'Fayoum', 'Minya', 'Asyut', 'Sohag', 'Qena',
-    'Luxor', 'Aswan', 'Red Sea', 'New Valley', 'Matrouh',
+    'Cairo',
+    'Alexandria',
+    'Giza',
+    'Qalyubia',
+    'Sharqia',
+    'Gharbia',
+    'Monufia',
+    'Beheira',
+    'Kafr El Sheikh',
+    'Dakahlia',
+    'Damietta',
+    'Port Said',
+    'Ismailia',
+    'Suez',
+    'North Sinai',
+    'South Sinai',
+    'Beni Suef',
+    'Fayoum',
+    'Minya',
+    'Asyut',
+    'Sohag',
+    'Qena',
+    'Luxor',
+    'Aswan',
+    'Red Sea',
+    'New Valley',
+    'Matrouh',
   ];
 
   nationalities = [
-    'Egyptian', 'American', 'British', 'French', 'German', 'Saudi',
-    'Emirati', 'Kuwaiti', 'Jordanian', 'Palestinian', 'Iraqi', 'Syrian',
-    'Lebanese', 'Libyan', 'Sudanese', 'Moroccan', 'Tunisian', 'Algerian',
-    'Turkish', 'Indian', 'Pakistani', 'Filipino', 'Other',
+    'Egyptian',
+    'American',
+    'British',
+    'French',
+    'German',
+    'Saudi',
+    'Emirati',
+    'Kuwaiti',
+    'Jordanian',
+    'Palestinian',
+    'Iraqi',
+    'Syrian',
+    'Lebanese',
+    'Libyan',
+    'Sudanese',
+    'Moroccan',
+    'Tunisian',
+    'Algerian',
+    'Turkish',
+    'Indian',
+    'Pakistani',
+    'Filipino',
+    'Other',
   ];
 
-  get studentUser() { return this.form.get('studentUser') as FormGroup; }
-  get student() { return this.form.get('student') as FormGroup; }
-  get father() { return this.form.get('father') as FormGroup; }
-  get mother() { return this.form.get('mother') as FormGroup; }
-  get guardian() { return this.form.get('guardian') as FormGroup; }
-  get guardianType() { return this.form.get('guardianType') as FormControl; }
-  get fatherJobName() { return this.father.get('jobName') as FormControl; }
-  get motherJobName() { return this.mother.get('jobName') as FormControl; }
-  get guardianJobName() { return this.guardian.get('jobName') as FormControl; }
+  get studentUser() {
+    return this.form.get('studentUser') as FormGroup;
+  }
+  get student() {
+    return this.form.get('student') as FormGroup;
+  }
+  get father() {
+    return this.form.get('father') as FormGroup;
+  }
+  get mother() {
+    return this.form.get('mother') as FormGroup;
+  }
+  get guardian() {
+    return this.form.get('guardian') as FormGroup;
+  }
+  get guardianType() {
+    return this.form.get('guardianType') as FormControl;
+  }
+  get fatherJobName() {
+    return this.father.get('jobName') as FormControl;
+  }
+  get motherJobName() {
+    return this.mother.get('jobName') as FormControl;
+  }
+  get guardianJobName() {
+    return this.guardian.get('jobName') as FormControl;
+  }
 
-  get studentPhoneNumbers() { return this.studentUser.get('phoneNumbers') as FormArray; }
-  get fatherPhoneNumbers() { return (this.father.get('user') as FormGroup).get('phoneNumbers') as FormArray; }
-  get motherPhoneNumbers() { return (this.mother.get('user') as FormGroup).get('phoneNumbers') as FormArray; }
-  get guardianPhoneNumbers() { return (this.guardian.get('user') as FormGroup).get('phoneNumbers') as FormArray; }
+  get studentPhoneNumbers() {
+    return this.studentUser.get('phoneNumbers') as FormArray;
+  }
+  get fatherPhoneNumbers() {
+    return (this.father.get('user') as FormGroup).get('phoneNumbers') as FormArray;
+  }
+  get motherPhoneNumbers() {
+    return (this.mother.get('user') as FormGroup).get('phoneNumbers') as FormArray;
+  }
+  get guardianPhoneNumbers() {
+    return (this.guardian.get('user') as FormGroup).get('phoneNumbers') as FormArray;
+  }
 
   get showGuardian(): boolean {
     return this.guardianType.value === 'OTHER';
   }
 
   ngOnInit(): void {
+    const idParam = Number(this.route.snapshot.paramMap.get('id'));
+    if (idParam) {
+      this.isEditMode = true;
+      this.editStudentId = idParam;
+      this.loadEditData(idParam);
+    }
+
     this.form.get('guardianType')?.valueChanges.subscribe((type) => {
       this.toggleGuardianValidators(type);
     });
     this.toggleGuardianValidators(this.guardianType.value);
   }
 
+  private loadEditData(id: number) {
+    this.studentService.getStudentById(id).subscribe({
+      next: (data) => this.patchFormFromDetail(data, id),
+      error: () => {
+        Swal.fire({
+          title: 'Error',
+          text: 'Could not load the student data for editing.',
+          icon: 'error',
+          confirmButtonText: 'Back',
+        }).then(() => this.router.navigate(['/students', id]));
+      },
+    });
+  }
+
+  private patchFormFromDetail(data: StudentDetailResponse, id: number) {
+    const student = data.studentResponse;
+    const studentUser = student.user;
+    const father = data.parentsResponse.find((parent) => parent.user.gender === 'M');
+    const mother = data.parentsResponse.find((parent) => parent.user.gender === 'F');
+    const draft = this.studentService.getStudentDraft(id);
+    const draftAny = draft as any;
+    const merged = draft ? this.mergeDraftIntoDetail(data, draft) : null;
+
+    this.studentUser.patchValue({
+      firstName: merged?.studentUser?.firstName ?? studentUser.firstName,
+      lastName: merged?.studentUser?.lastName ?? studentUser.lastName,
+      email: merged?.studentUser?.email ?? studentUser.email,
+      address: merged?.studentUser?.address ?? studentUser.address,
+      firstNameInArabic: merged?.studentUser?.firstNameInArabic ?? studentUser.firstNameInArabic,
+      lastNameInArabic: merged?.studentUser?.lastNameInArabic ?? studentUser.lastNameInArabic,
+      gender: merged?.studentUser?.gender ?? studentUser.gender,
+      nationality: merged?.studentUser?.nationality ?? studentUser.nationality,
+      birthDay: draftAny?.studentUser?.birthDay ?? this.extractDay(studentUser.birthDate),
+      birthMonth: draftAny?.studentUser?.birthMonth ?? this.extractMonth(studentUser.birthDate),
+      birthYear: draftAny?.studentUser?.birthYear ?? this.extractYear(studentUser.birthDate),
+      nationalNumber: merged?.studentUser?.nationalNumber ?? String(studentUser.nationalNumber),
+    });
+
+    this.replacePhoneNumbers(
+      this.studentPhoneNumbers,
+      merged?.studentUser?.phoneNumbers ?? studentUser.phoneNumbers.map((phone) => String(phone)),
+    );
+
+    this.student.patchValue({
+      governorate: merged?.student?.governorate ?? student.governorate,
+      academicScoreInMiddleSchool:
+        merged?.student?.academicScoreInMiddleSchool ?? String(student.academicScoreInMiddleSchool),
+      placeOfBirth: merged?.student?.placeOfBirth ?? student.placeOfBirth,
+      medicalHistoryText: Array.isArray(draftAny?.student?.medicalHistory)
+        ? draftAny.student.medicalHistory.join(', ')
+        : data.medicalHistories.join(', '),
+      martialParentsStatus: merged?.student?.martialParentsStatus ?? student.martialParentsStatus,
+    });
+
+    if (father) {
+      this.patchParentGroup(
+        this.father,
+        father.user,
+        father.jobName,
+        draftAny?.father ?? merged?.father,
+      );
+    }
+
+    if (mother) {
+      this.patchParentGroup(
+        this.mother,
+        mother.user,
+        mother.jobName,
+        draftAny?.mother ?? merged?.mother,
+      );
+    }
+
+    const guardian = draftAny?.guardian ?? merged?.guardian;
+    if (guardian?.user?.firstName || guardian?.jobName) {
+      this.guardianType.setValue('OTHER');
+      this.patchParentGroup(this.guardian, guardian.user as any, guardian.jobName || '', guardian);
+      this.toggleGuardianValidators('OTHER');
+    } else if (merged?.guardianType) {
+      this.guardianType.setValue(merged.guardianType);
+      this.toggleGuardianValidators(merged.guardianType);
+    } else if (data.parentsResponse.length > 0) {
+      this.guardianType.setValue(data.parentsResponse[0].user.gender === 'M' ? 'FATHER' : 'MOTHER');
+      this.toggleGuardianValidators(this.guardianType.value);
+    }
+  }
+
+  private mergeDraftIntoDetail(
+    data: StudentDetailResponse,
+    draft: Partial<CreateStudentRequest>,
+  ): Partial<CreateStudentRequest> {
+    const draftAny = draft as any;
+    return {
+      studentUser: {
+        ...this.buildDetailUserPayload(data.studentResponse.user),
+        ...(draftAny.studentUser ?? {}),
+      } as UserPayload,
+      student: {
+        governorate: data.studentResponse.governorate,
+        academicScoreInMiddleSchool: data.studentResponse.academicScoreInMiddleSchool,
+        placeOfBirth: data.studentResponse.placeOfBirth,
+        medicalHistory: data.medicalHistories,
+        martialParentsStatus: data.studentResponse.martialParentsStatus,
+        ...(draftAny.student ?? {}),
+      },
+      father: {
+        user: data.parentsResponse.find((parent) => parent.user.gender === 'M')
+          ? this.buildDetailUserPayload(
+              data.parentsResponse.find((parent) => parent.user.gender === 'M')!.user,
+            )
+          : (undefined as any),
+        jobName: data.parentsResponse.find((parent) => parent.user.gender === 'M')?.jobName || '',
+        ...(draftAny.father ?? {}),
+      },
+      mother: {
+        user: data.parentsResponse.find((parent) => parent.user.gender === 'F')
+          ? this.buildDetailUserPayload(
+              data.parentsResponse.find((parent) => parent.user.gender === 'F')!.user,
+            )
+          : (undefined as any),
+        jobName: data.parentsResponse.find((parent) => parent.user.gender === 'F')?.jobName || '',
+        ...(draftAny.mother ?? {}),
+      },
+      guardianType: draftAny.guardianType,
+      guardian: draftAny.guardian ?? null,
+    };
+  }
+
+  private buildDetailUserPayload(
+    user: StudentDetailResponse['studentResponse']['user'],
+  ): UserPayload {
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      address: user.address,
+      firstNameInArabic: user.firstNameInArabic,
+      lastNameInArabic: user.lastNameInArabic,
+      gender: user.gender,
+      nationality: user.nationality,
+      birthDate: this.formatBirthDate(user.birthDate),
+      religion: user.religion,
+      nationalNumber: user.nationalNumber,
+      phoneNumbers: user.phoneNumbers,
+    };
+  }
+
+  private patchParentGroup(
+    group: FormGroup,
+    user: StudentDetailResponse['studentResponse']['user'],
+    jobName: string,
+    draft?: any,
+  ) {
+    const userGroup = group.get('user') as FormGroup;
+    userGroup.patchValue({
+      firstName: draft?.user?.firstName ?? user.firstName,
+      lastName: draft?.user?.lastName ?? user.lastName,
+      email: draft?.user?.email ?? user.email,
+      address: draft?.user?.address ?? user.address,
+      firstNameInArabic: draft?.user?.firstNameInArabic ?? user.firstNameInArabic,
+      lastNameInArabic: draft?.user?.lastNameInArabic ?? user.lastNameInArabic,
+      gender: draft?.user?.gender ?? user.gender,
+      nationality: draft?.user?.nationality ?? user.nationality,
+      birthDay: draft?.user?.birthDay ?? this.extractDay(user.birthDate),
+      birthMonth: draft?.user?.birthMonth ?? this.extractMonth(user.birthDate),
+      birthYear: draft?.user?.birthYear ?? this.extractYear(user.birthDate),
+      nationalNumber: draft?.user?.nationalNumber ?? String(user.nationalNumber),
+    });
+    this.replacePhoneNumbers(
+      userGroup.get('phoneNumbers') as FormArray,
+      draft?.user?.phoneNumbers ?? user.phoneNumbers.map((phone: number) => String(phone)),
+    );
+    group.get('jobName')?.setValue(draft?.jobName ?? jobName);
+  }
+
+  private replacePhoneNumbers(array: FormArray, values: number[] | string[]) {
+    while (array.length) {
+      array.removeAt(0);
+    }
+    const nextValues = values.length ? values : [''];
+    nextValues.forEach((value) => {
+      array.push(
+        new FormControl(value, [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)]),
+      );
+    });
+  }
+
+  private extractDay(date: string | Date): string {
+    return String(new Date(date).getDate());
+  }
+
+  private extractMonth(date: string | Date): string {
+    return String(new Date(date).getMonth() + 1);
+  }
+
+  private extractYear(date: string | Date): string {
+    return String(new Date(date).getFullYear());
+  }
+
+  private formatBirthDate(date: string | Date): string {
+    const dt = new Date(date);
+    const year = dt.getFullYear();
+    const month = String(dt.getMonth() + 1).padStart(2, '0');
+    const day = String(dt.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private toggleGuardianValidators(type: string | null) {
     const guardianUser = this.guardian.get('user') as FormGroup;
-    const phoneArray = this.guardianPhoneNumbers;
     if (type === 'OTHER') {
-      Object.keys(guardianUser.controls).forEach(key => {
+      Object.keys(guardianUser.controls).forEach((key) => {
         const control = guardianUser.get(key);
         if (control instanceof FormArray) {
-          control.controls.forEach(c => {
+          control.controls.forEach((c) => {
             c.setValidators([Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)]);
             c.updateValueAndValidity();
           });
@@ -180,17 +484,22 @@ export class AddStudent implements OnInit {
         }
         if (key === 'birthDate') return;
         if (key === 'email') control?.setValidators([Validators.required, Validators.email]);
-        else if (key === 'nationalNumber') control?.setValidators([Validators.required, Validators.minLength(14), Validators.maxLength(14)]);
+        else if (key === 'nationalNumber')
+          control?.setValidators([
+            Validators.required,
+            Validators.minLength(14),
+            Validators.maxLength(14),
+          ]);
         else control?.setValidators(Validators.required);
         control?.updateValueAndValidity();
       });
       this.guardian.get('jobName')?.setValidators(Validators.required);
       this.guardian.get('jobName')?.updateValueAndValidity();
     } else {
-      Object.keys(guardianUser.controls).forEach(key => {
+      Object.keys(guardianUser.controls).forEach((key) => {
         const control = guardianUser.get(key);
         if (control instanceof FormArray) {
-          control.controls.forEach(c => {
+          control.controls.forEach((c) => {
             c.clearValidators();
             c.updateValueAndValidity();
           });
@@ -207,9 +516,10 @@ export class AddStudent implements OnInit {
   addPhoneNumber(type: 'student' | 'father' | 'mother' | 'guardian') {
     const arr = this.getPhoneArray(type);
     if (arr.length < 3) {
-      const validators = type === 'guardian' && this.guardianType.value !== 'OTHER'
-        ? []
-        : [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)];
+      const validators =
+        type === 'guardian' && this.guardianType.value !== 'OTHER'
+          ? []
+          : [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)];
       arr.push(new FormControl('', validators));
     }
   }
@@ -223,10 +533,14 @@ export class AddStudent implements OnInit {
 
   private getPhoneArray(type: 'student' | 'father' | 'mother' | 'guardian'): FormArray {
     switch (type) {
-      case 'student': return this.studentPhoneNumbers;
-      case 'father': return this.fatherPhoneNumbers;
-      case 'mother': return this.motherPhoneNumbers;
-      case 'guardian': return this.guardianPhoneNumbers;
+      case 'student':
+        return this.studentPhoneNumbers;
+      case 'father':
+        return this.fatherPhoneNumbers;
+      case 'mother':
+        return this.motherPhoneNumbers;
+      case 'guardian':
+        return this.guardianPhoneNumbers;
     }
   }
 
@@ -254,10 +568,12 @@ export class AddStudent implements OnInit {
   }
 
   private buildUserPayload(userGroup: FormGroup): UserPayload {
-    const phoneNumbers = (userGroup.get('phoneNumbers') as FormArray).controls.map(c => {
-      const raw = c.value || '';
-      return parseInt(raw, 10);
-    }).filter(n => !isNaN(n));
+    const phoneNumbers = (userGroup.get('phoneNumbers') as FormArray).controls
+      .map((c) => {
+        const raw = c.value || '';
+        return parseInt(raw, 10);
+      })
+      .filter((n) => !isNaN(n));
 
     return {
       firstName: userGroup.get('firstName')?.value || '',
@@ -289,14 +605,20 @@ export class AddStudent implements OnInit {
 
     const medicalText = this.form.get('student.medicalHistoryText')?.value || '';
     const medicalHistory = medicalText
-      ? medicalText.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
+      ? medicalText
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter((s: string) => s.length > 0)
       : [];
 
     const payload: CreateStudentRequest = {
       studentUser: this.buildUserPayload(this.studentUser),
       student: {
         governorate: this.student.get('governorate')?.value || '',
-        academicScoreInMiddleSchool: parseInt(this.student.get('academicScoreInMiddleSchool')?.value || '0', 10),
+        academicScoreInMiddleSchool: parseInt(
+          this.student.get('academicScoreInMiddleSchool')?.value || '0',
+          10,
+        ),
         placeOfBirth: this.student.get('placeOfBirth')?.value || '',
         medicalHistory,
         martialParentsStatus: this.student.get('martialParentsStatus')?.value || '',
@@ -318,6 +640,40 @@ export class AddStudent implements OnInit {
         user: this.buildUserPayload(this.guardian.get('user') as FormGroup),
         jobName: this.guardian.get('jobName')?.value || '',
       };
+    }
+
+    if (this.isEditMode && this.editStudentId) {
+      this.studentService.updateStudent(this.editStudentId, payload).subscribe({
+        next: () => {
+          this.studentService.clearStudentDraft(this.editStudentId!);
+          Swal.fire({
+            title: 'Updated!',
+            text: 'Student information has been updated successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+          }).then(() => {
+            this.router.navigate(['/students', this.editStudentId]);
+          });
+        },
+        error: (err) => {
+          if (err.status === 401) {
+            Swal.fire({
+              title: 'Session Expired',
+              text: 'Please login again.',
+              icon: 'error',
+              confirmButtonText: 'Login',
+            }).then(() => this.router.navigate(['/login']));
+          } else {
+            Swal.fire({
+              title: 'Error',
+              text: err.error?.message || 'Something went wrong. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'Try Again',
+            });
+          }
+        },
+      });
+      return;
     }
 
     this.studentService.createStudent(payload).subscribe({
@@ -352,6 +708,10 @@ export class AddStudent implements OnInit {
   }
 
   cancel() {
+    if (this.isEditMode && this.editStudentId) {
+      this.router.navigate(['/students', this.editStudentId]);
+      return;
+    }
     this.router.navigate(['/students']);
   }
 

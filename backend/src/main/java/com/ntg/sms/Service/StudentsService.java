@@ -10,4 +10,8 @@ public interface StudentsService {
     long gettotalstudents();
     List<Student> getAllStudents();
     Student addStudent(StudentRequest request);
+    Student getStudentById(Long id);
+    List<String> getStudentMedicalHistory(Student student);
+    void deleteStudent(Long id);
+    Student editStudent(StudentRequest request, Long studentId);
 }

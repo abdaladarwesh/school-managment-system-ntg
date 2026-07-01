@@ -84,7 +84,7 @@ public class User {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ROLE_ID", nullable = false)
     private Role role;
 

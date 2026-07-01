@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { StudentService } from './service/student-service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-
+import * as XLSX from 'xlsx';
 export type StudentStatus = 'Active' | 'Probation' | 'Suspended';
 
 export interface Student {
@@ -27,7 +27,7 @@ type StatusFilter = 'All' | StudentStatus;
 })
 export class StudentPage implements OnInit {
   studentService = inject(StudentService);
-  router = inject(Router)
+  router = inject(Router);
 
   ngOnInit(): void {
     this.studentService.getAllStudents().subscribe({
@@ -49,12 +49,12 @@ export class StudentPage implements OnInit {
         }
       },
       next: (req) => {
-        this.students.set(req.map(s => this.studentService.toStudent(s)))
-      }
+        this.students.set(req.map((s) => this.studentService.toStudent(s)));
+      },
     });
   }
 
-  students = signal<Student[]>([])
+  students = signal<Student[]>([]);
 
   // ---- Logged-in user (sidebar footer) -------------------------------------
   currentUser = {
@@ -188,11 +188,50 @@ export class StudentPage implements OnInit {
   }
 
   exportStudents() {
-    // Hook up to a real export service as needed.
-    console.log('Exporting', this.filteredStudents());
+    const data = this.filteredStudents();
+
+    if (!data.length) {
+      Swal.fire({
+        title: 'Nothing to export',
+        text: 'There are no students matching the current filters.',
+        icon: 'info',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    // Shape rows into a clean, human-readable table (avoid dumping raw object keys)
+    const rows = data.map((s) => ({
+      'Student ID': s.id,
+      Name: s.name,
+      Email: s.email,
+      Grade: s.grade,
+      Class: s.class,
+      'Academic Year': s.academicYear,
+      Gender: s.gender,
+      Status: s.status,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+
+    // Auto-size columns roughly based on content length
+    const colWidths = Object.keys(rows[0]).map((key) => ({
+      wch: Math.max(key.length, ...rows.map((r) => String((r as any)[key] ?? '').length)) + 2,
+    }));
+    worksheet['!cols'] = colWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+
+    const timestamp = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `students-export-${timestamp}.xlsx`);
   }
 
   addStudent() {
     this.router.navigate(['/students/add']);
+  }
+
+  viewStudent(id: string) {
+    this.router.navigate(['/students', id]);
   }
 }

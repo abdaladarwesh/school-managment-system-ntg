@@ -33,6 +33,14 @@ export const routes: Routes = [
         {
           path:"students/add",
           loadComponent: () => import("../app/pages/add-student/add-student").then(c => c.AddStudent)
+        },
+        {
+          path:"students/:id/edit",
+          loadComponent: () => import("../app/pages/add-student/add-student").then(c => c.AddStudent)
+        },
+        {
+          path:"students/:id",
+          loadComponent: () => import("../app/pages/student-detail/student-detail").then(c => c.StudentDetail)
         }
     ]
   }
