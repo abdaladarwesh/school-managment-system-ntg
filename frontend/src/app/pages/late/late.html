@@ -1,0 +1,211 @@
+<div class="late-arrivals-container">
+  
+  <div class="page-header">
+    <div class="title-area">
+      <span class="sub-title">STUDENT AFFAIRS</span>
+      <h1 class="main-title">Late Arrivals</h1>
+      <p class="description">Track and register student late arrival records</p>
+    </div>
+    <button class="btn-register" (click)="openLateArrivalModal()">
+      <span class="plus-icon">+</span> Register Late Arrival
+    </button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="card-icon bg-icon-red">⏰</div>
+      <div class="card-value text-dark-red">{{ totalRecords }}</div>
+      <div class="card-label">TOTAL RECORDS</div>
+    </div>
+    <div class="stat-card">
+      <div class="card-icon bg-icon-blue">📅</div>
+      <div class="card-value">{{ todayCount }}</div>
+      <div class="card-label">TODAY</div>
+    </div>
+    <div class="stat-card">
+      <div class="card-icon bg-icon-orange">🕒</div>
+      <div class="card-value">{{ thisWeekCount }}</div>
+      <div class="card-label">THIS WEEK</div>
+    </div>
+    <div class="stat-card">
+      <div class="card-icon bg-icon-green">📖</div>
+      <div class="card-value">{{ classesAffectedCount }}</div>
+      <div class="card-label">CLASSES AFFECTED</div>
+    </div>
+  </div>
+
+  <div class="search-filter-bar">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search by student name or reason..." [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+    </div>
+    
+    <div class="filter-controls">
+      <select [ngModel]="selectedClass()" (ngModelChange)="selectedClass.set($event)" class="class-select">
+        <option value="All Classes">All Classes</option>
+        <option value="1A">1A</option>
+        <option value="2A">2A</option>
+      </select>
+      
+      <div class="results-badge">
+        🌐 {{ filteredStudents.length }} results
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>STUDENT NAME</th>
+          <th>CLASS</th>
+          <th>DATE</th>
+          <th>ARRIVAL TIME</th>
+          <th>REASON</th>
+          <th>NOTES</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of filteredStudents; let i = index">
+          <td class="student-cell">
+            <div class="avatar">{{ getInitials(student.name) }}</div>
+            <span class="student-name">{{ student.name }}</span>
+          </td>
+          <td><span class="class-badge">{{ student.class }}</span></td>
+          <td>
+            <div class="date-container">
+              <span class="calendar-icon">📅</span>
+              <span class="date-text">{{ student.date }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="time-container">
+              <span class="time-icon">🕒</span>
+              <span class="time-text">{{ student.arrivalTime }}</span>
+            </div>
+          </td>
+          <td class="reason-text">{{ student.reason }}</td>
+          <td class="notes-text" title="{{ student.notes }}">{{ student.notes }}</td>
+          <td>
+            <div class="status-action-row">
+              <span class="status-pill" [ngClass]="student.status === 'Very Late' ? 'very-late' : 'late'">
+                <span class="dot">•</span> {{ student.status }}
+              </span>
+              
+              <div class="dropdown-container" (click)="toggleDropdown(i, $event)">
+                <span class="triple-dots">⋮</span>
+                <div class="dropdown-menu" *ngIf="activeDropdownIndex === i">
+                  <div class="menu-item" (click)="openEditModal(student, i, $event)">Edit Record</div>
+                  <div class="menu-item delete-item" (click)="deleteRecord(i, $event)">Delete</div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showLateArrivalModal">
+    <div class="modal-window">
+      <div class="modal-header header-blue-intense">
+        <div class="header-info">
+          <h2>Register Late Arrival</h2>
+          <p>Fill in the student's arrival details</p>
+        </div>
+        <span class="close-btn" (click)="closeLateArrivalModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>STUDENT NAME *</label>
+            <input type="text" placeholder="Full student name" [(ngModel)]="currentRecord.name">
+          </div>
+          <div class="form-group">
+            <label>CLASS *</label>
+            <select [(ngModel)]="currentRecord.class">
+              <option value="1A">1A</option>
+              <option value="2A">2A</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>DATE *</label>
+            <input type="text" [(ngModel)]="currentRecord.date">
+          </div>
+          <div class="form-group">
+            <label>ARRIVAL TIME *</label>
+            <input type="text" placeholder="--:-- --" [(ngModel)]="currentRecord.arrivalTime">
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label>REASON</label>
+          <select [(ngModel)]="currentRecord.reason">
+            <option value="">Select reason</option>
+            <option value="Traffic congestion">Traffic congestion</option>
+            <option value="Bus delay">Bus delay</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label>NOTES</label>
+          <textarea placeholder="Additional notes..." [(ngModel)]="currentRecord.notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeLateArrivalModal()">Cancel</button>
+        <button class="btn-submit bg-crimson" (click)="onSaveLateArrival()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="showEditModal">
+    <div class="modal-window">
+      <div class="modal-header header-blue-soft">
+        <div class="header-info">
+          <h2>Edit Late Arrival</h2>
+          <p>Update arrival record</p>
+        </div>
+        <span class="close-btn" (click)="closeEditModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>STUDENT NAME *</label>
+            <input type="text" [(ngModel)]="currentRecord.name">
+          </div>
+          <div class="form-group">
+            <label>CLASS *</label>
+            <select [(ngModel)]="currentRecord.class">
+              <option value="1A">1A</option>
+              <option value="2A">2A</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>DATE *</label>
+            <input type="text" [(ngModel)]="currentRecord.date">
+          </div>
+          <div class="form-group">
+            <label>ARRIVAL TIME *</label>
+            <input type="text" [(ngModel)]="currentRecord.arrivalTime">
+          </div>
+        </div>
+        <div class="form-group full-width">
+          <label>REASON</label>
+          <select [(ngModel)]="currentRecord.reason">
+            <option value="Traffic congestion">Traffic congestion</option>
+            <option value="Bus delay">Bus delay</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label>NOTES</label>
+          <textarea [(ngModel)]="currentRecord.notes"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeEditModal()">Cancel</button>
+        <button class="btn-submit bg-blue-action" (click)="onUpdateLateArrival()">Update Record</button>
+      </div>
+    </div>
+  </div>
+
+</div>

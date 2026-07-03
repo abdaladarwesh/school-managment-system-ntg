@@ -76,7 +76,7 @@
 
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 24px;
     margin-bottom: 25px;
 }
@@ -86,6 +86,8 @@
     border-radius: 16px;
     padding: 24px;
     display: flex;
+    width: 15vw;
+    justify-content: center;
     align-items: center;
     position: relative;
     overflow: hidden;
@@ -99,7 +101,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 16px;
+    /* margin-right: 16px; */
     z-index: 2;
 }
 
@@ -126,6 +128,7 @@
 
 .card-value {
     font-size: 32px;
+    text-align: center;
     font-weight: 700;
     color: #111827;
     margin-bottom: 6px;
@@ -359,7 +362,7 @@ td {
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 16px;
     margin-bottom: 16px;
 }

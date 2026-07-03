@@ -1,0 +1,27 @@
+<div class="search-container">
+  <input 
+    type="text" 
+    [ngModel]="searchQuery()" 
+    (ngModelChange)="searchQuery.set($event); isOpen.set(true)"
+    (click)="onInputClick()"
+    placeholder="Search student name..."
+    class="search-input"
+  />
+  @if (isOpen() && filteredStudents().length > 0) {
+    <ul class="dropdown-list">
+      @for (student of filteredStudents(); track student.id) {
+        <li (click)="selectStudent(student)">
+          <span>{{ student.user.firstName }} {{ student.user.lastName }}</span>
+          <span class="student-grade">
+            {{ student.studentClass?.grade?.name }} - {{ student.studentClass?.name }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+  @if (isOpen() && filteredStudents().length === 0) {
+    <ul class="dropdown-list">
+      <li class="no-results">No students found</li>
+    </ul>
+  }
+</div>

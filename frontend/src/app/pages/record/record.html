@@ -1,0 +1,305 @@
+<div class="attendance-container">
+
+  <div class="top-bar">
+    <div class="page-title">
+      <h2>Attendance Records</h2>
+      <p>Track, review and manage daily student attendance across all grades</p>
+    </div>
+
+    <div class="top-actions">
+      <button class="export-btn" (click)="exportReport()">
+        <i class="bi bi-download"></i>
+        Export Report
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="card present-card">
+      <div class="icon green"><i class="bi bi-check-circle-fill"></i></div>
+      <h1>{{presentCount}}</h1>
+      <span>PRESENT</span>
+    </div>
+
+    <div class="card absent-card">
+      <div class="icon red"><i class="bi bi-x-circle-fill"></i></div>
+      <h1>{{absentCount}}</h1>
+      <span>ABSENT</span>
+    </div>
+
+    <div class="card late-card">
+      <div class="icon orange"><i class="bi bi-clock"></i></div>
+      <h1>{{lateCount}}</h1>
+      <span>LATE</span>
+    </div>
+
+    <div class="card excused-card">
+      <div class="icon blue"><i class="bi bi-file-earmark-text"></i></div>
+      <h1>{{excusedCount}}</h1>
+      <span>EXCUSED</span>
+    </div>
+
+    <div class="card rate-card">
+      <div class="icon white"><i class="bi bi-graph-up"></i></div>
+      <h1>{{attendanceRate}}%</h1>
+      <span>ATTENDANCE RATE</span>
+      <small>{{totalRecords}} records</small>
+    </div>
+  </div>
+
+  <div class="filter-box">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search by student name..." [(ngModel)]="searchText">
+    </div>
+
+    <select [(ngModel)]="selectedGradeId">
+      <option value="all">All Grades</option>
+      <option *ngFor="let grade of allGrades()" [value]="grade.id">{{ grade.name }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedClassId" (ngModelChange)="onFilterChange()">
+      <option value="all">All Classes</option>
+      <option *ngFor="let cls of allClasses()" [value]="cls.id">{{ cls.name }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedYear">
+      <option value="all">All Years</option>
+      <option *ngFor="let yr of allYears()" [value]="yr">{{ yr }}</option>
+    </select>
+
+    <input type="date" [(ngModel)]="filterDate" (ngModelChange)="onFilterChange()">
+
+    <select [(ngModel)]="selectedStatus">
+      <option value="all">All Statuses</option>
+      <option value="Present">Present</option>
+      <option value="Absent">Absent</option>
+      <option value="Late">Late</option>
+      <option value="Excused">Excused</option>
+    </select>
+
+    <button class="reset-btn" (click)="resetFilters()">Reset</button>
+    <div class="records-count">{{totalRecords}} records</div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>STUDENT NAME</th>
+        <th>GRADE</th>
+        <th>CLASS</th>
+        <th>ACADEMIC YEAR</th>
+        <th>DATE</th>
+        <th>ATTENDANCE STATUS</th>
+        <th>ACTIONS</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let student of filteredStudents">
+        <td>
+          <div class="student-info">
+            <div class="avatar">{{student.initials}}</div>
+            <span>{{student.name}}</span>
+          </div>
+        </td>
+        <td>{{student.grade}}</td>
+        <td><span class="class-badge">{{student.class}}</span></td>
+        <td>{{student.academicYear}}</td>
+        <td>
+          <div class="date-box">
+            <i class="bi bi-calendar"></i>
+            <div>
+              <strong>{{student.date}}</strong>
+              <small>Today</small>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="status" [ngClass]="student.status.toLowerCase()">{{student.status}}</span>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="history-btn" (click)="openHistoryModal(student)">
+              <i class="bi bi-eye"></i>
+            </button>
+            <button class="edit-btn" (click)="openEditModal(student)">
+              <i class="bi bi-pen"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="showHistoryModal && selectedStudent">
+  <div class="sidebar-backdrop" (click)="closeAllModals()"></div>
+  <div class="sidebar-container">
+    <div class="sidebar-header">
+      <div class="profile-section">
+        <div class="avatar">{{ selectedStudent.initials }}</div>
+        <div class="user-info">
+          <h3>{{ selectedStudent.name }}</h3>
+          <p>{{ selectedStudent.grade }} · {{ selectedStudent.class }} · {{ selectedStudent.academicYear }}</p>
+        </div>
+      </div>
+      <div class="close-icon-wrapper" (click)="closeAllModals()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+             class="close-svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="sidebar-body">
+      <div class="card attendance-rate-card">
+        <div class="rate-header">
+          <span class="rate-title">ATTENDANCE RATE</span>
+          <span class="badge-excellent">↘ {{ selectedStudent.statusBadge || 'Excellent' }}</span>
+        </div>
+        <div class="rate-value">{{ selectedStudent.attendanceRate || 0 }}%</div>
+        <div class="progress-container">
+          <div class="progress-bar" [style.width.%]="selectedStudent.attendanceRate || 0"></div>
+        </div>
+        <div class="progress-footer">
+          <span>0%</span>
+          <span class="recorded-days">{{ selectedStudent.recordedDays || 0 }} school days recorded</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <div class="stats-grid-mini" *ngIf="selectedStudent.stats">
+        <div class="stat-box present">
+          <div>{{ selectedStudent.stats.present }}</div><span>PRESENT</span>
+        </div>
+        <div class="stat-box absent">
+          <div>{{ selectedStudent.stats.absent }}</div><span>ABSENT</span>
+        </div>
+        <div class="stat-box late">
+          <div>{{ selectedStudent.stats.late }}</div><span>LATE</span>
+        </div>
+        <div class="stat-box excused">
+          <div>{{ selectedStudent.stats.excused }}</div><span>EXCUSED</span>
+        </div>
+      </div>
+
+      <div class="view-toggle-container">
+        <div class="toggle-action" [class.active]="currentHistoryView === 'calendar'"
+             (click)="switchHistoryView('calendar')">Calendar View</div>
+        <div class="toggle-action" [class.active]="currentHistoryView === 'daily'" (click)="switchHistoryView('daily')">
+          Daily List</div>
+      </div>
+
+      <div class="card calendar-card" *ngIf="currentHistoryView === 'calendar'">
+        <div class="calendar-header">
+          <span class="month-title">June 2026 — Daily Attendance</span>
+        </div>
+        <div class="days-grid">
+          <div *ngFor="let day of selectedStudent.historyDays" class="day-cell" [ngClass]="{
+                 'present': day.status === 'P',
+                 'absent': day.status === 'A',
+                 'late': day.status === 'L',
+                 'excused': day.status === 'E',
+                 'empty': day.status === ''
+               }">
+            <span>{{ day.dayNumber }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card daily-list-card" *ngIf="currentHistoryView === 'daily'">
+        <p style="text-align: center; color: #64748b; font-size: 13px;">Daily Attendance List View</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="edit-modal-backdrop" *ngIf="showEditModal && selectedStudent">
+  <div class="edit-modal-box">
+    <div class="edit-modal-header">
+      <h2 class="edit-modal-title">Edit Attendance Record</h2>
+      <div class="edit-close-wrapper" (click)="closeAllModals()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
+             class="edit-close-svg">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="edit-modal-body">
+      <div class="form-field-group">
+        <label class="field-label">STUDENT NAME *</label>
+        <input type="text" [value]="selectedStudent.name" class="readonly-date-input" readonly />
+      </div>
+
+      <div class="form-field-group">
+        <label class="field-label">DATE *</label>
+        <input type="text" [value]="selectedStudent.date" class="readonly-date-input" readonly />
+      </div>
+
+      <div class="form-field-group">
+        <label class="field-label">ATTENDANCE STATUS *</label>
+        <div class="status-options-grid">
+          <label class="status-option-label" [class.selected-present]="selectedStudent.status === 'Present'">
+            <input type="radio" name="attendanceStatus" value="Present" [(ngModel)]="selectedStudent.status"
+                   class="hidden-radio" />
+            <span class="status-indicator"></span> Present
+          </label>
+          <label class="status-option-label" [class.selected-absent]="selectedStudent.status === 'Absent'">
+            <input type="radio" name="attendanceStatus" value="Absent" [(ngModel)]="selectedStudent.status"
+                   class="hidden-radio" />
+            <span class="status-indicator"></span> Absent
+          </label>
+          <label class="status-option-label" [class.selected-late]="selectedStudent.status === 'Late'">
+            <input type="radio" name="attendanceStatus" value="Late" [(ngModel)]="selectedStudent.status"
+                   class="hidden-radio" />
+            <span class="status-indicator"></span> Late
+          </label>
+          <label class="status-option-label" [class.selected-excused]="selectedStudent.status === 'Excused'">
+            <input type="radio" name="attendanceStatus" value="Excused" [(ngModel)]="selectedStudent.status"
+                   class="hidden-radio" />
+            <span class="status-indicator"></span> Excused
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="edit-modal-footer">
+      <button class="action-dismiss-trigger" (click)="closeAllModals()">Cancel</button>
+      <button class="action-submit-trigger" (click)="updateRecord()">Update Record</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showMarkAttendanceModal">
+  <div class="attendance-modal">
+    <div class="modal-header">
+      <div>
+        <h2> <i class="bi bi-plus-lg"></i> Mark Attendance</h2>
+        <p>Record student attendance for a date</p>
+      </div>
+      <button class="close-btn" (click)="closeAllModals()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <label>Student Name *</label>
+      <select>
+        <option>Select Student</option>
+        <option *ngFor="let student of students()">{{student.name}}</option>
+      </select>
+
+      <label>Date *</label>
+      <input type="date">
+
+      <label>Attendance Status *</label>
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn" (click)="closeAllModals()">Cancel</button>
+      <button class="save-btn">Save Attendance</button>
+    </div>
+  </div>
+</div>

@@ -13,7 +13,7 @@
       <h2 class="main-title">Leave Permission Requests</h2>
       <p class="description">Manage and track student leave permission requests</p>
     </div>
-    <button class="btn-primary" (click)="showPopup = true">+ New Permission Request</button>
+    <button class="btn-primary" (click)="openPopup()">+ New Permission Request</button>
   </div>
 
   <div class="cards-grid">
@@ -26,26 +26,6 @@
       <div class="card-blob blob-red"></div>
     </div>
 
-    <div class="card">
-      <div class="card-icon icon-approved">✅</div>
-      <div class="card-info">
-        <span class="card-value">{{ approvedRequest }}</span>
-        <span class="card-label">APPROVED</span>
-      </div>
-      <span class="rate-badge">↗ 50% rate</span>
-      <div class="card-blob blob-green"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-icon icon-pending">🕒</div>
-      <div class="card-info">
-        <span class="card-value">{{ pendingRequest }}</span>
-        <span class="card-label">PENDING REVIEW</span>
-      </div>
-      <div class="card-blob blob-orange"></div>
-    </div>
-  </div>
-
   <div class="filter-bar-container">
     <div class="search-box-wrapper">
       <span>🔍</span>
@@ -53,17 +33,17 @@
     </div>
     <div class="filter-dropdowns">
       <select [(ngModel)]="selectedGrade" class="filter-select">
+        @for (item of grades(); track $index) {
+          <option [value]="item">{{item}}</option>
+        }
         <option value="">All Grades</option>
-        <option value="Grade 10">Grade 10</option>
-        <option value="Grade 11">Grade 11</option>
-        <option value="Grade 12">Grade 12</option>
       </select>
       
       <select [(ngModel)]="selectedClass" class="filter-select">
+        @for (item of classes(); track $index) {
+          <option [value]="item">{{item}}</option>
+        }
         <option value="">All Classes</option>
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
       </select>
 
       <button class="btn-filter-results">⏳ {{ filteredPermission.length }} results</button>
@@ -78,7 +58,7 @@
           <th>CLASS</th>
           <th>DAY</th>
           <th>LEAVE REQUEST REASON</th>
-          <th>STATUS</th>
+          <th>NOTES</th>
         </tr>
       </thead>
       <tbody>
@@ -86,17 +66,15 @@
           <tr>
             <td>
               <div class="student-cell">
-                <span class="avatar">{{ item.student.charAt(0) }}</span>
-                <span class="student-name">{{ item.student }}</span>
+                <span class="avatar">{{ item.student.user.firstName.charAt(0) }}</span>
+                <span class="student-name">{{ item.student.user.firstName }}</span>
               </div>
             </td>
-            <td><span class="badge-class">{{ item.grade }} - {{ item.class }}</span></td>
-            <td><span class="table-icon">📅</span> {{ item.day }}</td>
+            <td><span class="badge-class">{{ item.student.studentClass?.grade?.name }} - {{ item.student.studentClass?.name }}</span></td>
+            <td><span class="table-icon">📅</span> {{ item.date }}</td>
             <td><span class="table-icon-flag">🏳</span> {{ item.reason }}</td>
             <td>
-              <span class="status-badge" [class]="'status-' + item.status.toLowerCase()">
-                ● {{ item.status }}
-              </span>
+                <span class="student-name">{{ item.notes ?? "No Notes" }}</span>
             </td>
           </tr>
         }
@@ -110,58 +88,41 @@
       <div class="modal-box">
         <div class="modal-header">
           <h3>📄 New Permission Request</h3>
-          <button class="close-x" (click)="showPopup = false">✕</button>
+          <button class="close-x" (click)="closePopup()">✕</button>
         </div>
 
-        <div class="modal-body">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>STUDENT NAME *</label>
-              <input type="text" [(ngModel)]="newRequest.student" placeholder="Full student name" />
+        <form [formGroup]="requestForm" (ngSubmit)="saveRequest()">
+          <div class="modal-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>STUDENT NAME *</label>
+                <app-student-search 
+                  [students]="students()" 
+                  (studentSelected)="onStudentSelected($event)">
+                </app-student-search>
+                @if (requestForm.controls.studentId.invalid && requestForm.controls.studentId.touched) {
+                  <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">Please select a student.</span>
+                }
+              </div>
             </div>
-            <div class="form-group">
-              <label>GRADE *</label>
-              <select [(ngModel)]="newRequest.grade">
-                <option value="">Select grade</option>
-                <option value="Grade 10">Grade 10</option>
-                <option value="Grade 11">Grade 11</option>
-                <option value="Grade 12">Grade 12</option>
-              </select>
+            <div class="form-group full-width">
+              <label>LEAVE REQUEST REASON *</label>
+              <input type="text" formControlName="reason">
+              @if (requestForm.controls.reason.invalid && requestForm.controls.reason.touched) {
+                <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">Reason is required.</span>
+              }
             </div>
-            <div class="form-group">
-              <label>CLASS *</label>
-              <select [(ngModel)]="newRequest.class">
-                <option value="">Select class</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>DAY *</label>
-              <select [(ngModel)]="newRequest.day">.
-                <option value="Monday">Sunday</option>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Monday">Wednesday</option>
-                <option value="Monday">Thursday</option>
-              </select>
+            <div class="form-group full-width mt-3">
+              <label>NOTES </label>
+              <input type="text" formControlName="notes">
             </div>
           </div>
-          <div class="form-group full-width">
-            <label>LEAVE REQUEST REASON *</label>
-            <select [(ngModel)]="newRequest.reason">
-              <option value="Medical Appointment">Medical Appointment</option>
-              <option value="Family Emergency">Family Emergency</option>
-              <option value="Religious Occasion"> Religious Occasion</option>
-            </select>
-          </div>
-        </div>
 
-        <div class="modal-footer">
-          <button class="btn-cancel" (click)="showPopup = false">✕ Cancel</button>
-          <button class="btn-save" (click)="saveRequest()">💾 Save Request</button>
-        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn-cancel" (click)="closePopup()">✕ Cancel</button>
+            <button type="submit" class="btn-save">💾 Save Request</button>
+          </div>
+        </form>
       </div>
     </div>
   }

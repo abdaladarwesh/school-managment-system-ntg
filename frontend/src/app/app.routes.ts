@@ -45,8 +45,27 @@ export const routes: Routes = [
         {
           path: "attendance",
           loadComponent: () => import("../app/pages/attendance/attendance").then(c => c.Attendance)
-        }
-
+        },
+        {
+          path: "complaints",
+          loadComponent: () => import("../app/pages/complaints/complaints").then(c => c.Complaints)
+        },
+        {
+          path: "permissions",
+          loadComponent: () => import("../app/pages//permissions/permissions").then(c => c .PermissionComponent)
+        },
+        {
+          path: "attendance-records",
+          loadComponent: () => import("../app/pages/record/record").then(c => c.AttendanceComponent)
+        },
+        {
+          path: "late-arrivals",
+          loadComponent: () => import("../app/pages/late/late").then(c => c.LateComponent)
+        },
+        {
+          path: "violations",
+          loadComponent: () => import("../app/pages/violations/violations").then(c => c.ViolationsComponent)
+        },
     ]
   }
 ];
