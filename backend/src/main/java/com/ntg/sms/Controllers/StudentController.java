@@ -1,9 +1,9 @@
 package com.ntg.sms.Controllers;
 
-import com.ntg.sms.Entities.Dtos.Request.StudentRequest;
-import com.ntg.sms.Entities.Dtos.Response.FullStudentResponse;
-import com.ntg.sms.Entities.Dtos.Response.ParentResponse;
-import com.ntg.sms.Entities.Dtos.Response.StudentResponse;
+import com.ntg.sms.Dtos.Request.StudentRequest;
+import com.ntg.sms.Dtos.Response.FullStudentResponse;
+import com.ntg.sms.Dtos.Response.ParentResponse;
+import com.ntg.sms.Dtos.Response.StudentResponse;
 import com.ntg.sms.Entities.Parent;
 import com.ntg.sms.Entities.Student;
 import com.ntg.sms.Mappers.ParentMapper;

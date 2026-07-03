@@ -1,6 +1,5 @@
-package com.ntg.sms.Entities.Dtos.Response;
+package com.ntg.sms.Dtos.Response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

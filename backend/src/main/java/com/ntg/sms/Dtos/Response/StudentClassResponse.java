@@ -1,9 +1,7 @@
-package com.ntg.sms.Entities.Dtos.Response;
+package com.ntg.sms.Dtos.Response;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.io.Serializable;
 
 /**
  * DTO for {@link com.ntg.sms.Entities.Class}
@@ -12,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ClassResponse {
+public class StudentClassResponse {
     Long id;
     @NotNull
     GradeResponse grade;

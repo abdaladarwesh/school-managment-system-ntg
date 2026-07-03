@@ -117,7 +117,6 @@ export class StudentService {
   toStudent(student: StudentResponse): Student {
     const firstName = student.user.firstName;
     const lastName = student.user.lastName;
-    console.log(student);
     
 
     return {

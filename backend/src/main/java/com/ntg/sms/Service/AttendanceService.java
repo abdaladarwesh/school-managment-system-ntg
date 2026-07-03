@@ -1,5 +1,10 @@
 package com.ntg.sms.Service;
 
+import com.ntg.sms.Dtos.Request.SaveAttendanceRequest;
+import com.ntg.sms.Dtos.Response.AttendanceGridResponse;
+import com.ntg.sms.Dtos.Response.ClassResponse;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AttendanceService {
@@ -13,4 +18,10 @@ public interface AttendanceService {
 
     /** Returns [className, absenceCount] pairs. */
     List<Object[]> getAbsenceByGrade();
+
+    AttendanceGridResponse getAttendanceGrid(Long classId, LocalDate date);
+
+    AttendanceGridResponse saveAttendance(SaveAttendanceRequest request);
+
+    List<ClassResponse> getAllClasses();
 }

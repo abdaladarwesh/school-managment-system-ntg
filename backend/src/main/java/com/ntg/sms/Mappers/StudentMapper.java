@@ -1,6 +1,6 @@
 package com.ntg.sms.Mappers;
 
-import com.ntg.sms.Entities.Dtos.Response.StudentResponse;
+import com.ntg.sms.Dtos.Response.StudentResponse;
 import com.ntg.sms.Entities.Student;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

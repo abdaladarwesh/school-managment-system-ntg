@@ -1,6 +1,6 @@
 package com.ntg.sms.Controllers;
 
-import com.ntg.sms.Entities.Dtos.Response.DashboardResponse;
+import com.ntg.sms.Dtos.Response.DashboardResponse;
 import com.ntg.sms.Service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

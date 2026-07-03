@@ -1,9 +1,8 @@
-package com.ntg.sms.Entities.Dtos.Response;
+package com.ntg.sms.Dtos.Response;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.Set;
 
 /**

@@ -41,7 +41,12 @@ export const routes: Routes = [
         {
           path:"students/:id",
           loadComponent: () => import("../app/pages/student-detail/student-detail").then(c => c.StudentDetail)
+        },
+        {
+          path: "attendance",
+          loadComponent: () => import("../app/pages/attendance/attendance").then(c => c.Attendance)
         }
+
     ]
   }
 ];

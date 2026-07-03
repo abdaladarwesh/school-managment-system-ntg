@@ -1,7 +1,7 @@
 package com.ntg.sms.Service;
 
 
-import com.ntg.sms.Entities.Dtos.Request.StudentRequest;
+import com.ntg.sms.Dtos.Request.StudentRequest;
 import com.ntg.sms.Entities.Student;
 
 import java.util.List;

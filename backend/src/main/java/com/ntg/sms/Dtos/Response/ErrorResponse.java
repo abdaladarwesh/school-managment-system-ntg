@@ -1,4 +1,4 @@
-package com.ntg.sms.Entities.Dtos.Response;
+package com.ntg.sms.Dtos.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

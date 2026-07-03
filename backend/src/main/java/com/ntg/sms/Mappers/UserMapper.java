@@ -1,6 +1,6 @@
 package com.ntg.sms.Mappers;
 
-import com.ntg.sms.Entities.Dtos.Response.UserResponse;
+import com.ntg.sms.Dtos.Response.UserResponse;
 import com.ntg.sms.Entities.User;
 import org.mapstruct.Mapper;
 

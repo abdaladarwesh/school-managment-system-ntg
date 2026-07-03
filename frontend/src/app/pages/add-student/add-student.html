@@ -105,7 +105,7 @@
                   <i class="bi bi-telephone field-icon"></i> STUDENT PHONE NUMBER <span class="text-danger d-inline">*</span>
                 </label>
                 <div formArrayName="phoneNumbers">
-                  @for (ctrl of studentPhoneNumbers.controls; track $index; let i = $index) {
+                  @for (ctrl of studentPhoneNumbers.controls; track ctrl; let i = $index) {
                     <div class="d-flex gap-2 mb-2">
                       <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
                         [formControlName]="i"
@@ -445,7 +445,7 @@
                     <i class="bi bi-telephone field-icon"></i> FATHER'S PHONE NUMBER <span class="text-danger d-inline">*</span>
                   </label>
                   <div formArrayName="phoneNumbers">
-                    @for (ctrl of fatherPhoneNumbers.controls; track $index; let i = $index) {
+                    @for (ctrl of fatherPhoneNumbers.controls; track ctrl; let i = $index) {
                       <div class="d-flex gap-2 mb-2">
                         <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
                           [formControlName]="i"
@@ -621,7 +621,7 @@
                     <i class="bi bi-telephone field-icon"></i> MOTHER'S PHONE NUMBER <span class="text-danger d-inline">*</span>
                   </label>
                   <div formArrayName="phoneNumbers">
-                    @for (ctrl of motherPhoneNumbers.controls; track $index; let i = $index) {
+                    @for (ctrl of motherPhoneNumbers.controls; track ctrl; let i = $index) {
                       <div class="d-flex gap-2 mb-2">
                         <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
                           [formControlName]="i"
@@ -879,7 +879,7 @@
                       <i class="bi bi-telephone field-icon"></i> GUARDIAN'S PHONE NUMBER <span class="text-danger d-inline">*</span>
                     </label>
                     <div formArrayName="phoneNumbers">
-                      @for (ctrl of guardianPhoneNumbers.controls; track $index; let i = $index) {
+                      @for (ctrl of guardianPhoneNumbers.controls; track ctrl; let i = $index) {
                         <div class="d-flex gap-2 mb-2">
                           <input type="tel" class="form-control form-field" placeholder="01X XXX XXXX" maxlength="11"
                             [formControlName]="i"

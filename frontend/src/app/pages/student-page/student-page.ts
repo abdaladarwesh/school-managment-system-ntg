@@ -78,11 +78,25 @@ export class StudentPage implements OnInit {
 
   statusTabs: StatusFilter[] = ['All', 'Active', 'Probation', 'Suspended'];
 
-  grades = computed(() => ['All Grades', ...new Set(this.students().map((s) => s.grade))]);
-  classes = computed(() => ['All Classes', ...new Set(this.students().map((s) => s.class))]);
+  // grades = computed(() => ['All Grades', ...new Set(this.students().map((s) => s.grade))]);
+  // classes = computed(() => ['All Classes', ...new Set(this.students().map((s) => s.class))]);
+  // years = computed(() => [
+  //   'All Academic Years',
+  //   ...new Set(this.students().map((s) => s.academicYear)),
+  // ]);
+  grades = computed(() => [
+    'All Grades',
+    ...new Set(this.students().map((s) => this.normalize(s.grade))),
+  ]);
+
+  classes = computed(() => [
+    'All Classes',
+    ...new Set(this.students().map((s) => this.normalize(s.class))),
+  ]);
+
   years = computed(() => [
     'All Academic Years',
-    ...new Set(this.students().map((s) => s.academicYear)),
+    ...new Set(this.students().map((s) => this.normalize(s.academicYear))),
   ]);
 
   // ---- Derived counts -------------------------------------------------------
@@ -100,12 +114,16 @@ export class StudentPage implements OnInit {
     const year = this.yearFilter();
 
     return this.students().filter((s) => {
+      const sGrade = this.normalize(s.grade);
+      const sClass = this.normalize(s.class);
+      const sYear = this.normalize(s.academicYear);
+
       const matchesTerm =
         !term || s.name.toLowerCase().includes(term) || s.grade.toLowerCase().includes(term);
       const matchesStatus = status === 'All' || s.status === status;
-      const matchesGrade = grade === 'All Grades' || s.grade === grade;
-      const matchesClass = cls === 'All Classes' || s.class === cls;
-      const matchesYear = year === 'All Academic Years' || s.academicYear === year;
+      const matchesGrade = grade === 'All Grades' || sGrade === grade;
+      const matchesClass = cls === 'All Classes' || sClass === cls;
+      const matchesYear = year === 'All Academic Years' || sYear === year;
       return matchesTerm && matchesStatus && matchesGrade && matchesClass && matchesYear;
     });
   });
@@ -113,7 +131,7 @@ export class StudentPage implements OnInit {
   resultCount = computed(() => this.filteredStudents().length);
 
   // ---- Pagination -------------------------------------------------------
-  pageSize = 5;
+  pageSize = 20;
   currentPage = signal(1);
 
   totalPages = computed(() => Math.max(1, Math.ceil(this.resultCount() / this.pageSize)));
@@ -233,5 +251,10 @@ export class StudentPage implements OnInit {
 
   viewStudent(id: string) {
     this.router.navigate(['/students', id]);
+  }
+  private readonly NOT_ASSIGNED = 'Not Assigned';
+
+  private normalize(value: string | null | undefined): string {
+    return value && value.trim() ? value : this.NOT_ASSIGNED;
   }
 }

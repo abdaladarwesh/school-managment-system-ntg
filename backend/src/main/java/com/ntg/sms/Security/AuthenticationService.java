@@ -32,19 +32,23 @@ public class AuthenticationService {
     @Value("${jwt.expiry}")
     private Long jwtExpiryMs;
 
-    
 
-    public UserDetails authenticate(String email, String password) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        return userDetailsService.loadUserByUsername(email);
+
+    public CustomUserDetails authenticate(String email, String password) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+        );
+
+        return (CustomUserDetails) userDetailsService.loadUserByUsername(email);
     }
-
     
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(CustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())
+                .claim("userId", userDetails.getId())
+                .claim("role", userDetails.getUser().getRole().getRoleName())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiryMs))
                 .signWith(getSigningKey())
@@ -78,7 +82,6 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

@@ -1,4 +1,4 @@
-package com.ntg.sms.Entities.Dtos.Response;
+package com.ntg.sms.Dtos.Response;
 
 import lombok.*;
 
@@ -9,5 +9,4 @@ import lombok.*;
 public class AuthenticationResponse {
     private String token;
     private Long expiresAt;
-    private String role;
 }

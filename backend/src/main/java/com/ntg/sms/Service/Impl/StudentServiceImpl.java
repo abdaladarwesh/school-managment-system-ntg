@@ -1,7 +1,7 @@
 package com.ntg.sms.Service.Impl;
 
 import com.ntg.sms.Entities.*;
-import com.ntg.sms.Entities.Dtos.Request.StudentRequest;
+import com.ntg.sms.Dtos.Request.StudentRequest;
 import com.ntg.sms.Exceptions.BadRequestException;
 import com.ntg.sms.Exceptions.ConflictException;
 import com.ntg.sms.Repositories.*;

@@ -1,7 +1,7 @@
 package com.ntg.sms.Security;
 
 
-import com.ntg.sms.Entities.Dtos.Response.ErrorResponse;
+import com.ntg.sms.Dtos.Response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

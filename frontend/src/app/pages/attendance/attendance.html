@@ -1,0 +1,118 @@
+<div class="attendance-container">
+  <header class="header-section">
+    <div class="search-bar">
+      <span class="material-icons">search</span>
+      <input type="text" placeholder="Search students, cases...">
+    </div>
+    <div class="header-right">
+      <div class="date-badge">
+        <span class="material-icons">calendar_today</span>
+        <span>{{ currentDate }}</span>
+      </div>
+      <div class="user-profile">NTG <span class="material-icons">expand_more</span></div>
+    </div>
+  </header>
+
+  <div class="title-section">
+    <div>
+      <span class="sub-title">STUDENT AFFAIRS</span>
+      <h1 class="main-title">Attendance Management</h1>
+      <p class="description">Record daily attendance for each period</p>
+    </div>
+    <div class="stats-badges">
+      <span class="badge present">Present: {{ presentCount() }}</span>
+      <span class="badge absent">Absent: {{ absentCount() }}</span>
+      <span class="badge permission">Permission: {{ permissionCount() }}</span>
+    </div>
+  </div>
+
+  <!-- Class Tabs -->
+  <div class="class-tabs-container">
+    <div class="tabs">
+      <button
+        *ngFor="let cls of allClasses()"
+        [class.active]="cls.id === selectedClass()?.id"
+        (click)="onClassChange(cls)"
+        class="tab-btn"
+      >
+        {{ cls.name }}
+      </button>
+    </div>
+    <div class="student-count">
+      <span class="material-icons">groups</span>
+      {{ grid()?.studentCount ?? 0 }} students
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend-section">
+    <span class="legend-title">LEGEND:</span>
+    <span class="legend-item"><span class="dot p-dot">P</span> Present</span>
+    <span class="legend-item"><span class="dot a-dot">A</span> Absent</span>
+    <span class="legend-item"><span class="dot ex-dot">Ex</span> Permission</span>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading()" class="loading-state">
+    <span class="material-icons spinning">sync</span> Loading…
+  </div>
+
+  <!-- No sessions for this day -->
+  <div *ngIf="!loading() && sessions().length === 0 && selectedClass()" class="empty-state">
+    <span class="material-icons">event_busy</span>
+    No sessions scheduled for this class on this day.
+  </div>
+
+  <!-- Grid table -->
+  <div class="table-responsive" *ngIf="!loading() && sessions().length > 0">
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th>STUDENT NAME</th>
+          <th>CLASS</th>
+          <th *ngFor="let s of sessions()">PERIOD {{ s.periodNumber }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows()">
+          <td>
+            <div class="student-info">
+              <div class="avatar">{{ row.initials }}</div>
+              <span class="name">
+                {{ row.fullName.split(' ')[0] }} {{ row.fullName.split(' ')[1] }}
+              </span>
+            </div>
+          </td>
+          <td><span class="class-label">{{ row.className }}</span></td>
+          <td *ngFor="let sess of row.sessions">
+            <div class="radio-group">
+              <button
+                (click)="setStatus(row.studentId, sess.sessionId, 'P')"
+                [class.active-p]="getStatus(row.studentId, sess.sessionId) === 'P'"
+                class="btn-p"
+              >P</button>
+              <button
+                (click)="setStatus(row.studentId, sess.sessionId, 'A')"
+                [class.active-a]="getStatus(row.studentId, sess.sessionId) === 'A'"
+                class="btn-a"
+              >A</button>
+              <button
+                (click)="setStatus(row.studentId, sess.sessionId, 'E')"
+                [class.active-ex]="getStatus(row.studentId, sess.sessionId) === 'E'"
+                class="btn-ex"
+              >Ex</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="footer-section">
+    <span class="footer-date">Date: {{ currentDate }}</span>
+    <button class="save-btn" (click)="saveAttendance()" [disabled]="saving()">
+      <span class="material-icons">{{ saving() ? 'hourglass_empty' : 'save' }}</span>
+      {{ saving() ? 'Saving…' : 'Save Attendance' }}
+    </button>
+  </footer>
+</div>

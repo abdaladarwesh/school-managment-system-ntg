@@ -1,4 +1,4 @@
-package com.ntg.sms.Entities.Dtos.Response;
+package com.ntg.sms.Dtos.Response;
 
 import com.ntg.sms.Entities.Student;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +21,6 @@ public class StudentResponse {
     Long academicScoreInMiddleSchool;
     Student.MartialParentsStatus martialParentsStatus;
     String placeOfBirth;
-    ClassResponse studentClass;
+    StudentClassResponse studentClass;
     List<String> medicalHistory;
 }

@@ -149,9 +149,9 @@
                       </div>
                     </div>
                   </td>
-                  <td><span class="badge class-chip fw-semibold">{{ student.grade === "" ? "Not Assigned" : ""}}</span></td>
-                  <td><span class="badge class-chip fw-semibold">{{ student.class === "" ? "Not Assigned" : ""}}</span></td>
-                  <td>{{ student.academicYear === "" ? "Not Assigned" : ""}}</td>
+                  <td><span class="badge class-chip fw-semibold">{{ student.grade === "" ? "Not Assigned" : student.grade}}</span></td>
+                  <td><span class="badge class-chip fw-semibold">{{ student.class === "" ? "Not Assigned" : student.class}}</span></td>
+                  <td>{{ student.academicYear === "" ? "Not Assigned" : student.academicYear}}</td>
                   <td>{{ student.gender }}</td>
                   <td><span [class]="statusBadgeClass(student.status)">{{ student.status }}</span></td>
                 </tr>

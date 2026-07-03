@@ -1,8 +1,9 @@
 package com.ntg.sms.Controllers;
 
 import com.ntg.sms.Security.AuthenticationService;
-import com.ntg.sms.Entities.Dtos.Request.AuthenticationRequest;
-import com.ntg.sms.Entities.Dtos.Response.AuthenticationResponse;
+import com.ntg.sms.Dtos.Request.AuthenticationRequest;
+import com.ntg.sms.Dtos.Response.AuthenticationResponse;
+import com.ntg.sms.Security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> login(
             @RequestBody @Valid AuthenticationRequest request
     ) {
-        UserDetails user = authenticationService.authenticate(request.getEmail(), request.getPassword());
+        CustomUserDetails user = authenticationService.authenticate(request.getEmail(), request.getPassword());
 
         String token = authenticationService.generateToken(user);
         String role = user.getAuthorities()
@@ -36,7 +37,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(
                 AuthenticationResponse.builder()
                         .token(token)
-                        .role(role)
                         .expiresAt(expiresAt)
                         .build());
     }

@@ -294,7 +294,9 @@ export class AddStudent implements OnInit {
       address: merged?.studentUser?.address ?? studentUser.address,
       firstNameInArabic: merged?.studentUser?.firstNameInArabic ?? studentUser.firstNameInArabic,
       lastNameInArabic: merged?.studentUser?.lastNameInArabic ?? studentUser.lastNameInArabic,
-      gender: merged?.studentUser?.gender ?? studentUser.gender,
+      gender: merged?.studentUser?.gender ?? studentUser.gender  ,
+      religion: merged?.studentUser?.religion ?? studentUser.religion,  
+
       nationality: merged?.studentUser?.nationality ?? studentUser.nationality,
       birthDay: draftAny?.studentUser?.birthDay ?? this.extractDay(studentUser.birthDate),
       birthMonth: draftAny?.studentUser?.birthMonth ?? this.extractMonth(studentUser.birthDate),
@@ -304,7 +306,7 @@ export class AddStudent implements OnInit {
 
     this.replacePhoneNumbers(
       this.studentPhoneNumbers,
-      merged?.studentUser?.phoneNumbers ?? studentUser.phoneNumbers.map((phone) => String(phone)),
+      merged?.studentUser?.phoneNumbers ?? studentUser.phoneNumbers.map((phone) => this.normalizePhone(phone)),
     );
 
     this.student.patchValue({
@@ -424,7 +426,8 @@ export class AddStudent implements OnInit {
       address: draft?.user?.address ?? user.address,
       firstNameInArabic: draft?.user?.firstNameInArabic ?? user.firstNameInArabic,
       lastNameInArabic: draft?.user?.lastNameInArabic ?? user.lastNameInArabic,
-      gender: draft?.user?.gender ?? user.gender,
+      gender: draft?.user?.gender ?? user.gender,  
+      religion: draft?.user?.religion ?? user.religion,   
       nationality: draft?.user?.nationality ?? user.nationality,
       birthDay: draft?.user?.birthDay ?? this.extractDay(user.birthDate),
       birthMonth: draft?.user?.birthMonth ?? this.extractMonth(user.birthDate),
@@ -433,7 +436,7 @@ export class AddStudent implements OnInit {
     });
     this.replacePhoneNumbers(
       userGroup.get('phoneNumbers') as FormArray,
-      draft?.user?.phoneNumbers ?? user.phoneNumbers.map((phone: number) => String(phone)),
+      draft?.user?.phoneNumbers ?? user.phoneNumbers.map((phone) => this.normalizePhone(phone)),
     );
     group.get('jobName')?.setValue(draft?.jobName ?? jobName);
   }
@@ -722,4 +725,11 @@ export class AddStudent implements OnInit {
   getError(control: AbstractControl | null, errorKey: string): boolean {
     return !!(control && control.hasError(errorKey) && control.touched);
   }
+  private normalizePhone(phone: number | string): string {
+  let s = String(phone);
+  if (s.length === 10 && /^(10|11|12|15)/.test(s)) {
+    s = '0' + s;
+  }
+  return s;
+}
 }

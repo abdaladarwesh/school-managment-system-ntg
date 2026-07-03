@@ -1,4 +1,4 @@
-package com.ntg.sms.Entities.Dtos.Request;
+package com.ntg.sms.Dtos.Request;
 
 import com.ntg.sms.Entities.Student;
 import jakarta.validation.Valid;
@@ -112,6 +112,8 @@ public class StudentRequest {
 
         @NotNull(message = "MartialParentsStatus is Required!")
         private Student.MartialParentsStatus martialParentsStatus;
+
+        private Long ClassId;
     }
 
 

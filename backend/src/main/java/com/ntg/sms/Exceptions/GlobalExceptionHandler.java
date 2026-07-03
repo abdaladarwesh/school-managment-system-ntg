@@ -1,6 +1,6 @@
 package com.ntg.sms.Exceptions;
 
-import com.ntg.sms.Entities.Dtos.Response.ErrorResponse;
+import com.ntg.sms.Dtos.Response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

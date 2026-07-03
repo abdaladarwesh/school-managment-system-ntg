@@ -27,4 +27,8 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     Optional<Student> findById(Long aLong);
 
     boolean existsByUserId(Long userId);
+
+    List<Student> findByStudentClassIdOrderByUserFirstNameAsc(Long studentClassId);
+
+    long countByStudentClassId(Long studentClassId);
 }
