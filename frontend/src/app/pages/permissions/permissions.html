@@ -1,0 +1,168 @@
+<div class="dashboard-container">
+  <div class="top-navbar">
+    <input type="text" placeholder="Search students, cases..." class="top-search-input" />
+    <div class="date-user-info">
+      <span>📅 Thursday, July 2, 2026</span>
+      <strong>AD NTG ▾</strong>
+    </div>
+  </div>
+
+  <div class="header-section-container">
+    <div class="header-section">
+      <span class="sub-title">STUDENT AFFAIRS</span>
+      <h2 class="main-title">Leave Permission Requests</h2>
+      <p class="description">Manage and track student leave permission requests</p>
+    </div>
+    <button class="btn-primary" (click)="showPopup = true">+ New Permission Request</button>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-icon icon-total">📄</div>
+      <div class="card-info">
+        <span class="card-value">{{ totalRequest }}</span>
+        <span class="card-label">TOTAL REQUESTS</span>
+      </div>
+      <div class="card-blob blob-red"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-approved">✅</div>
+      <div class="card-info">
+        <span class="card-value">{{ approvedRequest }}</span>
+        <span class="card-label">APPROVED</span>
+      </div>
+      <span class="rate-badge">↗ 50% rate</span>
+      <div class="card-blob blob-green"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon icon-pending">🕒</div>
+      <div class="card-info">
+        <span class="card-value">{{ pendingRequest }}</span>
+        <span class="card-label">PENDING REVIEW</span>
+      </div>
+      <div class="card-blob blob-orange"></div>
+    </div>
+  </div>
+
+  <div class="filter-bar-container">
+    <div class="search-box-wrapper">
+      <span>🔍</span>
+      <input type="text" placeholder="Search by student name..." [(ngModel)]="searchQuery" />
+    </div>
+    <div class="filter-dropdowns">
+      <select [(ngModel)]="selectedGrade" class="filter-select">
+        <option value="">All Grades</option>
+        <option value="Grade 10">Grade 10</option>
+        <option value="Grade 11">Grade 11</option>
+        <option value="Grade 12">Grade 12</option>
+      </select>
+      
+      <select [(ngModel)]="selectedClass" class="filter-select">
+        <option value="">All Classes</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+
+      <button class="btn-filter-results">⏳ {{ filteredPermission.length }} results</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>STUDENT NAME</th>
+          <th>CLASS</th>
+          <th>DAY</th>
+          <th>LEAVE REQUEST REASON</th>
+          <th>STATUS</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filteredPermission; track item.student) {
+          <tr>
+            <td>
+              <div class="student-cell">
+                <span class="avatar">{{ item.student.charAt(0) }}</span>
+                <span class="student-name">{{ item.student }}</span>
+              </div>
+            </td>
+            <td><span class="badge-class">{{ item.grade }} - {{ item.class }}</span></td>
+            <td><span class="table-icon">📅</span> {{ item.day }}</td>
+            <td><span class="table-icon-flag">🏳</span> {{ item.reason }}</td>
+            <td>
+              <span class="status-badge" [class]="'status-' + item.status.toLowerCase()">
+                ● {{ item.status }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="table-footer">Showing {{ filteredPermission.length }} of {{ totalRequest }} records</div>
+  </div>
+
+  @if (showPopup) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>📄 New Permission Request</h3>
+          <button class="close-x" (click)="showPopup = false">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>STUDENT NAME *</label>
+              <input type="text" [(ngModel)]="newRequest.student" placeholder="Full student name" />
+            </div>
+            <div class="form-group">
+              <label>GRADE *</label>
+              <select [(ngModel)]="newRequest.grade">
+                <option value="">Select grade</option>
+                <option value="Grade 10">Grade 10</option>
+                <option value="Grade 11">Grade 11</option>
+                <option value="Grade 12">Grade 12</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>CLASS *</label>
+              <select [(ngModel)]="newRequest.class">
+                <option value="">Select class</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>DAY *</label>
+              <select [(ngModel)]="newRequest.day">.
+                <option value="Monday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Monday">Wednesday</option>
+                <option value="Monday">Thursday</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label>LEAVE REQUEST REASON *</label>
+            <select [(ngModel)]="newRequest.reason">
+              <option value="Medical Appointment">Medical Appointment</option>
+              <option value="Family Emergency">Family Emergency</option>
+              <option value="Religious Occasion"> Religious Occasion</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="showPopup = false">✕ Cancel</button>
+          <button class="btn-save" (click)="saveRequest()">💾 Save Request</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
