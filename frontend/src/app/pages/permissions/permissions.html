@@ -16,15 +16,14 @@
     <button class="btn-primary" (click)="openPopup()">+ New Permission Request</button>
   </div>
 
-  <div class="cards-grid">
-    <div class="card">
-      <div class="card-icon icon-total">📄</div>
-      <div class="card-info">
-        <span class="card-value">{{ totalRequest }}</span>
-        <span class="card-label">TOTAL REQUESTS</span>
-      </div>
-      <div class="card-blob blob-red"></div>
+  <div class="card">
+    <div class="card-icon icon-total">📄</div>
+    <div class="card-info">
+      <span class="card-value">{{ totalRequest }}</span>
+      <span class="card-label">TOTAL REQUESTS</span>
     </div>
+    <div class="card-blob blob-red"></div>
+  </div>
 
   <div class="filter-bar-container">
     <div class="search-box-wrapper">
@@ -38,7 +37,7 @@
         }
         <option value="">All Grades</option>
       </select>
-      
+
       <select [(ngModel)]="selectedClass" class="filter-select">
         @for (item of classes(); track $index) {
           <option [value]="item">{{item}}</option>
@@ -53,13 +52,13 @@
   <div class="table-container">
     <table>
       <thead>
-        <tr>
-          <th>STUDENT NAME</th>
-          <th>CLASS</th>
-          <th>DAY</th>
-          <th>LEAVE REQUEST REASON</th>
-          <th>NOTES</th>
-        </tr>
+      <tr>
+        <th>STUDENT NAME</th>
+        <th>CLASS</th>
+        <th>DAY</th>
+        <th>LEAVE REQUEST REASON</th>
+        <th>NOTES</th>
+      </tr>
       </thead>
       <tbody>
         @for (item of filteredPermission; track item.student) {
@@ -74,7 +73,7 @@
             <td><span class="table-icon">📅</span> {{ item.date }}</td>
             <td><span class="table-icon-flag">🏳</span> {{ item.reason }}</td>
             <td>
-                <span class="student-name">{{ item.notes ?? "No Notes" }}</span>
+              <span class="student-name">{{ item.notes ?? "No Notes" }}</span>
             </td>
           </tr>
         }
@@ -96,8 +95,8 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>STUDENT NAME *</label>
-                <app-student-search 
-                  [students]="students()" 
+                <app-student-search
+                  [students]="students()"
                   (studentSelected)="onStudentSelected($event)">
                 </app-student-search>
                 @if (requestForm.controls.studentId.invalid && requestForm.controls.studentId.touched) {

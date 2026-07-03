@@ -3,15 +3,18 @@ package com.ntg.sms.Entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "DELAYS")
 public class Delay {
     @Id
@@ -26,7 +29,7 @@ public class Delay {
 
     @NotNull
     @Column(name = "TIME_OF_ARRIVAL", nullable = false)
-    private LocalDate timeOfArrival;
+    private LocalDateTime timeOfArrival;
 
     @Size(max = 255)
     @Column(name = "NOTES")
