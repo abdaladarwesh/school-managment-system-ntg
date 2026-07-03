@@ -3,8 +3,7 @@ package com.ntg.sms.Entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -14,6 +13,9 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table(name = "VIOLATIONS")
 public class Violation {
     @Id
@@ -49,7 +51,7 @@ public class Violation {
 
     @NotNull
     @Column(name = "ISMEETING", nullable = false)
-    private Long ismeeting;
+    private Boolean ismeeting;
 
     @Size(max = 255)
     @Column(name = "NOTES")
@@ -58,6 +60,4 @@ public class Violation {
     @ColumnDefault("sysdate")
     @Column(name = "\"date\"")
     private LocalDate date;
-
-
 }

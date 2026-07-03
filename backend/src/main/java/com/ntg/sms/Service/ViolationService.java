@@ -1,5 +1,8 @@
 package com.ntg.sms.Service;
 
+import com.ntg.sms.Dtos.Request.ViolationRequest;
+import com.ntg.sms.Entities.Violation;
+
 import java.util.List;
 
 public interface ViolationService {
@@ -10,4 +13,8 @@ public interface ViolationService {
 
     /** Returns formatted month name labels for the last {@code months} months. */
     List<String> getViolationMonthLabels(int months);
+
+    List<Violation> getAllViolations();
+
+    Violation createViolation(ViolationRequest request);
 }

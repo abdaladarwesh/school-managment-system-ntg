@@ -1,5 +1,9 @@
 package com.ntg.sms.Service.Impl;
 
+import com.ntg.sms.Dtos.Request.ViolationRequest;
+import com.ntg.sms.Entities.Student;
+import com.ntg.sms.Entities.Violation;
+import com.ntg.sms.Repositories.StudentRepository;
 import com.ntg.sms.Repositories.ViolationRepository;
 import com.ntg.sms.Service.ViolationService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class ViolationServiceImpl implements ViolationService {
 
     private final ViolationRepository violationRepository;
+    private final StudentRepository studentRepository;
 
     @Override
     public long gettotalviolations() {
@@ -58,5 +63,26 @@ public class ViolationServiceImpl implements ViolationService {
                     + " '" + String.format("%02d", month.getYear() % 100));
         }
         return labels;
+    }
+
+    @Override
+    public List<Violation> getAllViolations() {
+       return violationRepository.findAll() ;
+    }
+
+    @Override
+    public Violation createViolation(ViolationRequest request) {
+        Student student = studentRepository.findById(request.getStudentId()).orElse(null);
+        Violation violation = Violation.builder()
+                .student(student)
+                .violation(request.getViolation())
+                .nameOfViolator(request.getNameOfViolator())
+                .applicableProcedure(request.getApplicableProcedure())
+                .referringAuthority(request.getReferringAuthority())
+                .ismeeting(request.getIsmeeting())
+                .notes(request.getNotes())
+                .date(LocalDate.now())
+                .build();
+        return violationRepository.save(violation);
     }
 }
