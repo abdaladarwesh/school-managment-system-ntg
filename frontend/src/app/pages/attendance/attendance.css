@@ -1,12 +1,15 @@
 :host {
   font-family: 'Cairo', 'Segoe UI', Roboto, sans-serif;
-  background-color: #fcf9f9;
+  background-color: var(--background);
   display: block;
   min-height: 100vh;
-  padding: 20px;
+  padding: 25px;
 }
 
+
+
 .attendance-container {
+  background: var(--background);
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -305,7 +308,7 @@
 }
 
 .save-btn {
-  background-color: #1d4ed8;
+  background-color: var(--blue);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -349,4 +352,4 @@
 
 .spinning {
   animation: spin 1s linear infinite;
-}
+}

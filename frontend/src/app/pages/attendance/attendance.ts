@@ -95,6 +95,7 @@ export class Attendance implements OnInit {
         this.handleError(err);
       },
       next: (classes) => {
+        console.log(classes);
         this.allClasses.set(classes);
         if (classes.length > 0) {
           this.onClassChange(classes[0]);
@@ -124,6 +125,7 @@ export class Attendance implements OnInit {
           console.log(err);
         },
         next: (gridData) => {
+          console.log(gridData);
           this.grid.set(gridData);
           // Seed local status from existing attendance records
           const statusMap: Record<string, Record<string, 'P' | 'A' | 'E'>> = {};

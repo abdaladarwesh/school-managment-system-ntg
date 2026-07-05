@@ -10,4 +10,21 @@
   --text-main: #1a1a2e;
   --text-muted: #6c757d;
   --border: #e9ecef;
+  --background: #f3f1f2;
+  --titles: #620000;
+  --maroon: #620000;
+  --maroon-dark: #620000;
+  --blue: #2563eb;
 }
+.eyebrow-bar {
+  width: 4px;
+  height: 14px;
+  background: var(--maroon);
+  display: inline-block;
+  border-radius: 1px;
+}
+
+.text-maroon {
+  color: var(--maroon) !important;
+}
+

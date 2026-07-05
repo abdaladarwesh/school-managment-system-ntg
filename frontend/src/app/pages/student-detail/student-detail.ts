@@ -43,6 +43,38 @@ export class StudentDetail implements OnInit {
     });
   }
 
+  generatePassword(userId: number) {
+    this.studentService.generatePassword(userId).subscribe({
+      error: (err) => {
+        if (err.status === 401) {
+          Swal.fire({
+            title: 'Your session expired',
+            text: 'Please login again to continue using the application',
+            icon: 'error',
+            confirmButtonText: 'Continue',
+          }).then(() => this.router.navigate(['/login']));
+        } else {
+          Swal.fire({
+            title: 'Unexpected error — please try again later',
+            text: 'We are sorry, please try again later',
+            icon: 'error',
+            confirmButtonText: 'Try again',
+          });
+        }
+      },
+      next: (res) => {
+        // Standard SweetAlert2 Success Example
+        Swal.fire({
+          title: 'done',
+          text:
+            'Your data has been saved successfully.\nThe password for the student is\n' +
+            res.password,
+          icon: 'success',
+        });
+      },
+    });
+  }
+
   goBack() {
     this.router.navigate(['/students']);
   }
@@ -56,7 +88,7 @@ export class StudentDetail implements OnInit {
     const draft = this.studentService.getStudentDraft(id);
     if (!draft) return data;
 
-    const studentResponse : any = {
+    const studentResponse: any = {
       ...data.studentResponse,
       user: {
         ...data.studentResponse.user,
@@ -64,13 +96,15 @@ export class StudentDetail implements OnInit {
       },
       governorate: draft.student?.governorate ?? data.studentResponse.governorate,
       academicScoreInMiddleSchool:
-        draft.student?.academicScoreInMiddleSchool ?? data.studentResponse.academicScoreInMiddleSchool,
+        draft.student?.academicScoreInMiddleSchool ??
+        data.studentResponse.academicScoreInMiddleSchool,
       placeOfBirth: draft.student?.placeOfBirth ?? data.studentResponse.placeOfBirth,
-      martialParentsStatus: draft.student?.martialParentsStatus ?? data.studentResponse.martialParentsStatus,
+      martialParentsStatus:
+        draft.student?.martialParentsStatus ?? data.studentResponse.martialParentsStatus,
     };
 
     const medicalHistories = draft.student?.medicalHistory ?? data.medicalHistories;
-    const parentsResponse : any = data.parentsResponse.map((parent) => {
+    const parentsResponse: any = data.parentsResponse.map((parent) => {
       if (parent.user.gender === 'M' && draft.father) {
         return {
           ...parent,
@@ -131,12 +165,12 @@ export class StudentDetail implements OnInit {
       },
       next: () => {
         Swal.fire({
-          title: "Done",
-          text:"Student has been deleted successfully",
-          icon: "success",
-          confirmButtonText: "Ok"
-        })
-      }
+          title: 'Done',
+          text: 'Student has been deleted successfully',
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        });
+      },
     });
   }
 }

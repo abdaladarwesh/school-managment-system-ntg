@@ -4,6 +4,7 @@ import com.ntg.sms.Dtos.Request.ViolationRequest;
 import com.ntg.sms.Dtos.Response.ViolationResponse;
 import com.ntg.sms.Mappers.ViolationMapper;
 import com.ntg.sms.Service.ViolationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ViolationController {
 
 
     @PostMapping
-    public ResponseEntity<ViolationResponse> createViolation(@RequestBody ViolationRequest request) {
+    public ResponseEntity<ViolationResponse> createViolation(@RequestBody @Valid ViolationRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         violationMapper.toResponse(

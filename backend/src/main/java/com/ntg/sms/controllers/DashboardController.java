@@ -65,7 +65,7 @@ public class DashboardController {
         return DashboardResponse.builder()
                 .totalStudents(studentService.gettotalstudents())
                 .totalClasses(classService.gettotalstudents())
-                .todayAttendance(attendanceService.getTodayAttendance())
+                .todayAttendance((double) attendanceService.getTodayAbsenceCount())
                 .totalViolations(violationService.gettotalviolations())
                 .leaveRequests(permissionService.getleaveRequests())
                 .totalComplaints(complaintService.gettotalComplaints())

@@ -4,6 +4,7 @@ import com.ntg.sms.Dtos.Request.DelayRequest;
 import com.ntg.sms.Dtos.Response.DelayResponse;
 import com.ntg.sms.Mappers.DelayMapper;
 import com.ntg.sms.Service.DelayService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class DelayController {
     }
 
     @PutMapping
-    public ResponseEntity<DelayResponse> createDelay(@RequestBody DelayRequest request) {
+    public ResponseEntity<DelayResponse> createDelay(@RequestBody @Valid DelayRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(delayMapper.toResponse(delayService.createDelay(request)));
     }
 }

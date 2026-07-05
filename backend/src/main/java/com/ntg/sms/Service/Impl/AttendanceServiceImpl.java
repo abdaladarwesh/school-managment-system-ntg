@@ -1,13 +1,13 @@
 package com.ntg.sms.Service.Impl;
 
-import com.ntg.sms.Entities.*;
-import com.ntg.sms.Entities.Class;
 import com.ntg.sms.Dtos.Request.AttendanceEntryRequest;
 import com.ntg.sms.Dtos.Request.SaveAttendanceRequest;
 import com.ntg.sms.Dtos.Response.AttendanceGridResponse;
 import com.ntg.sms.Dtos.Response.ClassResponse;
 import com.ntg.sms.Dtos.Response.SessionAttendanceResponse;
 import com.ntg.sms.Dtos.Response.StudentAttendanceRowResponse;
+import com.ntg.sms.Entities.*;
+import com.ntg.sms.Entities.Class;
 import com.ntg.sms.Exceptions.ResourceNotFoundException;
 import com.ntg.sms.Repositories.AttendanceRepository;
 import com.ntg.sms.Repositories.ClassRepository;
@@ -41,6 +41,15 @@ public class AttendanceServiceImpl implements AttendanceService {
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
         return (double) attendanceRepository.countByDateBetween(start, end);
+    }
+
+    @Override
+    public Long getTodayAbsenceCount() {
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+        return attendanceRepository.countAbsenceByDateBetween(start, end);
     }
 
     @Override
@@ -89,6 +98,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         List<Student> students = studentRepository.findByStudentClassIdOrderByUserFirstNameAsc(classId);
 
         long dayOfWeekValue = date.getDayOfWeek().getValue(); // 1=Monday .. 7=Sunday
+
         List<Session> sessions = sessionRepository
                 .findByClassField_IdAndDayOfWeekOrderByStartAtAsc(classId, dayOfWeekValue);
 

@@ -10,6 +10,8 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -55,5 +57,9 @@ public class TrainingProgram {
     @Column(name = "CREATED_AT", nullable = false)
     private Instant createdAt;
 
+    // Inside TrainingProgram.java
+
+    @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Student> students = new LinkedHashSet<>();
 
 }

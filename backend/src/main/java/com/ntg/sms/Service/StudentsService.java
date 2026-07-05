@@ -14,4 +14,5 @@ public interface StudentsService {
     List<String> getStudentMedicalHistory(Student student);
     void deleteStudent(Long id);
     Student editStudent(StudentRequest request, Long studentId);
+    String generatePassword(Long studentId);
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -37,11 +38,11 @@ public class Session {
 
     @NotNull
     @Column(name = "START_AT", nullable = false)
-    private LocalDate startAt;
+    private LocalDateTime startAt;
 
     @NotNull
     @Column(name = "END_AT", nullable = false)
-    private LocalDate endAt;
+    private LocalDateTime endAt;
 
     @NotNull
     @Column(name = "UPDATED_AT", nullable = false)

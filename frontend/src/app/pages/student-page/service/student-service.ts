@@ -117,7 +117,7 @@ export class StudentService {
   toStudent(student: StudentResponse): Student {
     const firstName = student.user.firstName;
     const lastName = student.user.lastName;
-    
+
 
     return {
       id: student.id.toString(),
@@ -126,7 +126,7 @@ export class StudentService {
       email: student.user.email,
       grade: student.studentClass == null ? "" : student.studentClass.grade.name,
       class: student.studentClass == null ? "" : student.studentClass.name,
-      academicYear: student.studentClass == null ? "" : student.studentClass.grade.terms[0].year.toString(), 
+      academicYear: student.studentClass == null ? "" : student.studentClass.grade.terms[0].year.toString(),
       gender: student.user.gender === 'M' ? 'Male' : 'Female',
 
       status: student.user.isDeleted ? 'Probation' : "Active",
@@ -163,4 +163,12 @@ export class StudentService {
     return this.http.delete(`${this.url}/${studentId}`);
 
   }
+
+  generatePassword(userId:number): Observable<GeneratePasswordResponse> {
+    return this.http.post<GeneratePasswordResponse>(`${this.url}/generate-password/${userId}`, {});
+  }
+}
+
+interface GeneratePasswordResponse{
+  password: string;
 }

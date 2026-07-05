@@ -59,6 +59,11 @@ public class Student {
     )
     private Set<Team> teams = new LinkedHashSet<>();
 
+    // Inside Student.java
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PROGRAM_ID") // This creates the foreign key in the STUDENT table
+    private TrainingProgram trainingProgram;
 
 
 }

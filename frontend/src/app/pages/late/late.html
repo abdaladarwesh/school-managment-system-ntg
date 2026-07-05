@@ -2,9 +2,15 @@
 
   <div class="page-header">
     <div class="title-area">
-      <span class="sub-title">STUDENT AFFAIRS</span>
-      <h1 class="main-title">Late Arrivals</h1>
-      <p class="description">Track and register student late arrival records</p>
+      <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+          <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
+            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          </p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Late Arrivals</h1>
+          <p class="text-muted mb-0">Track and register student late arrival records</p>
+        </div>
+      </div>
     </div>
     <button class="btn-register" (click)="openLateArrivalModal()">
       <span class="plus-icon">+</span> Register Late Arrival
@@ -84,6 +90,10 @@
               </div>
             </td>
           </tr>
+        } @empty {
+          <tr>
+            <td class="text-align-center d-flex">There is no Late Arrivals</td>
+          </tr>
         }
       </tbody>
     </table>
@@ -126,7 +136,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn-cancel" (click)="closeLateArrivalModal()">Cancel</button>
-            <button type="submit" class="btn-submit bg-crimson">Save</button>
+            <button type="submit" class="btn-submit ">Save</button>
           </div>
         </form>
       </div>

@@ -10,6 +10,8 @@ import java.util.List;
 public interface AttendanceService {
     Double getTodayAttendance();
 
+    Long getTodayAbsenceCount();
+
     /** Returns weekly attendance counts for the last {@code weeks} weeks. */
     List<Long> getWeeklyAttendanceCounts(int weeks);
 

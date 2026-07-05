@@ -22,6 +22,18 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("startOfNextDay") LocalDateTime startOfNextDay
     );
 
+    @Query("""
+                SELECT COUNT(a)
+                FROM Attendance a
+                WHERE (a.dateTime >= :startOfDay
+                  AND a.dateTime < :startOfNextDay)
+                            AND a.status = 'A'
+            """)
+    long countAbsenceByDateBetween(
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("startOfNextDay") LocalDateTime startOfNextDay
+    );
+
     /**
      * Count attendance records falling in a specific week
      * (from weekStart inclusive to weekEnd exclusive).

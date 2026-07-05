@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { StudentService } from './service/student-service';
+import { StudentResponse, StudentService } from './service/student-service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
@@ -29,7 +29,7 @@ export class StudentPage implements OnInit {
   studentService = inject(StudentService);
   router = inject(Router);
 
-  ngOnInit(): void {
+  loadStudents() {
     this.studentService.getAllStudents().subscribe({
       error: (err) => {
         if (err.status === 401) {
@@ -49,10 +49,18 @@ export class StudentPage implements OnInit {
         }
       },
       next: (req) => {
+        console.log(req);
+        this.originalStudents.set(req);
         this.students.set(req.map((s) => this.studentService.toStudent(s)));
       },
     });
   }
+
+  ngOnInit(): void {
+    this.loadStudents();
+  }
+
+  originalStudents = signal<StudentResponse[]>([]);
 
   students = signal<Student[]>([]);
 
@@ -257,4 +265,5 @@ export class StudentPage implements OnInit {
   private normalize(value: string | null | undefined): string {
     return value && value.trim() ? value : this.NOT_ASSIGNED;
   }
+
 }

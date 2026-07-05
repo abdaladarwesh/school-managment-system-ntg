@@ -37,7 +37,7 @@ export class Login {
           localStorage.setItem("token", value.token)
           localStorage.setItem("role", value.role)
           this.router.navigate(['/dashboard'])
-          
+
         },
         error(err) {
           if (err.status == 401){
@@ -47,6 +47,15 @@ export class Login {
               icon: 'error',
               confirmButtonText: 'Try again',
             });
+          }
+          else {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Something went wrong with your request please check your internet.',
+              icon: 'error',
+              confirmButtonText: 'Try Again'
+            });
+
           }
         },
       });

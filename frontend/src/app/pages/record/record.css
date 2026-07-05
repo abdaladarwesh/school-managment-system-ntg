@@ -2,14 +2,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
-  background: #f5f7fb;
+  background: var(--background);
 }
 
 .attendance-container {
+  background: var(--background);
   padding: 25px;
 }
 
@@ -198,12 +198,13 @@ body {
 
 .search-box input {
   width: 100%;
-  padding: 13px 18px 13px 45px;
+  padding-left: 50px;
   border: none;
   background: #f6f8fc;
   border-radius: 12px;
   outline: none;
 }
+
 
 .filter-box select,
 .filter-box input {

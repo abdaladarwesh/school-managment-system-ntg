@@ -15,8 +15,10 @@
           <p class="text-muted mb-0">Complete student profile information</p>
         </div>
         <div class="d-flex gap-1">
-          <button [class.disabled]="data()?.studentResponse?.user?.isDeleted"(click)="deleteStudent()" class="btn btn-danger fw-semibold" >Delete Student</button>
-          <button type="button" class="btn btn-primary fw-semibold" (click)="editStudent()">+ Edit Student</button>
+          <button [class.disabled]="data()?.studentResponse?.user?.isDeleted" (click)="deleteStudent()"
+                  class="btn btn-danger fw-semibold">Delete Student
+          </button>
+          <button type="button" class="btn fw-semibold" style="background-color: var(--blue) !important; color: white" (click)="editStudent()">+ Edit Student</button>
         </div>
       </div>
 
@@ -54,11 +56,13 @@
                 <!-- Name -->
                 <div class="col-md-6">
                   <p class="field-label">Full Name (English)</p>
-                  <p class="field-value">{{ data()!.studentResponse.user.firstName }} {{ data()!.studentResponse.user.lastName }}</p>
+                  <p
+                    class="field-value">{{ data()!.studentResponse.user.firstName }} {{ data()!.studentResponse.user.lastName }}</p>
                 </div>
                 <div class="col-md-6">
                   <p class="field-label">Full Name (Arabic)</p>
-                  <p class="field-value">{{ data()!.studentResponse.user.firstNameInArabic }} {{ data()!.studentResponse.user.lastNameInArabic }}</p>
+                  <p
+                    class="field-value">{{ data()!.studentResponse.user.firstNameInArabic }} {{ data()!.studentResponse.user.lastNameInArabic }}</p>
                 </div>
                 <!-- Email -->
                 <div class="col-md-6">
@@ -69,7 +73,8 @@
                 <div class="col-md-6">
                   <p class="field-label">Phone Numbers</p>
                   <p class="mb-0" *ngIf="data()!.studentResponse.user.phoneNumbers.length">
-                    <span *ngFor="let phone of data()!.studentResponse.user.phoneNumbers; let last = last" class="badge class-chip fw-semibold me-1">+20{{ phone }}{{ !last ? '' : '' }}</span>
+                    <span *ngFor="let phone of data()!.studentResponse.user.phoneNumbers; let last = last"
+                          class="badge class-chip fw-semibold me-1">+20{{ phone }}{{ !last ? '' : '' }}</span>
                   </p>
                   <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.user.phoneNumbers.length">N/A</p>
                 </div>
@@ -108,6 +113,15 @@
                   <p class="field-label">Academic Score (Middle School)</p>
                   <p class="field-value">{{ data()!.studentResponse.academicScoreInMiddleSchool }}</p>
                 </div>
+            @if (data()!.studentResponse.user.lastLogin == null) {
+                <button class="mt-5 btn btn-primary m-0"
+                        (click)="generatePassword(data()!.studentResponse.user.id)">Generate Password
+                </button>
+            } @else if (data()!.studentResponse.user.lastLogin != null){
+              <button class="mt-5 btn btn-primary m-0"
+                      (click)="generatePassword(data()!.studentResponse.user.id)">Reset Password
+              </button>
+            }
               </div>
             </div>
           </div>
@@ -139,13 +153,15 @@
                 <div class="col-6">
                   <p class="field-label">Class</p>
                   <p class="field-value" *ngIf="data()!.studentResponse.studentClass">
-                    {{ data()!.studentResponse.studentClass?.grade?.name ?? "Not Assigned"  }} - {{ data()!.studentResponse.studentClass?.name ?? "Not Assigned" }}
+                    {{ data()!.studentResponse.studentClass?.grade?.name ?? "Not Assigned" }}
+                    - {{ data()!.studentResponse.studentClass?.name ?? "Not Assigned" }}
                   </p>
                   <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.studentClass">Not Assigned</p>
                 </div>
                 <div class="col-6">
                   <p class="field-label">Class Capacity</p>
-                  <p class="field-value" *ngIf="data()!.studentResponse.studentClass">{{ data()!.studentResponse.studentClass?.capacity ?? "Not Assigned" }}</p>
+                  <p class="field-value"
+                     *ngIf="data()!.studentResponse.studentClass">{{ data()!.studentResponse.studentClass?.capacity ?? "Not Assigned" }}</p>
                   <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.studentClass">N/A</p>
                 </div>
               </div>
@@ -162,7 +178,9 @@
               <div class="row g-3">
                 <div class="col-12">
                   <p class="field-label">Status</p>
-                  <span class="badge rounded-pill" [class.status-badge--active]="!data()!.studentResponse.user.isDeleted" [class.status-badge--suspended]="data()!.studentResponse.user.isDeleted">
+                  <span class="badge rounded-pill"
+                        [class.status-badge--active]="!data()!.studentResponse.user.isDeleted"
+                        [class.status-badge--suspended]="data()!.studentResponse.user.isDeleted">
                     {{ data()!.studentResponse.user.isDeleted ? 'Deleted' : 'Active' }}
                   </span>
                 </div>
@@ -172,7 +190,8 @@
                 </div>
                 <div class="col-12">
                   <p class="field-label">Last Login</p>
-                  <p class="field-value" *ngIf="data()!.studentResponse.user.lastLogin">{{ formatDateTime(data()!.studentResponse.user.lastLogin) }}</p>
+                  <p class="field-value"
+                     *ngIf="data()!.studentResponse.user.lastLogin">{{ formatDateTime(data()!.studentResponse.user.lastLogin) }}</p>
                   <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.user.lastLogin">Never logged in</p>
                 </div>
               </div>
@@ -188,7 +207,8 @@
                 </div>
               </div>
               <div *ngIf="data()!.medicalHistories.length">
-                <span *ngFor="let condition of data()!.medicalHistories" class="badge rounded-pill medical-chip me-2 mb-2">
+                <span *ngFor="let condition of data()!.medicalHistories"
+                      class="badge rounded-pill medical-chip me-2 mb-2">
                   {{ condition }}
                 </span>
               </div>
@@ -214,7 +234,8 @@
             <div class="parent-divider" *ngIf="i > 0"></div>
             <div class="row g-3">
               <div class="col-12">
-                <p class="parent-label" [class.father-label]="parent.user.gender === 'M'" [class.mother-label]="parent.user.gender === 'F'">
+                <p class="parent-label" [class.father-label]="parent.user.gender === 'M'"
+                   [class.mother-label]="parent.user.gender === 'F'">
                   {{ parent.user.gender === 'M' ? 'Father' : 'Mother' }}
                 </p>
               </div>
@@ -239,7 +260,8 @@
               <div class="col-md-6">
                 <p class="field-label">Phone Numbers</p>
                 <p class="mb-0" *ngIf="parent.user.phoneNumbers.length">
-                  <span *ngFor="let phone of parent.user.phoneNumbers; let last = last" class="badge class-chip fw-semibold me-1">+20{{ phone }}{{ !last ? '' : '' }}</span>
+                  <span *ngFor="let phone of parent.user.phoneNumbers; let last = last"
+                        class="badge class-chip fw-semibold me-1">+20{{ phone }}{{ !last ? '' : '' }}</span>
                 </p>
                 <p class="mb-0 text-muted" *ngIf="!parent.user.phoneNumbers.length">N/A</p>
               </div>
@@ -265,7 +287,18 @@
               <div class="col-md-4">
                 <p class="field-label">Birth Date</p>
                 <p class="field-value">{{ formatDate(parent.user.birthDate) }}</p>
+
               </div>
+                @if (data()!.studentResponse.user.lastLogin == null) {
+                  <button class="mt-5 btn btn-primary m-0"
+                          (click)="generatePassword(data()!.studentResponse.user.id)">Generate Password
+                  </button>
+                } @else if (data()!.studentResponse.user.lastLogin != null){
+
+                  <button class="mt-5 btn btn-primary m-0"
+                          (click)="generatePassword(data()!.studentResponse.user.id)">Reset Password
+                  </button>
+                }
             </div>
           </ng-container>
         </div>

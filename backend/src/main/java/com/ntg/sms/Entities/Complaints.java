@@ -2,8 +2,10 @@ package com.ntg.sms.Entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -37,6 +39,6 @@ public class Complaints {
     private String response;
 
     @Column(name = "SUBMITTED_AT")
-    private String submittedAt;
+    private LocalDateTime submittedAt;
 
 }

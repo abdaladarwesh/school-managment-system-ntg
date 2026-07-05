@@ -1,1 +1,159 @@
-<p>complaints works!</p>
+
+<div class="main-container">
+
+
+  <main class="content-wrapper">
+    <div class="page-header">
+      <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+          <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
+            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          </p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Complaints</h1>
+          <p class="text-muted mb-0">Review and respond to students, teachers and parents complaints and concerns
+          </p>
+        </div>
+      </div>
+      <div class="awaiting-box">
+        <span class="awaiting-count">{{ pendingCount }}</span>
+        <span class="awaiting-text">AWAITING REPLY</span>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="card-icon-wrapper bg-rose">
+          <span class="icon-bubble">💬</span>
+        </div>
+        <div class="stat-number">{{ totalCount }}</div>
+        <div class="stat-label">TOTAL COMPLAINTS</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="card-icon-wrapper bg-green">
+          <span class="icon-check">✓</span>
+        </div>
+        <div class="stat-number">{{ repliedCount }}</div>
+        <div class="stat-label">REPLIED</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="card-icon-wrapper bg-orange">
+          <span class="icon-alert">!</span>
+        </div>
+        <div class="stat-number">{{ pendingCount }}</div>
+        <div class="stat-label">PENDING REPLY</div>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-bar-wrapper" style="width: 360px;">
+        <input
+          type="text"
+          placeholder="Search by student name or complaint title..."
+          class="search-input"
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+        >
+      </div>
+      <div class="filter-actions">
+        <button [class.active]="activeFilter() === 'All'" (click)="setFilter('All')" class="filter-btn">All</button>
+        <button [class.active]="activeFilter() === 'Pending'" (click)="setFilter('Pending')" class="filter-btn">Pending</button>
+        <button [class.active]="activeFilter() === 'Replied'" (click)="setFilter('Replied')" class="filter-btn">Replied</button>
+        <span class="results-badge">{{ filteredComplaints().length }} results</span>
+      </div>
+    </div>
+
+    <div class="complaints-grid">
+      @for (item of filteredComplaints(); track item.id) {
+        <div class="complaint-card" [ngClass]="item.status === 'Replied' ? 'border-green' : 'border-blue'">
+          <div class="card-header">
+            <div class="student-info">
+              <div class="avatar">{{ getInitials(item.submitterName) }}</div>
+              <div>
+                <h3 class="student-name">{{ item.submitterName }}</h3>
+                <p class="student-class">{{ item.category }}</p>
+              </div>
+            </div>
+            <span class="status-badge" [ngClass]="item.status === 'Replied' ? 'status-replied' : 'status-pending'">
+              ● {{ item.status }}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <span class="complaint-date">📅 {{ item.date }}</span>
+            <h4 class="complaint-title">{{ item.title }}</h4>
+            <p class="complaint-text">{{ item.description }}</p>
+
+            @if (item.status === 'Replied' && item.response) {
+              <div class="reply-preview-box">
+                <span class="reply-preview-label">✔ Admin Reply:</span>
+                <p class="reply-preview-text">{{ item.response }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="card-footer">
+            @if (item.status === 'Pending') {
+              <button (click)="openReplyModal(item)" class="btn-reply">
+                <span>💬</span> Reply to Complaint
+              </button>
+            }
+            @if (item.status === 'Replied') {
+              <button (click)="openReplyModal(item)" class="btn-view">
+                <span>👁</span> View / Edit Reply
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (filteredComplaints().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📭</span>
+          <p>No complaints found.</p>
+        </div>
+      }
+    </div>
+  </main>
+
+  @if (isModalOpen) {
+    <div class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-header-title">
+            <span class="modal-icon">💬</span>
+            <div>
+              <h3>{{ selectedComplaint?.status === 'Replied' ? 'Edit Reply' : 'Reply to Complaint' }}</h3>
+              <p>{{ selectedComplaint?.submitterName }} · {{ selectedComplaint?.category }}</p>
+            </div>
+          </div>
+          <button (click)="closeReplyModal()" class="close-btn">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="complaint-preview-box">
+            <span class="preview-tag">{{ selectedComplaint?.title | uppercase }}</span>
+            <p class="preview-text">{{ selectedComplaint?.description }}</p>
+          </div>
+
+          <div class="reply-input-group">
+            <label class="reply-label">➔ YOUR REPLY</label>
+            <textarea
+              [(ngModel)]="replyText"
+              placeholder="Write your official response here..."
+              rows="4"
+              class="reply-textarea"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeReplyModal()" class="btn-cancel">✕ Cancel</button>
+          <button (click)="submitReply()" [disabled]="!replyText.trim()" class="btn-submit">➔ Send Reply</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

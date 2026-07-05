@@ -6,11 +6,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req)
   }
   const token = localStorage.getItem('token');
-  console.log(req);
-  
+
 
   if (!token) {
-    
+
     return next(req);
   }
 
@@ -19,7 +18,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       Authorization: `Bearer ${token}`
     }
   });
-  
+
 
   return next(clonedRequest);
 };

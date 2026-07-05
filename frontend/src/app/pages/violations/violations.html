@@ -2,11 +2,17 @@
 
   <div class="dashboard-header">
     <div>
-      <span class="sub-brand">| Student Affairs</span>
-      <h1 class="main-title">Student Violations</h1>
-      <p class="sub-title">Monitor, record, and manage student disciplinary cases</p>
+      <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+          <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
+            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          </p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Violations</h1>
+          <p class="text-muted mb-0">Monitor, record, and manage student disciplinary cases</p>
+        </div>
+      </div>
     </div>
-    <button class="btn-primary" (click)="openModal()">
+    <button class="btn-register" (click)="openModal()">
       <span class="btn-icon">+</span> Register Violation
     </button>
   </div>
@@ -88,6 +94,10 @@
                   </button>
                 </div>
               </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td>There is no violations</td>
             </tr>
           }
         </tbody>

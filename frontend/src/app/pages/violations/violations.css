@@ -1,9 +1,8 @@
 .dashboard-container {
   min-height: 100vh;
-  background-color: #f9f9f9;
+  background-color: var(--background);
   padding: 24px;
   color: #333333;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
@@ -11,8 +10,30 @@
 .main-title { font-size: 24px; font-weight: 700; color: #4a1515; margin: 4px 0 0 0; }
 .sub-title { font-size: 14px; color: #6b7280; margin: 2px 0 0 0; }
 
+.btn-register {
+  background-color: #1e56e3;
+  color: white;
+  border: 2px solid #1e56e3;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(30, 86, 227, 0.15);
+  transition: 0.3s;
+}
+
+
+.btn-register:hover {
+  background-color: transparent;
+  color: var(--blue);
+  border: 2px solid var(--blue);
+}
 .btn-primary {
-  background-color: #1e56a0;
+  background-color: var(--blue);
   color: #ffffff;
   padding: 10px 20px;
   border-radius: 12px;

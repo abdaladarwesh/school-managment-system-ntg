@@ -2,6 +2,7 @@ package com.ntg.sms.Controllers;
 
 import com.ntg.sms.Dtos.Request.StudentRequest;
 import com.ntg.sms.Dtos.Response.FullStudentResponse;
+import com.ntg.sms.Dtos.Response.GeneratePasswordResponse;
 import com.ntg.sms.Dtos.Response.ParentResponse;
 import com.ntg.sms.Dtos.Response.StudentResponse;
 import com.ntg.sms.Entities.Parent;
@@ -45,6 +46,12 @@ public class StudentController {
                 }
         );
         return dto;
+    }
+
+    @PostMapping("generate-password/{id}")
+    public ResponseEntity<?> generatePassword(@PathVariable Long id){
+        String s = userService.generatePassword(id);
+        return ResponseEntity.ok(GeneratePasswordResponse.builder().password(s).build());
     }
 
 

@@ -32,6 +32,21 @@
 .btn-back:hover {
   color: var(--maroon);
 }
+.save-btn {
+  background-color: var(--blue);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(29,78,216,0.3);
+  transition: opacity 0.2s;
+}
 
 /* ===== Flat info panel (replaces the old card + gradient header) ===== */
 .info-panel {

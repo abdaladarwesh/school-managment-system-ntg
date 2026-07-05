@@ -8,13 +8,14 @@ import com.ntg.sms.Repositories.*;
 import com.ntg.sms.Service.StudentsService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.RandomStringGenerator;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class StudentServiceImpl implements StudentsService {
     private final ParentRepository parentRepository;
     private final StudentsParentRepository studentsParentRepository;
     private final UserPhoneNumberRepository userPhoneNumberRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -37,7 +39,7 @@ public class StudentServiceImpl implements StudentsService {
 
     @Override
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        return studentRepository.findAllWhereNotIsDeleted();
     }
 
     @Override
@@ -74,14 +76,14 @@ public class StudentServiceImpl implements StudentsService {
             });
         }
 
-        Parent father = createParent(request.getFather(), parentRole);
-        Parent mother = createParent(request.getMother(), parentRole);
+        Parent father = getOrCreateParent(request.getFather(), parentRole);
+        Parent mother = getOrCreateParent(request.getMother(), parentRole);
 
         linkParent(savedStudent, father, "FATHER", request.getGuardianType() == StudentRequest.GuardianType.FATHER);
         linkParent(savedStudent, mother, "MOTHER", request.getGuardianType() == StudentRequest.GuardianType.MOTHER);
 
         if (request.getGuardianType() == StudentRequest.GuardianType.OTHER) {
-            Parent guardian = createParent(request.getGuardian(), parentRole);
+            Parent guardian = getOrCreateParent(request.getGuardian(), parentRole);
             linkParent(savedStudent, guardian, "GUARDIAN", true);
         }
 
@@ -152,20 +154,40 @@ public class StudentServiceImpl implements StudentsService {
         return savedUser;
     }
 
-    private Parent createParent(StudentRequest.ParentInfo request, Role parentRole) {
-        User user = createUser(request.getUser(), parentRole);
-
-        if (parentRepository.existsByUserId(user.getId())) {
-            throw new ConflictException("Parent already exists for user id: '" + user.getId() + "'");
+    private Parent getOrCreateParent(StudentRequest.ParentInfo requestInfo, Role parentRole) {
+        if (requestInfo == null || requestInfo.getUser() == null) {
+            return null;
         }
 
+        StudentRequest.UserInfo userInfo = requestInfo.getUser();
+
+        // 1. Check if Parent already exists by National Number (Recommended Primary Key for citizens)
+        if (userInfo.getNationalNumber() != null) {
+            User existingUser = userRepository.findByNationalNumber(userInfo.getNationalNumber()).orElse(null);
+            if (existingUser != null) {
+                return parentRepository.findByUserId(existingUser.getId())
+                        .orElseThrow(() -> new ConflictException("User exists but is not registered as a PARENT."));
+            }
+        }
+
+        // 2. Fallback: Check by Email
+        if (userInfo.getEmail() != null && userRepository.existsByEmail(userInfo.getEmail())) {
+            User existingUser = userRepository.findByEmail(userInfo.getEmail()).orElse(null);
+            if (existingUser != null) {
+                return parentRepository.findByUserId(existingUser.getId())
+                        .orElseThrow(() -> new ConflictException("Email belongs to an account that is not a PARENT."));
+            }
+        }
+
+        // 3. If parent does not exist at all, create them as new
+        User newUser = createUser(userInfo, parentRole);
+
         Parent parent = new Parent();
-        parent.setUser(user);
-        parent.setJobName(request.getJobName());
+        parent.setUser(newUser);
+        parent.setJobName(requestInfo.getJobName());
 
         return parentRepository.saveAndFlush(parent);
     }
-
     private void linkParent(Student student, Parent parent, String parentRole, boolean isGuardian) {
         StudentsParentId id = new StudentsParentId();
         id.setStudentId(student.getId());
@@ -212,19 +234,6 @@ public class StudentServiceImpl implements StudentsService {
     private void validateGuardian(StudentRequest request) {
         if (request.getGuardianType() == StudentRequest.GuardianType.OTHER && request.getGuardian() == null) {
             throw new BadRequestException("Guardian info is required when guardian type is OTHER.");
-        }
-    }
-
-    private void validateUniqueUsers(StudentRequest request) {
-        Set<String> emails = new HashSet<>();
-        Set<Long> nationalNumbers = new HashSet<>();
-
-        validateUniqueUser(request.getStudentUser(), emails, nationalNumbers);
-        validateUniqueUser(request.getFather().getUser(), emails, nationalNumbers);
-        validateUniqueUser(request.getMother().getUser(), emails, nationalNumbers);
-
-        if (request.getGuardianType() == StudentRequest.GuardianType.OTHER) {
-            validateUniqueUser(request.getGuardian().getUser(), emails, nationalNumbers);
         }
     }
 
@@ -301,6 +310,21 @@ public class StudentServiceImpl implements StudentsService {
         return savedStudent;
     }
 
+    @Override
+    public String generatePassword(Long studentId) {
+        Student student = studentRepository.findById(studentId).orElse(null);
+        User user = userRepository.findById(student.getUser().getId()).orElse(null);
+        SecureRandom secureRandom = new SecureRandom();
+        RandomStringGenerator secureGenerator = new RandomStringGenerator.Builder()
+                .withinRange('!', 'z') // Includes symbols, numbers, and uppercase/lowercase letters
+                .usingRandom(secureRandom::nextInt) // Explicitly binds SecureRandom
+                .get();
+        String generatedPassword = secureGenerator.generate(16);
+        user.setPassword(passwordEncoder.encode(generatedPassword));
+        userRepository.saveAndFlush(user);
+        return generatedPassword;
+    }
+
     private void validateUserInfo(StudentRequest.UserInfo request) {
         if (request.getGender() != 'M' && request.getGender() != 'F') {
             throw new BadRequestException("Gender must be 'M' or 'F'.");
@@ -351,22 +375,120 @@ public class StudentServiceImpl implements StudentsService {
         } else {
             // Fallback: If they didn't have this parent role before, create it
             Role parentRole = getOrCreateRole("PARENT");
-            Parent newParent = createParent(requestInfo, parentRole);
+            Parent newParent = getOrCreateParent(requestInfo, parentRole);
             linkParent(student, newParent, roleName, isGuardian);
         }
     }
 
-    // Helper to validate unique users during an UPDATE (ignores the current users' existing emails/IDs)
-    private void validateUniqueUsersForUpdate(StudentRequest request, Student existingStudent) {
-        // Note: For a robust system, you should check if the new email belongs to a DIFFERENT user ID.
-        // Example logic:
-        // User userWithEmail = userRepository.findByEmail(request.getStudentUser().getEmail());
-        // if(userWithEmail != null && !userWithEmail.getId().equals(existingStudent.getUser().getId())) {
-        //     throw new ConflictException("Email already in use.");
-        // }
-        //
-        // You will need to implement a variation of validateUniqueUsers that skips the check
-        // if the matched record's User ID is the same as the one currently being updated.
+    private void validateUniqueUsers(StudentRequest request) {
+        Set<String> emailsInPayload = new HashSet<>();
+        Set<Long> nationalNumbersInPayload = new HashSet<>();
+
+        // 1. The Student MUST be strictly new
+        validateStrictlyNewUser(request.getStudentUser(), emailsInPayload, nationalNumbersInPayload);
+
+        // 2. For Parents, we only check for duplicates within the current request payload
+        // (e.g., passing the exact same email for both Father and Mother in one request)
+        validatePayloadDuplicatesOnly(request.getFather().getUser(), emailsInPayload, nationalNumbersInPayload);
+        validatePayloadDuplicatesOnly(request.getMother().getUser(), emailsInPayload, nationalNumbersInPayload);
+
+        if (request.getGuardianType() == StudentRequest.GuardianType.OTHER && request.getGuardian() != null) {
+            validatePayloadDuplicatesOnly(request.getGuardian().getUser(), emailsInPayload, nationalNumbersInPayload);
+        }
     }
 
+    private void validateStrictlyNewUser(StudentRequest.UserInfo request, Set<String> emails, Set<Long> nationalNumbers) {
+        validatePayloadDuplicatesOnly(request, emails, nationalNumbers);
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("User already exists with email: '" + request.getEmail() + "'");
+        }
+        if (request.getNationalNumber() != null && userRepository.existsByNationalNumber(request.getNationalNumber())) {
+            throw new ConflictException("User already exists with national number: '" + request.getNationalNumber() + "'");
+        }
+    }
+
+    private void validatePayloadDuplicatesOnly(StudentRequest.UserInfo request, Set<String> emails, Set<Long> nationalNumbers) {
+        if (request == null) return;
+
+        String email = request.getEmail().trim().toLowerCase();
+        if (!emails.add(email)) {
+            throw new ConflictException("Duplicate email submitted within the request payload: '" + request.getEmail() + "'");
+        }
+
+        if (request.getNationalNumber() != null && !nationalNumbers.add(request.getNationalNumber())) {
+            throw new ConflictException("Duplicate national number submitted within the request payload: '" + request.getNationalNumber() + "'");
+        }
+    }
+
+
+    private void validateUniqueUsersForUpdate(StudentRequest request, Student existingStudent) {
+        Set<String> emailsInPayload = new HashSet<>();
+        Set<Long> nationalNumbersInPayload = new HashSet<>();
+
+        // 1. Validate Student User (excluding existing Student's User ID from DB conflict check)
+        validateUserUniquenessForUpdate(
+                request.getStudentUser(),
+                existingStudent.getUser().getId(),
+                emailsInPayload,
+                nationalNumbersInPayload
+        );
+
+        // 2. Validate Parents (Father, Mother, and Guardian if applicable)
+        validateParentUniquenessForUpdate(existingStudent, "FATHER", request.getFather(), emailsInPayload, nationalNumbersInPayload);
+        validateParentUniquenessForUpdate(existingStudent, "MOTHER", request.getMother(), emailsInPayload, nationalNumbersInPayload);
+
+        if (request.getGuardianType() == StudentRequest.GuardianType.OTHER && request.getGuardian() != null) {
+            validateParentUniquenessForUpdate(existingStudent, "GUARDIAN", request.getGuardian(), emailsInPayload, nationalNumbersInPayload);
+        }
+    }
+
+    private void validateParentUniquenessForUpdate(Student existingStudent, String roleName, StudentRequest.ParentInfo requestInfo, Set<String> emailsInPayload, Set<Long> nationalNumbersInPayload) {
+        if (requestInfo == null || requestInfo.getUser() == null) {
+            return;
+        }
+
+        StudentsParent existingLink = studentsParentRepository
+                .findByStudentIdAndParentRole(existingStudent.getId(), roleName)
+                .orElse(null);
+
+        if (existingLink != null) {
+            // Parent is already linked: validate DB uniqueness excluding their current user ID
+            Long currentParentUserId = existingLink.getParent().getUser().getId();
+            validateUserUniquenessForUpdate(requestInfo.getUser(), currentParentUserId, emailsInPayload, nationalNumbersInPayload);
+        } else {
+            // Parent is being linked for the first time during an update: check payload duplicates only.
+            // (getOrCreateParent() will handle safely fetching or creating the account during persistence)
+            validatePayloadDuplicatesOnly(requestInfo.getUser(), emailsInPayload, nationalNumbersInPayload);
+        }
+    }
+
+    private void validateUserUniquenessForUpdate(StudentRequest.UserInfo request, Long currentUserId, Set<String> emailsInPayload, Set<Long> nationalNumbersInPayload) {
+        if (request == null) {
+            return;
+        }
+
+        // 1. Check for duplicates submitted within the current JSON request payload
+        validatePayloadDuplicatesOnly(request, emailsInPayload, nationalNumbersInPayload);
+
+        // 2. Check Database duplicates (ensure email belongs to currentUserId if it exists in DB)
+        if (request.getEmail() != null) {
+            userRepository.findByEmail(request.getEmail().trim())
+                    .ifPresent(existingUser -> {
+                        if (!existingUser.getId().equals(currentUserId)) {
+                            throw new ConflictException("Email is already in use by another account: '" + request.getEmail() + "'");
+                        }
+                    });
+        }
+
+        // 3. Check Database duplicates (ensure national number belongs to currentUserId if it exists in DB)
+        if (request.getNationalNumber() != null) {
+            userRepository.findByNationalNumber(request.getNationalNumber())
+                    .ifPresent(existingUser -> {
+                        if (!existingUser.getId().equals(currentUserId)) {
+                            throw new ConflictException("National number is already in use by another account: '" + request.getNationalNumber() + "'");
+                        }
+                    });
+        }
+    }
 }

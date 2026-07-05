@@ -1,13 +1,19 @@
-<div class="attendance-container">
+<div class="attendance-container" >
 
   <div class="top-bar">
     <div class="page-title">
-      <h2>Attendance Records</h2>
-      <p>Track, review and manage daily student attendance across all grades</p>
+      <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
+        <div>
+          <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
+            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          </p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Attendance Records</h1>
+          <p class="text-muted mb-0">Track, review and manage daily student attendance across all grades</p>
+        </div>
+      </div>
     </div>
-
     <div class="top-actions">
-      <button class="export-btn" (click)="exportReport()">
+      <button class="btn btn-outline-secondary p-2 px-3" (click)="exportReport()">
         <i class="bi bi-download"></i>
         Export Report
       </button>
@@ -42,14 +48,13 @@
     <div class="card rate-card">
       <div class="icon white"><i class="bi bi-graph-up"></i></div>
       <h1>{{attendanceRate}}%</h1>
-      <span>ATTENDANCE RATE</span>
+      <span style="color: white">ATTENDANCE RATE</span>
       <small>{{totalRecords}} records</small>
     </div>
   </div>
 
   <div class="filter-box">
     <div class="search-box">
-      <i class="bi bi-search"></i>
       <input type="text" placeholder="Search by student name..." [(ngModel)]="searchText">
     </div>
 
@@ -78,7 +83,7 @@
       <option value="Excused">Excused</option>
     </select>
 
-    <button class="reset-btn" (click)="resetFilters()">Reset</button>
+    <button class="btn btn-outline-secondary p-2 px-3" (click)="resetFilters()">Reset</button>
     <div class="records-count">{{totalRecords}} records</div>
   </div>
 

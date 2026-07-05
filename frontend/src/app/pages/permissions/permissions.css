@@ -1,6 +1,6 @@
 .dashboard-container {
-    background-color: #f3f4f6;
-    padding: 0 40px 40px 40px;
+  background: var(--background);
+  padding: 25px;
     font-family: system-ui, -apple-system, sans-serif;
     min-height: 100vh;
 }
@@ -63,15 +63,28 @@
     margin: 0;
 }
 
-.btn-primary {
-    background-color: #1d4ed8;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 24px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+.save-btn {
+  background-color: var(--blue);
+  color: white;
+  border: none;
+  /*padding: 12px 24px;*/
+  border-radius: 8px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  /*font-size: 14px;*/
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(29,78,216,0.3);
+  border: 2px solid var(--blue);
+  transition: 0.3s;
+}
+
+.save-btn:hover {
+  background-color: transparent;
+  border: 2px solid var(--blue);
+  color: var(--blue);
 }
 
 .cards-grid {
