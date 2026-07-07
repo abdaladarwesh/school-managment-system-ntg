@@ -41,30 +41,6 @@
             </div>
           </div>
         </div>
-        <div class="col-6 col-md-3">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">Active</p>
-              <p class="fs-3 fw-bold mb-0 text-success">{{ activeCount() }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">On Probation</p>
-              <p class="fs-3 fw-bold mb-0 text-warning-emphasis">{{ probationCount() }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-              <p class="text-muted text-uppercase small mb-2" style="font-size: 0.7rem;">Suspended</p>
-              <p class="fs-3 fw-bold mb-0 text-maroon">{{ suspendedCount() }}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Table card -->
@@ -81,18 +57,6 @@
                 [ngModel]="searchTerm()"
                 (ngModelChange)="onSearchChange($event)"
               />
-            </div>
-
-            <div class="btn-group" role="group">
-              <button
-                *ngFor="let tab of statusTabs"
-                type="button"
-                class="btn btn-light status-tab"
-                [class.active]="statusFilter() === tab"
-                (click)="setStatusFilter(tab)"
-              >
-                {{ tab }}
-              </button>
             </div>
 
             <span class="ms-auto border rounded px-3 py-2 small text-muted">

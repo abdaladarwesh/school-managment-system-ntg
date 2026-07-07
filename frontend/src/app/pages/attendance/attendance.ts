@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -74,8 +74,8 @@ export class Attendance implements OnInit {
   /** Student rows with mutable local attendance map  */
   rows = computed(() => this.grid()?.rows ?? []);
 
-  // Local mutable copy: studentId → sessionId → status
-  localStatus = signal<Record<string, Record<string, 'P' | 'A' | 'E'>>>({});
+  /** 1. ALLOW NULL IN THE SIGNAL TYPE */
+  localStatus = signal<Record<string, Record<string, 'P' | 'A' | 'E' | null>>>({});
 
   loading = signal(false);
   saving = signal(false);
@@ -86,8 +86,6 @@ export class Attendance implements OnInit {
   }
 
   // ── Data loading ──────────────────────────────────────────────────────────
-  // ── Data loading ──────────────────────────────────────────────────────────
-
   loadClasses(): void {
     this.http.get<ClassResponse[]>('http://localhost:8080/api/v1/attendance/classes').subscribe({
       error: (err) => {
@@ -95,7 +93,6 @@ export class Attendance implements OnInit {
         this.handleError(err);
       },
       next: (classes) => {
-        console.log(classes);
         this.allClasses.set(classes);
         if (classes.length > 0) {
           this.onClassChange(classes[0]);
@@ -125,15 +122,14 @@ export class Attendance implements OnInit {
           console.log(err);
         },
         next: (gridData) => {
-          console.log(gridData);
           this.grid.set(gridData);
-          // Seed local status from existing attendance records
-          const statusMap: Record<string, Record<string, 'P' | 'A' | 'E'>> = {};
+
+          /** 2. REMOVED THE DEFAULT 'P' FALLBACK HERE */
+          const statusMap: Record<string, Record<string, 'P' | 'A' | 'E' | null>> = {};
           for (const row of gridData.rows) {
             statusMap[row.studentId] = {};
             for (const sess of row.sessions) {
-              // Default to 'P' if not yet recorded
-              statusMap[row.studentId][sess.sessionId] = (sess.status as 'P' | 'A' | 'E') ?? 'P';
+              statusMap[row.studentId][sess.sessionId] = sess.status;
             }
           }
           this.localStatus.set(statusMap);
@@ -143,8 +139,10 @@ export class Attendance implements OnInit {
   }
 
   // ── Attendance interaction ─────────────────────────────────────────────────
-  getStatus(studentId: number, sessionId: number): 'P' | 'A' | 'E' {
-    return this.localStatus()[studentId]?.[sessionId] ?? 'P';
+
+  /** 3. RETURN TYPE UPDATED TO INCLUDE NULL AND DEFAULTED TO NULL */
+  getStatus(studentId: number, sessionId: number): 'P' | 'A' | 'E' | null {
+    return this.localStatus()[studentId]?.[sessionId] ?? null;
   }
 
   setStatus(studentId: number, sessionId: number, status: 'P' | 'A' | 'E'): void {
@@ -153,15 +151,14 @@ export class Attendance implements OnInit {
     this.localStatus.set(current);
   }
 
-// ── Stats ─────────────────────────────────────────────────────────────────
-  // A student's day is classified into exactly one bucket:
-  //  - present:  at least one 'P' among the day's sessions
-  //  - excused:  no 'P', and every session is 'E'
-  //  - absent:   everything else (all 'A', or a mix of 'A'/'E' with no 'P')
+  // ── Stats ─────────────────────────────────────────────────────────────────
+
+  /** 4. UPDATED DAY STATUS TO CORRECTLY IGNORE UNRECORDED NULL ENTRIES FROM COUNTS */
   private dayStatus(studentId: number): 'P' | 'A' | 'E' | null {
     const statuses = Object.values(this.localStatus()[studentId] ?? {});
     if (statuses.length === 0) return null;
     if (statuses.includes('P')) return 'P';
+    if (statuses.includes(null)) return null; // Do not count student if any session is still unrecorded
     if (statuses.every((s) => s === 'E')) return 'E';
     return 'A';
   }
@@ -197,14 +194,15 @@ export class Attendance implements OnInit {
     if (!cls || !gridData) return;
 
     const statusMap = this.localStatus();
-    const entries: { studentId: number; sessionId: number; status: string }[] = [];
+    const entries: { studentId: number; sessionId: number; status: 'P' | 'A' | 'E' | null }[] = [];
 
     for (const row of gridData.rows) {
       for (const sess of row.sessions) {
+        /** 5. FALLBACK CHANGED TO NULL INSTEAD OF 'P' TO SEND TRUE STATE TO BACKEND */
         entries.push({
           studentId: row.studentId,
           sessionId: sess.sessionId,
-          status: statusMap[row.studentId]?.[sess.sessionId] ?? 'P',
+          status: statusMap[row.studentId]?.[sess.sessionId] ?? null,
         });
       }
     }
@@ -220,7 +218,6 @@ export class Attendance implements OnInit {
       error: (err) => {
         this.saving.set(false);
         console.log(err);
-
         this.handleError(err);
       },
       next: (updated) => {

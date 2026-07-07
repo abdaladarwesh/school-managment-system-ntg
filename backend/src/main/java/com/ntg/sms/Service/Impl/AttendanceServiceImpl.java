@@ -2,10 +2,7 @@ package com.ntg.sms.Service.Impl;
 
 import com.ntg.sms.Dtos.Request.AttendanceEntryRequest;
 import com.ntg.sms.Dtos.Request.SaveAttendanceRequest;
-import com.ntg.sms.Dtos.Response.AttendanceGridResponse;
-import com.ntg.sms.Dtos.Response.ClassResponse;
-import com.ntg.sms.Dtos.Response.SessionAttendanceResponse;
-import com.ntg.sms.Dtos.Response.StudentAttendanceRowResponse;
+import com.ntg.sms.Dtos.Response.*;
 import com.ntg.sms.Entities.*;
 import com.ntg.sms.Entities.Class;
 import com.ntg.sms.Exceptions.ResourceNotFoundException;
@@ -41,6 +38,82 @@ public class AttendanceServiceImpl implements AttendanceService {
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
         return (double) attendanceRepository.countByDateBetween(start, end);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StudentHistoryResponse getStudentHistory(Long studentId, LocalDate date) {
+        // 1. Verify student exists
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
+
+        // 2. Fetch all historical attendance rows for this student
+        List<Attendance> records = attendanceRepository.findByStudentId(studentId);
+
+        // 3. Group session records by their LocalDate execution day
+        Map<LocalDate, List<Attendance>> recordsByDate = records.stream()
+                .filter(a -> a.getDateTime() != null)
+                .collect(Collectors.groupingBy(a -> a.getDateTime().toLocalDate()));
+
+        int presentDays = 0;
+        int absentDays = 0;
+        int lateDays = 0;
+        int excusedDays = 0;
+
+        List<StudentHistoryDay> historyDays = new ArrayList<>();
+
+        // 4. Collapse multi-session days into unified daily statuses
+        for (Map.Entry<LocalDate, List<Attendance>> entry : recordsByDate.entrySet()) {
+            LocalDate day = entry.getKey();
+            List<Attendance> dayRecords = entry.getValue();
+
+            List<Character> statuses = dayRecords.stream()
+                    .map(Attendance::getStatus)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            if (statuses.isEmpty()) {
+                continue; // Skip days with no recorded data
+            }
+
+            String consolidatedStatus;
+            if (statuses.contains('P')) {
+                consolidatedStatus = "P";
+                presentDays++;
+            } else if (statuses.contains('L')) {
+                consolidatedStatus = "L";
+                lateDays++;
+            } else if (statuses.stream().allMatch(s -> s == 'E')) {
+                consolidatedStatus = "E";
+                excusedDays++;
+            } else {
+                consolidatedStatus = "A";
+                absentDays++;
+            }
+
+            historyDays.add(StudentHistoryDay.builder()
+                    .date(day)
+                    .status(consolidatedStatus)
+                    .build());
+        }
+
+        // 5. Sort chronologically for the calendar layout alignment
+        historyDays.sort(Comparator.comparing(StudentHistoryDay::getDate));
+
+        int totalDays = presentDays + absentDays + lateDays + excusedDays;
+        double rate = totalDays == 0 ? 0.0 : Math.round(((double) presentDays / totalDays) * 100.0);
+
+        return StudentHistoryResponse.builder()
+                .attendanceRate(rate)
+                .recordedDays((long) totalDays)
+                .stats(StudentHistoryResponse.Stats.builder()
+                        .present(presentDays)
+                        .absent(absentDays)
+                        .late(lateDays)
+                        .excused(excusedDays)
+                        .build())
+                .historyDays(historyDays)
+                .build();
     }
 
     @Override

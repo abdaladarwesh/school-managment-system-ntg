@@ -3,12 +3,15 @@ package com.ntg.sms.Service;
 import com.ntg.sms.Dtos.Request.SaveAttendanceRequest;
 import com.ntg.sms.Dtos.Response.AttendanceGridResponse;
 import com.ntg.sms.Dtos.Response.ClassResponse;
+import com.ntg.sms.Dtos.Response.StudentHistoryResponse;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface AttendanceService {
     Double getTodayAttendance();
+
+    StudentHistoryResponse getStudentHistory(Long studentId, LocalDate date);
 
     Long getTodayAbsenceCount();
 

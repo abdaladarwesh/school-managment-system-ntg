@@ -4,6 +4,7 @@ package com.ntg.sms.Controllers;
 import com.ntg.sms.Dtos.Request.SaveAttendanceRequest;
 import com.ntg.sms.Dtos.Response.AttendanceGridResponse;
 import com.ntg.sms.Dtos.Response.ClassResponse;
+import com.ntg.sms.Dtos.Response.StudentHistoryResponse;
 import com.ntg.sms.Service.AttendanceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,12 @@ public class AttendanceController {
     @GetMapping("/absence-by-grade")
     public ResponseEntity<List<Object[]>> getAbsenceByGrade() {
         return ResponseEntity.ok(attendanceService.getAbsenceByGrade());
+    }
+
+    @GetMapping("/student/{studentId}/history")
+    public ResponseEntity<StudentHistoryResponse> getStudentHistory(
+            @PathVariable Long studentId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(attendanceService.getStudentHistory(studentId, date));
     }
 }

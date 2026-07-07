@@ -67,8 +67,7 @@ export class StudentDetail implements OnInit {
         Swal.fire({
           title: 'done',
           text:
-            'Your data has been saved successfully.\nThe password for the student is\n' +
-            res.password,
+            'Your data has been saved successfully.',
           icon: 'success',
         });
       },

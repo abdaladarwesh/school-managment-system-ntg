@@ -25,7 +25,7 @@ public class Term {
     private Long term;
 
     @NotNull
-    @Column(name = "YEAR", nullable = false)
+    @Column(name = "YEAR_NUMBER", nullable = false)
     private Long year;
 
     @ManyToMany(mappedBy = "terms")

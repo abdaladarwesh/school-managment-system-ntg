@@ -22,12 +22,32 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("startOfNextDay") LocalDateTime startOfNextDay
     );
 
+    List<Attendance> findByStudentId(Long studentId);
+
+//    @Query("""
+//                SELECT COUNT(a)
+//                FROM Attendance a
+//                WHERE (a.dateTime >= :startOfDay
+//                  AND a.dateTime < :startOfNextDay)
+//                            AND a.status = 'A'
+//            """)
+//    long countAbsenceByDateBetween(
+//            @Param("startOfDay") LocalDateTime startOfDay,
+//            @Param("startOfNextDay") LocalDateTime startOfNextDay
+//    );
+
     @Query("""
-                SELECT COUNT(a)
-                FROM Attendance a
-                WHERE (a.dateTime >= :startOfDay
-                  AND a.dateTime < :startOfNextDay)
-                            AND a.status = 'A'
+            SELECT COUNT(DISTINCT a.student.id)
+            FROM Attendance a
+            WHERE (a.dateTime >= :startOfDay AND a.dateTime < :startOfNextDay)
+            AND a.student.id IN (
+                SELECT sub.student.id
+                FROM Attendance sub
+                WHERE (sub.dateTime >= :startOfDay AND sub.dateTime < :startOfNextDay)
+                  AND sub.status = 'A'
+                GROUP BY sub.student.id
+                HAVING COUNT(sub.id) = 7
+            )
             """)
     long countAbsenceByDateBetween(
             @Param("startOfDay") LocalDateTime startOfDay,

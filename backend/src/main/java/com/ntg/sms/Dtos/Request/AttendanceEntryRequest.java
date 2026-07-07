@@ -17,7 +17,6 @@ public class AttendanceEntryRequest {
     @NotNull(message = "Session id is required!")
     private Long sessionId;
 
-    @NotNull(message = "Status is required!")
     @Pattern(regexp = "[PALE]", message = "Status must be one of P, A, L, E")
     private String status;
 }

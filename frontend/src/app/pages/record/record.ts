@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -35,7 +35,7 @@ interface SessionAttendanceResponse {
   courseName: string;
   startAt: string;
   endAt: string;
-  status: 'P' | 'A' | 'E' | null;
+  status: 'P' | 'A' | 'E' | 'L' | null;
 }
 
 interface StudentAttendanceRowResponse {
@@ -55,6 +55,24 @@ interface AttendanceGridResponse {
   rows: StudentAttendanceRowResponse[];
 }
 
+interface StudentHistoryDay {
+  date: string; // e.g., "2026-06-01"
+  status: 'P' | 'A' | 'L' | 'E' | '';
+}
+
+interface StudentHistoryResponse {
+  attendanceRate: number;
+  recordedDays: number;
+  stats: { present: number; absent: number; late: number; excused: number };
+  historyDays: StudentHistoryDay[];
+}
+
+interface CalendarCell {
+  dayNumber: number | null;
+  dateString: string;
+  status: 'P' | 'A' | 'L' | 'E' | '';
+}
+
 // ==========================================
 // FRONTEND MODEL INTERFACE
 // ==========================================
@@ -69,12 +87,17 @@ interface StudentAttendance {
   classId: number;
   academicYear: string;
   date: string;
-  status: 'Present' | 'Absent' | 'Late' | 'Excused';
+  status: 'Present' | 'Absent' | 'Late' | 'Excused' | 'Not Marked';
   attendanceRate?: number;
   statusBadge?: string;
   recordedDays?: number;
   stats?: { present: number; absent: number; late: number; excused: number };
-  historyDays?: Array<{ dayNumber: number; status: 'P' | 'A' | 'L' | 'E' | '' }>;
+  historyDays?: Array<{
+    dayNumber: number;
+    dateString: string;
+    status: 'P' | 'A' | 'L' | 'E' | '';
+  }>;
+  calendarGrid?: CalendarCell[];
   originalSessions?: SessionAttendanceResponse[];
 }
 
@@ -88,28 +111,78 @@ interface StudentAttendance {
 export class AttendanceComponent implements OnInit {
   private http = inject(HttpClient);
 
-  // Filter State Variables
-  searchText = '';
-  selectedGradeId: number | 'all' = 'all';
-  selectedClassId: number | 'all' = 'all';
-  selectedYear: number | 'all' = 'all';
-  selectedStatus: string = 'all';
-  filterDate = new Date().toISOString().split('T')[0];
+  // ==========================================
+  // FILTER STATE (signals)
+  // ==========================================
+  searchText = signal('');
+  selectedGradeId = signal<number | 'all'>('all');
+  selectedClassId = signal<number | 'all'>('all');
+  selectedYear = signal<number | 'all'>('all');
+  selectedStatus = signal<string>('all');
+  filterDate = signal(new Date().toISOString().split('T')[0]);
 
-  // Dynamic Signals
+  // ==========================================
+  // DATA STATE (signals)
+  // ==========================================
   allClasses = signal<ClassResponse[]>([]);
   allGrades = signal<GradeResponse[]>([]);
   allYears = signal<number[]>([]);
   students = signal<StudentAttendance[]>([]);
 
-  // Modal State Variables
-  showMarkAttendanceModal = false;
-  showEditModal = false;
-  showHistoryModal = false;
-  selectedStudent: StudentAttendance | null = null;
-  loading = false;
-  today = new Date();
-  currentHistoryView: 'calendar' | 'daily' = 'calendar';
+  // ==========================================
+  // MODAL / UI STATE (signals)
+  // ==========================================
+  selectedStudent = signal<StudentAttendance | null>(null);
+  showMarkAttendanceModal = signal(false);
+  showEditModal = signal(false);
+  showHistoryModal = signal(false);
+  loading = signal(false);
+  currentHistoryView = signal<'calendar' | 'daily'>('calendar');
+  today = new Date(); // static per render, no need for a signal
+
+  // ==========================================
+  // DERIVED STATE (computed)
+  // ==========================================
+  filteredStudents = computed(() => {
+    const search = this.searchText().toLowerCase();
+    const classId = this.selectedClassId();
+    const gradeId = this.selectedGradeId();
+    const year = this.selectedYear();
+    const status = this.selectedStatus();
+
+    return this.students().filter((student) => {
+      const matchesSearch = student.name.toLowerCase().includes(search);
+      const matchesClass = classId === 'all' || student.classId === Number(classId);
+      const matchesGrade = gradeId === 'all' || student.gradeId === Number(gradeId);
+      const matchesYear = year === 'all' || student.academicYear === year.toString();
+      const matchesStatus =
+        status === 'all' || student.status.toLowerCase() === status.toLowerCase();
+
+      return matchesSearch && matchesClass && matchesGrade && matchesYear && matchesStatus;
+    });
+  });
+
+  totalRecords = computed(() => this.filteredStudents().length);
+
+  presentCount = computed(
+    () => this.filteredStudents().filter((s) => s.status === 'Present').length,
+  );
+  absentCount = computed(() => this.filteredStudents().filter((s) => s.status === 'Absent').length);
+  lateCount = computed(() => this.filteredStudents().filter((s) => s.status === 'Late').length);
+  excusedCount = computed(
+    () => this.filteredStudents().filter((s) => s.status === 'Excused').length,
+  );
+  notMarkedCount = computed(
+    () => this.filteredStudents().filter((s) => s.status === 'Not Marked').length,
+  );
+
+  attendanceRate = computed(() => {
+    const evaluatedRecords = this.filteredStudents().filter(
+      (s) => s.status !== 'Not Marked',
+    ).length;
+    if (evaluatedRecords === 0) return 0;
+    return Math.round((this.presentCount() / evaluatedRecords) * 100);
+  });
 
   ngOnInit(): void {
     this.loadClasses();
@@ -123,7 +196,6 @@ export class AttendanceComponent implements OnInit {
       next: (classes) => {
         this.allClasses.set(classes);
 
-        // 1. Extract unique grades dynamically from the classes array
         const uniqueGradesMap = new Map<number, GradeResponse>();
         classes.forEach((c) => {
           if (c.grade && !uniqueGradesMap.has(c.grade.id)) {
@@ -132,14 +204,12 @@ export class AttendanceComponent implements OnInit {
         });
         this.allGrades.set(Array.from(uniqueGradesMap.values()));
 
-        // 2. Extract unique academic years dynamically from terms
         const yearsSet = new Set<number>();
         classes.forEach((c) => {
           c.grade?.terms?.forEach((t) => yearsSet.add(t.year));
         });
         this.allYears.set(Array.from(yearsSet));
 
-        // 3. Load attendance records now that metadata is ready
         this.loadRecords();
       },
       error: (err) => console.error('Failed to load classes', err),
@@ -150,36 +220,38 @@ export class AttendanceComponent implements OnInit {
    * Loads attendance grid records based on the selected Class ID and Date
    */
   loadRecords(): void {
-    this.loading = true;
+    this.loading.set(true);
+    const classId = this.selectedClassId();
+    const date = this.filterDate();
 
-    if (this.selectedClassId === 'all') {
+    if (classId === 'all') {
       if (this.allClasses().length === 0) {
         this.students.set([]);
-        this.loading = false;
+        this.loading.set(false);
         return;
       }
 
-      const requests = this.allClasses().map((cls) => this.fetchGrid(cls.id, this.filterDate));
+      const requests = this.allClasses().map((cls) => this.fetchGrid(cls.id, date));
 
       forkJoin(requests).subscribe({
         next: (grids) => {
           this.students.set(grids.flatMap((grid) => this.mapGridToStudents(grid)));
-          this.loading = false;
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Failed to load grids', err);
-          this.loading = false;
+          this.loading.set(false);
         },
       });
     } else {
-      this.fetchGrid(Number(this.selectedClassId), this.filterDate).subscribe({
+      this.fetchGrid(Number(classId), date).subscribe({
         next: (grid) => {
           this.students.set(grid ? this.mapGridToStudents(grid) : []);
-          this.loading = false;
+          this.loading.set(false);
         },
         error: (err) => {
           console.error('Failed to load grid', err);
-          this.loading = false;
+          this.loading.set(false);
         },
       });
     }
@@ -190,12 +262,12 @@ export class AttendanceComponent implements OnInit {
   }
 
   resetFilters(): void {
-    this.searchText = '';
-    this.selectedGradeId = 'all';
-    this.selectedClassId = 'all';
-    this.selectedYear = 'all';
-    this.selectedStatus = 'all';
-    this.filterDate = new Date().toISOString().split('T')[0];
+    this.searchText.set('');
+    this.selectedGradeId.set('all');
+    this.selectedClassId.set('all');
+    this.selectedYear.set('all');
+    this.selectedStatus.set('all');
+    this.filterDate.set(new Date().toISOString().split('T')[0]);
     this.onFilterChange();
   }
 
@@ -212,12 +284,11 @@ export class AttendanceComponent implements OnInit {
   }
 
   /**
-   * Maps backend grid rows to frontend StudentAttendance objects, linking Grade and Year info
+   * Maps backend grid rows to frontend StudentAttendance objects, cleanly checking for missing data
    */
   private mapGridToStudents(grid: AttendanceGridResponse | null): StudentAttendance[] {
     if (!grid) return [];
 
-    // Match the class from our signal to get the exact Grade Name and Academic Year
     const matchedClass = this.allClasses().find((c) => c.id === grid.classId);
     const gradeName = matchedClass?.grade?.name || 'N/A';
     const gradeId = matchedClass?.grade?.id || -1;
@@ -225,11 +296,15 @@ export class AttendanceComponent implements OnInit {
 
     return grid.rows.map((row) => {
       const statuses = row.sessions.map((s) => s.status);
-      let dailyStatus: 'Present' | 'Absent' | 'Late' | 'Excused' = 'Absent';
+      let dailyStatus: 'Present' | 'Absent' | 'Late' | 'Excused' | 'Not Marked' = 'Not Marked';
 
-      if (statuses.includes('P')) {
+      if (statuses.length === 0 || statuses.every((s) => s === null)) {
+        dailyStatus = 'Not Marked';
+      } else if (statuses.includes('P')) {
         dailyStatus = 'Present';
-      } else if (statuses.length > 0 && statuses.every((s) => s === 'E')) {
+      } else if (statuses.includes('L')) {
+        dailyStatus = 'Late';
+      } else if (statuses.every((s) => s === 'E')) {
         dailyStatus = 'Excused';
       } else {
         dailyStatus = 'Absent';
@@ -247,66 +322,13 @@ export class AttendanceComponent implements OnInit {
         date: grid.date,
         status: dailyStatus,
         originalSessions: row.sessions,
-        attendanceRate: 100,
-        statusBadge: 'Good',
-        recordedDays: 20,
-        stats: { present: 20, absent: 0, late: 0, excused: 0 },
+        attendanceRate: 0,
+        statusBadge: 'N/A',
+        recordedDays: 0,
+        stats: { present: 0, absent: 0, late: 0, excused: 0 },
         historyDays: [],
       };
     });
-  }
-
-  // ==========================================
-  // GETTERS & CLIENT-SIDE FILTERING
-  // ==========================================
-
-  get filteredStudents(): StudentAttendance[] {
-    return this.students().filter((student) => {
-      // 1. Search text filter
-      const matchesSearch = student.name.toLowerCase().includes(this.searchText.toLowerCase());
-
-      // 2. Class filter
-      const matchesClass =
-        this.selectedClassId === 'all' || student.classId === Number(this.selectedClassId);
-
-      // 3. Grade filter
-      let matchesGrade = true;
-      if (this.selectedGradeId !== 'all') {
-        matchesGrade = student.gradeId === Number(this.selectedGradeId);
-      }
-
-      // 4. Academic Year filter
-      const matchesYear =
-        this.selectedYear === 'all' || student.academicYear === this.selectedYear.toString();
-
-      // 5. Status filter
-      const matchesStatus =
-        this.selectedStatus === 'all' ||
-        student.status.toLowerCase() === this.selectedStatus.toLowerCase();
-
-      return matchesSearch && matchesClass && matchesGrade && matchesYear && matchesStatus;
-    });
-  }
-
-  get totalRecords(): number {
-    return this.filteredStudents.length;
-  }
-  get presentCount(): number {
-    return this.filteredStudents.filter((s) => s.status === 'Present').length;
-  }
-  get absentCount(): number {
-    return this.filteredStudents.filter((s) => s.status === 'Absent').length;
-  }
-  get lateCount(): number {
-    return this.filteredStudents.filter((s) => s.status === 'Late').length;
-  }
-  get excusedCount(): number {
-    return this.filteredStudents.filter((s) => s.status === 'Excused').length;
-  }
-
-  get attendanceRate(): number {
-    if (this.totalRecords === 0) return 0;
-    return Math.round((this.presentCount / this.totalRecords) * 100);
   }
 
   // ==========================================
@@ -314,55 +336,119 @@ export class AttendanceComponent implements OnInit {
   // ==========================================
 
   openEditModal(student: StudentAttendance) {
-    this.selectedStudent = { ...student };
-    this.showEditModal = true;
+    this.selectedStudent.set({ ...student });
+    this.showEditModal.set(true);
   }
 
+  /**
+   * Opens history view and fetches overall historical data values for the specific student
+   */
   openHistoryModal(student: StudentAttendance) {
-    this.selectedStudent = student;
-    this.currentHistoryView = 'calendar';
-    this.showHistoryModal = true;
+    this.selectedStudent.set({ ...student });
+    this.currentHistoryView.set('calendar');
+    this.showHistoryModal.set(true);
+
+    // 1. Generate empty grid immediately (for instant UI feedback)
+    const targetDate = new Date(student.date);
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayIndex = new Date(year, month, 1).getDay();
+
+    const grid: CalendarCell[] = Array.from({ length: firstDayIndex }, () => ({
+      dayNumber: null,
+      dateString: '',
+      status: '',
+    }));
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      grid.push({
+        dayNumber: d,
+        dateString: `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
+        status: '',
+      });
+    }
+
+    this.selectedStudent.update((s) => (s ? { ...s, calendarGrid: grid } : null));
+
+    // 2. Fetch and merge data
+    this.http
+      .get<StudentHistoryResponse>(
+        `http://localhost:8080/api/v1/attendance/student/${this.selectedStudent()?.studentId}/history`,
+        {
+          params: new HttpParams().set('date', student.date),
+        },
+      )
+      .subscribe((historyData) => {
+        this.selectedStudent.update((s) => {
+          if (!s) return null;
+
+          const historyMap = new Map(historyData.historyDays.map((d) => [d.date, d.status]));
+
+          return {
+            ...s,
+            attendanceRate: historyData.attendanceRate,
+            recordedDays: historyData.recordedDays,
+            stats: historyData.stats,
+            historyDays: historyData.historyDays.map((d) => ({
+              dayNumber: new Date(d.date).getDate(),
+              dateString: d.date,
+              status: d.status,
+            })),
+            calendarGrid: s.calendarGrid!.map((cell) => ({
+              ...cell,
+              status: cell.dateString ? ((historyMap.get(cell.dateString) || '') as any) : '',
+            })),
+          };
+        });
+      });
   }
 
   switchHistoryView(viewType: 'calendar' | 'daily') {
-    this.currentHistoryView = viewType;
+    this.currentHistoryView.set(viewType);
+  }
+
+  setSelectedStatus(status: StudentAttendance['status']): void {
+    this.selectedStudent.update((s) => (s ? { ...s, status } : null));
   }
 
   closeAllModals() {
-    this.showMarkAttendanceModal = false;
-    this.showEditModal = false;
-    this.showHistoryModal = false;
-    this.selectedStudent = null;
+    this.showMarkAttendanceModal.set(false);
+    this.showEditModal.set(false);
+    this.showHistoryModal.set(false);
+    this.selectedStudent.set(null); // FIX: was `this.selectedStudent = null`, which clobbered the signal itself
   }
 
   updateRecord() {
-    if (!this.selectedStudent || !this.selectedStudent.originalSessions) {
+    const student = this.selectedStudent(); // FIX: was reading `.status`/`.originalSessions` off the signal fn, not its value
+    if (!student || !student.originalSessions) {
       this.closeAllModals();
       return;
     }
 
-    const newStatusBackend =
-      this.selectedStudent.status === 'Present'
-        ? 'P'
-        : this.selectedStudent.status === 'Absent'
-          ? 'A'
-          : this.selectedStudent.status === 'Excused'
-            ? 'E'
-            : 'A';
+    let newStatusBackend: 'P' | 'A' | 'E' | 'L' = 'A';
+    if (student.status === 'Present') newStatusBackend = 'P';
+    else if (student.status === 'Absent') newStatusBackend = 'A';
+    else if (student.status === 'Excused') newStatusBackend = 'E';
+    else if (student.status === 'Late') newStatusBackend = 'L';
 
-    const entries = this.selectedStudent.originalSessions.map((session) => ({
-      studentId: this.selectedStudent!.studentId,
+
+
+    const entries = student.originalSessions.map((session) => ({
+      studentId: student.studentId,
       sessionId: session.sessionId,
       status: newStatusBackend,
     }));
 
     const body = {
-      classId: this.selectedStudent.classId,
-      date: this.selectedStudent.date,
+      classId: student.classId,
+      date: student.date,
       entries: entries,
     };
 
-    this.loading = true;
+    console.log(body);
+
+    this.loading.set(true);
     this.http.put('http://localhost:8080/api/v1/attendance', body).subscribe({
       next: () => {
         Swal.fire('Updated!', 'Attendance record updated successfully.', 'success');
@@ -372,16 +458,17 @@ export class AttendanceComponent implements OnInit {
       error: (err) => {
         console.error('Failed to update record', err);
         Swal.fire('Error', 'Failed to update attendance record.', 'error');
-        this.loading = false;
+        this.loading.set(false);
         this.closeAllModals();
       },
     });
   }
+
   /**
-   * Exports the currently filtered attendance records to an Excel (.xlsx) file.
+   * Dynamic Excel Export handler
    */
   exportReport(): void {
-    const recordsToExport = this.filteredStudents;
+    const recordsToExport = this.filteredStudents();
 
     if (recordsToExport.length === 0) {
       Swal.fire(
@@ -392,7 +479,6 @@ export class AttendanceComponent implements OnInit {
       return;
     }
 
-    // 1. Map complex student objects into clean, flat row objects for Excel columns
     const excelData = recordsToExport.map((student) => ({
       'Student ID': student.studentId,
       'Student Name': student.name,
@@ -401,44 +487,36 @@ export class AttendanceComponent implements OnInit {
       'Academic Year': student.academicYear,
       Date: student.date,
       'Daily Status': student.status,
-      'Attendance Rate (%)': student.attendanceRate || 0,
-      'Total Present': student.stats?.present || 0,
-      'Total Absent': student.stats?.absent || 0,
-      'Total Late': student.stats?.late || 0,
-      'Total Excused': student.stats?.excused || 0,
     }));
 
-    // 2. Create a new worksheet from the mapped JSON array
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelData);
-
-    // 3. Optional: Auto-size columns slightly so text isn't cut off
-    const columnWidths = [
-      { wch: 12 }, // Student ID
-      { wch: 25 }, // Student Name
-      { wch: 12 }, // Grade
-      { wch: 10 }, // Class
-      { wch: 15 }, // Academic Year
-      { wch: 12 }, // Date
-      { wch: 15 }, // Daily Status
-      { wch: 20 }, // Attendance Rate
-      { wch: 14 }, // Total Present
-      { wch: 14 }, // Total Absent
-      { wch: 14 }, // Total Late
-      { wch: 14 }, // Total Excused
+    worksheet['!cols'] = [
+      { wch: 12 },
+      { wch: 25 },
+      { wch: 12 },
+      { wch: 10 },
+      { wch: 15 },
+      { wch: 12 },
+      { wch: 15 },
     ];
-    worksheet['!cols'] = columnWidths;
 
-    // 4. Create a workbook and append our worksheet
     const workbook: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance Report');
 
-    // 5. Generate a dynamic filename based on current filter state
-    const classLabel =
-      this.selectedClassId === 'all' ? 'AllClasses' : `Class_${this.selectedClassId}`;
-    const dateLabel = this.filterDate || new Date().toISOString().split('T')[0];
-    const fileName = `Attendance_Report_${classLabel}_${dateLabel}.xlsx`;
+    const classId = this.selectedClassId();
+    const classLabel = classId === 'all' ? 'AllClasses' : `Class_${classId}`;
+    const fileName = `Attendance_Report_${classLabel}_${this.filterDate()}.xlsx`;
 
-    // 6. Trigger the browser download
     XLSX.writeFile(workbook, fileName);
+  }
+
+  /**
+   * Helper utility inside the template to cleanly format target dates contextually
+   */
+  getReadableMonthYear(): string {
+    const date = this.filterDate();
+    if (!date) return 'Selected Month';
+    const parsed = new Date(date);
+    return parsed.toLocaleString('default', { month: 'long', year: 'numeric' });
   }
 }
