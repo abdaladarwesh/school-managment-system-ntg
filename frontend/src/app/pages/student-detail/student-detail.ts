@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { StudentService, StudentDetailResponse } from '../student-page/service/student-service';
+import {
+  StudentService,
+  StudentDetailResponse,
+  ParentResponse,
+} from '../student-page/service/student-service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -168,7 +172,10 @@ export class StudentDetail implements OnInit {
           text: 'Student has been deleted successfully',
           icon: 'success',
           confirmButtonText: 'Ok',
+        }).then(() => {
+          this.router.navigate(['/students']);
         });
+
       },
     });
   }

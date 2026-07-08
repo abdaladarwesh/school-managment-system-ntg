@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ParentService {
     List<Parent> getParentsByStudent(Student student);
+
+    List<Parent> getAllParents();
 }

@@ -12,8 +12,8 @@ export interface AbsenceClass {
 })
 export class AbsenceChartComponent {
 
-  @Input() title = 'Avg. Absence per Class';
-  @Input() subtitle = 'Days absent per student — this month';
+  @Input() title = 'Avg. Absence per Grade';
+  @Input() subtitle = 'Days absent per student — Today';
 
   @Input({ required: true })
   data: AbsenceClass[] = [];

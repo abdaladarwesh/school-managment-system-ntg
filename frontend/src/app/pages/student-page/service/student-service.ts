@@ -61,7 +61,7 @@ interface UserResponse {
   phoneNumbers: number[];
 }
 
-interface ParentResponse {
+export interface ParentResponse {
   id: number;
   user: UserResponse;
   jobName: string;
@@ -112,6 +112,10 @@ export class StudentService {
 
   getStudentById(id: number): Observable<StudentDetailResponse> {
     return this.http.get<StudentDetailResponse>(`${this.url}/${id}`);
+  }
+
+  getParents(): Observable<ParentResponse[]>{
+    return this.http.get<ParentResponse[]>("http://localhost:8080/api/v1/parents");
   }
 
   toStudent(student: StudentResponse): Student {

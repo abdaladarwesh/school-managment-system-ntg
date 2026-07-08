@@ -1,0 +1,48 @@
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css');
+
+.font-sans {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+.text-navy {
+  color: #1e293b !important;
+}
+
+.fs-7 {
+  font-size: 0.88rem !important;
+}
+
+.custom-table {
+  width: 100%;
+  margin-bottom: 1rem;
+  vertical-align: middle;
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.2s ease !important;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.custom-table th {
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  color: #64748b !important;
+  background-color: #f8fafc !important;
+  padding-bottom: 1rem !important;
+}
+
+.border-primary {
+  border-color: #0d6efd !important;
+}
+
+.text-wrap {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+.rounded-4 {
+  border-radius: 1rem !important;
+}

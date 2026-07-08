@@ -29,4 +29,10 @@ public class ParentServiceImpl implements ParentService {
         });
         return parents;
     }
+
+    @Override
+    public List<Parent> getAllParents() {
+       return parentRepository.findAll();
+    }
+
 }

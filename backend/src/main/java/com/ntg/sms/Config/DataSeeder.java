@@ -62,7 +62,7 @@ public class DataSeeder implements CommandLineRunner {
                     .address("Nasr City, Cairo")
                     .firstNameInArabic("أحمد")
                     .lastNameInArabic("علي")
-                    .password(passwordEncoder.encode("123"))
+                    .password(passwordEncoder.encode("abdullah2009"))
                     .isDeleted(false)
                     .createdAt(LocalDateTime.now())
                     .lastLogin(LocalDateTime.now())

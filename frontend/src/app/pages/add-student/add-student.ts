@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -14,12 +14,15 @@ import {
   CreateStudentRequest,
   UserPayload,
   StudentDetailResponse,
+  ParentResponse,
 } from '../student-page/service/student-service';
+import { ParentSearchComponent } from '../../components/parent-search/parent-search.component';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-student',
-  imports: [ReactiveFormsModule, CommonModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule, ParentSearchComponent],
   templateUrl: './add-student.html',
   styleUrl: './add-student.css',
 })
@@ -29,6 +32,18 @@ export class AddStudent implements OnInit {
   private router = inject(Router);
   private editStudentId: number | null = null;
   isEditMode = false;
+
+  // --- Parent Search State ---
+  fatherMode = signal<'new' | 'existing'>('new');
+  motherMode = signal<'new' | 'existing'>('new');
+  guardianMode = signal<'new' | 'existing'>('new');
+
+  selectedFather = signal<ParentResponse | null>(null);
+  selectedMother = signal<ParentResponse | null>(null);
+  selectedGuardian = signal<ParentResponse | null>(null);
+
+  allParents = signal<ParentResponse[]>([]);
+  // ---------------------------
 
   form = new FormGroup({
     studentUser: new FormGroup({
@@ -138,14 +153,14 @@ export class AddStudent implements OnInit {
 
   days = Array.from({ length: 31 }, (_, i) => i + 1);
   months = Array.from({ length: 12 }, (_, i) => i + 1);
-  years = Array.from({ length: 26 }, (_, i) => 2026 - i);
+  years = Array.from({ length: 70 }, (_, i) => 2026 - i);
 
   genders = [
     { value: 'M', label: 'Male' },
     { value: 'F', label: 'Female' },
   ];
 
-  religions = ['Islam', 'Christianity', 'Other'];
+  religions = ['Muslim', 'Christianity', 'Other'];
   maritalStatuses = ['MARRIED', 'DIVORCED'];
   guardianTypes = ['FATHER', 'MOTHER', 'OTHER'];
 
@@ -251,6 +266,15 @@ export class AddStudent implements OnInit {
   }
 
   ngOnInit(): void {
+    // --- Fetch parents for the search component ---
+    // Make sure 'getParents()' or the equivalent method exists in your StudentService
+    if ((this.studentService as any).getParents) {
+      (this.studentService as any).getParents().subscribe({
+        next: (res: ParentResponse[]) => this.allParents.set(res),
+        error: (err: any) => console.error('Failed to fetch parents:', err),
+      });
+    }
+
     const idParam = Number(this.route.snapshot.paramMap.get('id'));
     if (idParam) {
       this.isEditMode = true;
@@ -263,6 +287,29 @@ export class AddStudent implements OnInit {
     });
     this.toggleGuardianValidators(this.guardianType.value);
   }
+
+  // --- Parent Selection Handlers ---
+  setMode(type: 'father' | 'mother' | 'guardian', mode: 'new' | 'existing') {
+    if (type === 'father') this.fatherMode.set(mode);
+    if (type === 'mother') this.motherMode.set(mode);
+    if (type === 'guardian') this.guardianMode.set(mode);
+  }
+
+  onParentSelected(parent: ParentResponse, type: 'father' | 'mother' | 'guardian') {
+    if (type === 'father') {
+      console.log(parent);
+      this.selectedFather.set(parent);
+      // Remove the 4th argument so it uses the normalized 'user' fallbacks
+      this.patchParentGroup(this.father, parent.user as any, parent.jobName || '');
+    } else if (type === 'mother') {
+      console.log(parent);
+      this.selectedMother.set(parent);
+      this.patchParentGroup(this.mother, parent.user as any, parent.jobName || '');
+    } else if (type === 'guardian') {
+      this.selectedGuardian.set(parent);
+      this.patchParentGroup(this.guardian, parent.user as any, parent.jobName || '');
+    }
+  } // ---------------------------------
 
   private loadEditData(id: number) {
     this.studentService.getStudentById(id).subscribe({
@@ -294,8 +341,8 @@ export class AddStudent implements OnInit {
       address: merged?.studentUser?.address ?? studentUser.address,
       firstNameInArabic: merged?.studentUser?.firstNameInArabic ?? studentUser.firstNameInArabic,
       lastNameInArabic: merged?.studentUser?.lastNameInArabic ?? studentUser.lastNameInArabic,
-      gender: merged?.studentUser?.gender ?? studentUser.gender  ,
-      religion: merged?.studentUser?.religion ?? studentUser.religion,  
+      gender: merged?.studentUser?.gender ?? studentUser.gender,
+      religion: merged?.studentUser?.religion ?? studentUser.religion,
 
       nationality: merged?.studentUser?.nationality ?? studentUser.nationality,
       birthDay: draftAny?.studentUser?.birthDay ?? this.extractDay(studentUser.birthDate),
@@ -306,7 +353,8 @@ export class AddStudent implements OnInit {
 
     this.replacePhoneNumbers(
       this.studentPhoneNumbers,
-      merged?.studentUser?.phoneNumbers ?? studentUser.phoneNumbers.map((phone) => this.normalizePhone(phone)),
+      merged?.studentUser?.phoneNumbers ??
+        studentUser.phoneNumbers.map((phone) => this.normalizePhone(phone)),
     );
 
     this.student.patchValue({
@@ -328,7 +376,6 @@ export class AddStudent implements OnInit {
         draftAny?.father ?? merged?.father,
       );
     }
-
     if (mother) {
       this.patchParentGroup(
         this.mother,
@@ -418,6 +465,7 @@ export class AddStudent implements OnInit {
     jobName: string,
     draft?: any,
   ) {
+    console.log(user);
     const userGroup = group.get('user') as FormGroup;
     userGroup.patchValue({
       firstName: draft?.user?.firstName ?? user.firstName,
@@ -426,8 +474,8 @@ export class AddStudent implements OnInit {
       address: draft?.user?.address ?? user.address,
       firstNameInArabic: draft?.user?.firstNameInArabic ?? user.firstNameInArabic,
       lastNameInArabic: draft?.user?.lastNameInArabic ?? user.lastNameInArabic,
-      gender: draft?.user?.gender ?? user.gender,  
-      religion: draft?.user?.religion ?? user.religion,   
+      gender: draft?.user?.gender ?? user.gender,
+      religion: draft?.user?.religion || this.matchOption(user.religion, this.religions) || '',
       nationality: draft?.user?.nationality ?? user.nationality,
       birthDay: draft?.user?.birthDay ?? this.extractDay(user.birthDate),
       birthMonth: draft?.user?.birthMonth ?? this.extractMonth(user.birthDate),
@@ -456,11 +504,9 @@ export class AddStudent implements OnInit {
   private extractDay(date: string | Date): string {
     return String(new Date(date).getDate());
   }
-
   private extractMonth(date: string | Date): string {
     return String(new Date(date).getMonth() + 1);
   }
-
   private extractYear(date: string | Date): string {
     return String(new Date(date).getFullYear());
   }
@@ -725,11 +771,29 @@ export class AddStudent implements OnInit {
   getError(control: AbstractControl | null, errorKey: string): boolean {
     return !!(control && control.hasError(errorKey) && control.touched);
   }
+
   private normalizePhone(phone: number | string): string {
-  let s = String(phone);
-  if (s.length === 10 && /^(10|11|12|15)/.test(s)) {
-    s = '0' + s;
+    if (!phone) return ''; // Safeguard against null/undefined
+
+    let s = String(phone);
+
+    // Handle numbers saved with the '20' country code (e.g., 201200000002 -> 12 digits)
+    if (s.length === 12 && s.startsWith('20')) {
+      s = '0' + s.slice(2);
+    }
+    // Handle numbers saved as integers that lost their leading zero (e.g., 1200000002 -> 10 digits)
+    else if (s.length === 10 && /^(10|11|12|15)/.test(s)) {
+      s = '0' + s;
+    }
+
+    return s;
   }
-  return s;
-}
+
+  // Add this helper method to your class
+  private matchOption(dbValue: string, options: string[]): string {
+    if (!dbValue) return '';
+    // Find a match ignoring case, e.g., "ISLAM" matches "Islam"
+    const match = options.find((opt) => opt.toLowerCase() === dbValue.toLowerCase());
+    return match || dbValue;
+  }
 }

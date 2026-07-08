@@ -6,6 +6,8 @@ import com.ntg.sms.Exceptions.BadRequestException;
 import com.ntg.sms.Exceptions.ConflictException;
 import com.ntg.sms.Repositories.*;
 import com.ntg.sms.Service.StudentsService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.RandomStringGenerator;
@@ -21,6 +23,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class StudentServiceImpl implements StudentsService {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -45,6 +49,19 @@ public class StudentServiceImpl implements StudentsService {
     @Override
     @Transactional
     public Student addStudent(StudentRequest request) {
+        String username = "SYSTEM"; // Fallback for DataSeeder
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            username = authentication.getName();
+        }
+
+        // CALL THE BUILT-IN ORACLE REGISTER (No special privileges required!)
+        entityManager.createNativeQuery("BEGIN DBMS_APPLICATION_INFO.SET_CLIENT_INFO(:user); END;")
+                .setParameter("user", username)
+                .executeUpdate();
+
+
         validateGuardian(request);
         validateUniqueUsers(request);
 
@@ -261,6 +278,20 @@ public class StudentServiceImpl implements StudentsService {
     @Override
     @Transactional
     public Student editStudent(StudentRequest request, Long studentId) {
+
+
+        String username = "SYSTEM"; // Fallback for DataSeeder
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            username = authentication.getName();
+        }
+
+        // CALL THE BUILT-IN ORACLE REGISTER (No special privileges required!)
+        entityManager.createNativeQuery("BEGIN DBMS_APPLICATION_INFO.SET_CLIENT_INFO(:user); END;")
+                .setParameter("user", username)
+                .executeUpdate();
+
         validateGuardian(request);
 
         // 1. Fetch the existing student
@@ -355,30 +386,37 @@ public class StudentServiceImpl implements StudentsService {
     }
 
     // Helper to fetch and update an existing Parent, or create if they don't exist
+// Helper to fetch an existing Parent (or create if they don't exist) and link the relation
     private void updateParentRecord(Student student, String roleName, StudentRequest.ParentInfo requestInfo, boolean isGuardian) {
-        if (requestInfo == null) return;
+        if (requestInfo == null || requestInfo.getUser() == null) return;
 
-        // Find if this student already has this specific parent role linked
+        // 1. Get existing parent globally based on Email/National ID, or create a new one.
+        // This does NOT overwrite their existing User profile data if they are found.
+        Role parentRole = getOrCreateRole("PARENT");
+        Parent targetParent = getOrCreateParent(requestInfo, parentRole);
+
+        // 2. Find if this student already has a parent linked for this specific role
         StudentsParent existingLink = studentsParentRepository.findByStudentIdAndParentRole(student.getId(), roleName)
                 .orElse(null);
 
         if (existingLink != null) {
-            // Update existing parent
-            Parent existingParent = existingLink.getParent();
-            updateUser(existingParent.getUser(), requestInfo.getUser());
-            existingParent.setJobName(requestInfo.getJobName());
-            parentRepository.save(existingParent);
-
-            // Update guardian status if changed
-            existingLink.setIsguardian(isGuardian ? 1L : 0L);
-            studentsParentRepository.save(existingLink);
+            // 3. If a link exists, check if it points to the same parent
+            if (!existingLink.getParent().getId().equals(targetParent.getId())) {
+                // The parent has changed. Because StudentsParentId is a composite key
+                // containing the parentId, we must delete the old relation and create a new one.
+                studentsParentRepository.delete(existingLink);
+                linkParent(student, targetParent, roleName, isGuardian);
+            } else {
+                // It is the same parent. Just update the guardian status if it changed.
+                existingLink.setIsguardian(isGuardian ? 1L : 0L);
+                studentsParentRepository.save(existingLink);
+            }
         } else {
-            // Fallback: If they didn't have this parent role before, create it
-            Role parentRole = getOrCreateRole("PARENT");
-            Parent newParent = getOrCreateParent(requestInfo, parentRole);
-            linkParent(student, newParent, roleName, isGuardian);
+            // 4. No previous link existed for this role, create a new relation
+            linkParent(student, targetParent, roleName, isGuardian);
         }
     }
+
 
     private void validateUniqueUsers(StudentRequest request) {
         Set<String> emailsInPayload = new HashSet<>();
@@ -426,7 +464,7 @@ public class StudentServiceImpl implements StudentsService {
         Set<String> emailsInPayload = new HashSet<>();
         Set<Long> nationalNumbersInPayload = new HashSet<>();
 
-        // 1. Validate Student User (excluding existing Student's User ID from DB conflict check)
+        // 1. Validate Student User uniqueness against the database
         validateUserUniquenessForUpdate(
                 request.getStudentUser(),
                 existingStudent.getUser().getId(),
@@ -434,34 +472,19 @@ public class StudentServiceImpl implements StudentsService {
                 nationalNumbersInPayload
         );
 
-        // 2. Validate Parents (Father, Mother, and Guardian if applicable)
-        validateParentUniquenessForUpdate(existingStudent, "FATHER", request.getFather(), emailsInPayload, nationalNumbersInPayload);
-        validateParentUniquenessForUpdate(existingStudent, "MOTHER", request.getMother(), emailsInPayload, nationalNumbersInPayload);
-
+        // 2. For Parents, we only validate that there are no duplicate emails/IDs WITHIN the payload.
+        // We DO NOT check the DB here, because we WANT to find and link existing parents in updateParentRecord.
+        if (request.getFather() != null) {
+            validatePayloadDuplicatesOnly(request.getFather().getUser(), emailsInPayload, nationalNumbersInPayload);
+        }
+        if (request.getMother() != null) {
+            validatePayloadDuplicatesOnly(request.getMother().getUser(), emailsInPayload, nationalNumbersInPayload);
+        }
         if (request.getGuardianType() == StudentRequest.GuardianType.OTHER && request.getGuardian() != null) {
-            validateParentUniquenessForUpdate(existingStudent, "GUARDIAN", request.getGuardian(), emailsInPayload, nationalNumbersInPayload);
+            validatePayloadDuplicatesOnly(request.getGuardian().getUser(), emailsInPayload, nationalNumbersInPayload);
         }
     }
 
-    private void validateParentUniquenessForUpdate(Student existingStudent, String roleName, StudentRequest.ParentInfo requestInfo, Set<String> emailsInPayload, Set<Long> nationalNumbersInPayload) {
-        if (requestInfo == null || requestInfo.getUser() == null) {
-            return;
-        }
-
-        StudentsParent existingLink = studentsParentRepository
-                .findByStudentIdAndParentRole(existingStudent.getId(), roleName)
-                .orElse(null);
-
-        if (existingLink != null) {
-            // Parent is already linked: validate DB uniqueness excluding their current user ID
-            Long currentParentUserId = existingLink.getParent().getUser().getId();
-            validateUserUniquenessForUpdate(requestInfo.getUser(), currentParentUserId, emailsInPayload, nationalNumbersInPayload);
-        } else {
-            // Parent is being linked for the first time during an update: check payload duplicates only.
-            // (getOrCreateParent() will handle safely fetching or creating the account during persistence)
-            validatePayloadDuplicatesOnly(requestInfo.getUser(), emailsInPayload, nationalNumbersInPayload);
-        }
-    }
 
     private void validateUserUniquenessForUpdate(StudentRequest.UserInfo request, Long currentUserId, Set<String> emailsInPayload, Set<Long> nationalNumbersInPayload) {
         if (request == null) {

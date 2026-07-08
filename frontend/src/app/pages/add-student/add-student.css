@@ -1,6 +1,5 @@
 :host {
   --maroon: #620000;
-  --blue: #2563eb;
   --purple: #7c3aed;
   --green: #16a34a;
   display: block;
@@ -176,7 +175,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #1d4ed8;
+  background-color: #102872;
   border-color: #1d4ed8;
 }
 

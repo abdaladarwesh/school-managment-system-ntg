@@ -2,6 +2,7 @@ package com.ntg.sms.Entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Audited;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;

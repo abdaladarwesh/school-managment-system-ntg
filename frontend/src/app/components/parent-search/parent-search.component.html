@@ -1,0 +1,27 @@
+<div class="search-container">
+  <input
+    type="text"
+    [ngModel]="searchQuery()"
+    (ngModelChange)="searchQuery.set($event); isOpen.set(true)"
+    (click)="onInputClick()"
+    placeholder="Search parent name or ID..."
+    class="search-input"
+  />
+  @if (isOpen() && filteredParents().length > 0) {
+    <ul class="dropdown-list">
+      @for (parent of filteredParents(); track parent.id) {
+        <li (click)="selectParent(parent)">
+          <div class="parent-info">
+            <span class="parent-name">{{ parent.user.firstName }} {{ parent.user.lastName }}</span>
+            <span class="parent-id">ID: {{ parent.user.nationalNumber }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+  @if (isOpen() && filteredParents().length === 0) {
+    <ul class="dropdown-list">
+      <li class="no-results">No parents found</li>
+    </ul>
+  }
+</div>

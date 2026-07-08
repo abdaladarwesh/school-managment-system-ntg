@@ -79,6 +79,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('../app/pages/medicalNotes/app.component').then((c) => c.AppComponent),
       },
+      {
+        path: 'audit-logs',
+        loadComponent: () =>
+          import('../app/pages/audit-page/audit-logs').then((c) => c.AuditLogsComponent),
+      },
     ],
   },
 ];
