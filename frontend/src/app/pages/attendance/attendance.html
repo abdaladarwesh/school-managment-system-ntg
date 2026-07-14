@@ -3,16 +3,16 @@
     <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
       <div>
         <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-          <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          <span class="eyebrow-bar"></span> {{ "STUDENT AFFAIRS" | translate }}
         </p>
-        <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Attendance</h1>
-        <p class="text-muted mb-0">Record daily attendance for each period</p>
+        <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ "Attendance" | translate }}</h1>
+        <p class="text-muted mb-0">{{ "Record daily attendance for each period" | translate }}</p>
       </div>
     </div>
     <div class="stats-badges">
-      <span class="badge present">Present: {{ presentCount() }}</span>
-      <span class="badge absent">Absent: {{ absentCount() }}</span>
-      <span class="badge permission">Permission: {{ permissionCount() }}</span>
+      <span class="badge present">{{ "Present:" | translate }} {{ presentCount() }}</span>
+      <span class="badge absent">{{ "Absent:" | translate }} {{ absentCount() }}</span>
+      <span class="badge permission">{{ "Permission:" | translate }} {{ permissionCount() }}</span>
     </div>
   </div>
 
@@ -30,27 +30,27 @@
     </div>
     <div class="student-count">
       <span class="material-icons">groups</span>
-      {{ grid()?.studentCount ?? 0 }} students
+      {{ grid()?.studentCount ?? 0 }} {{ "students" | translate }}
     </div>
   </div>
 
   <!-- Legend -->
   <div class="legend-section">
-    <span class="legend-title">LEGEND:</span>
-    <span class="legend-item"><span class="dot p-dot">P</span> Present</span>
-    <span class="legend-item"><span class="dot a-dot">A</span> Absent</span>
-    <span class="legend-item"><span class="dot ex-dot">Ex</span> Permission</span>
+    <span class="legend-title">{{ "LEGEND:" | translate }}</span>
+    <span class="legend-item"><span class="dot p-dot">{{ "P" | translate }}</span> {{ "Present" | translate }}</span>
+    <span class="legend-item"><span class="dot a-dot">{{ "A" | translate }}</span> {{ "Absent" | translate }}</span>
+    <span class="legend-item"><span class="dot ex-dot">{{ "Ex" | translate }}</span> {{ "Permission" | translate }}</span>
   </div>
 
   <!-- Loading state -->
   <div *ngIf="loading()" class="loading-state">
-    <span class="material-icons spinning">sync</span> Loading…
+    <span class="material-icons spinning">sync</span> {{ "Loading..." | translate }}
   </div>
 
   <!-- No sessions for this day -->
   <div *ngIf="!loading() && sessions().length === 0 && selectedClass()" class="empty-state">
     <span class="material-icons">event_busy</span>
-    No sessions scheduled for this class on this day.
+    {{ "No sessions scheduled for this class on this day." | translate }}
   </div>
 
   <!-- Grid table -->
@@ -58,9 +58,9 @@
     <table class="attendance-table">
       <thead>
         <tr>
-          <th>STUDENT NAME</th>
-          <th>CLASS</th>
-          <th *ngFor="let s of sessions()">PERIOD {{ s.periodNumber }}</th>
+          <th>{{ "STUDENT NAME" | translate }}</th>
+          <th>{{ "CLASS" | translate }}</th>
+          <th *ngFor="let s of sessions()">{{ "PERIOD" | translate }} {{ s.periodNumber }}</th>
         </tr>
       </thead>
       <tbody>
@@ -80,17 +80,17 @@
                 (click)="setStatus(row.studentId, sess.sessionId, 'P')"
                 [class.active-p]="getStatus(row.studentId, sess.sessionId) === 'P'"
                 class="btn-p"
-              >P</button>
+              >{{ "P" | translate }}</button>
               <button
                 (click)="setStatus(row.studentId, sess.sessionId, 'A')"
                 [class.active-a]="getStatus(row.studentId, sess.sessionId) === 'A'"
                 class="btn-a"
-              >A</button>
+              >{{ "A" | translate }}</button>
               <button
                 (click)="setStatus(row.studentId, sess.sessionId, 'E')"
                 [class.active-ex]="getStatus(row.studentId, sess.sessionId) === 'E'"
                 class="btn-ex"
-              >Ex</button>
+              >{{ "Ex" | translate }}</button>
             </div>
           </td>
         </tr>
@@ -99,10 +99,10 @@
   </div>
 
   <footer class="footer-section">
-    <span class="footer-date">Date: {{ currentDate }}</span>
+    <span class="footer-date">{{ "Date:" | translate }} {{ currentDate }}</span>
     <button class="save-btn" (click)="saveAttendance()" [disabled]="saving()">
       <span class="material-icons">{{ saving() ? 'hourglass_empty' : 'save' }}</span>
-      {{ saving() ? 'Saving…' : 'Save Attendance' }}
+      {{ (saving() ? 'Saving…' : 'Save Attendance') | translate }}
     </button>
   </footer>
 </div>

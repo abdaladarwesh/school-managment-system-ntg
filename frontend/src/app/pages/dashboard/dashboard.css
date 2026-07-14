@@ -5,6 +5,7 @@ body {
   margin: 0;
   overflow-x: hidden;
 }
+
 /* ── Top bar ── */
 #topbar {
   background: var(--top-bar);
@@ -16,6 +17,11 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+
+.cursor:hover {
+  cursor: pointer;
 }
 
 .topbar-search {
@@ -161,29 +167,33 @@ body {
   border-radius: 20px;
   position: absolute;
   top: 14px;
-  right: 14px;
-}
+  inset-inline-end: 14px; /* Replaces right: 14px */}
 
 .badge-up {
   background: #e8f5e9;
   color: #2e7d32;
 }
+
 .badge-down {
   background: #fdecea;
   color: #c62828;
 }
+
 .badge-stable {
   background: #e3f2fd;
   color: #1565c0;
 }
+
 .badge-new {
   background: #f3e5f5;
   color: #6a1b9a;
 }
+
 .badge-today {
   background: #fff8e1;
   color: #e65100;
 }
+
 
 .stat-icon {
   width: 38px;
@@ -200,22 +210,27 @@ body {
   background: #e3f2fd;
   color: #1976d2;
 }
+
 .icon-green {
   background: #e8f5e9;
   color: #2e7d32;
 }
+
 .icon-orange {
   background: #fff3e0;
   color: #e65100;
 }
+
 .icon-red {
   background: #fdecea;
   color: #c62828;
 }
+
 .icon-yellow {
   background: #fff8e1;
   color: #f9a825;
 }
+
 .icon-purple {
   background: #f3e5f5;
   color: #7b1fa2;
@@ -304,6 +319,7 @@ body {
 .bar-dark {
   background: #7a0a0a;
 }
+
 .bar-blue {
   background: #5b9bd5;
 }
@@ -328,11 +344,13 @@ body {
 .absence-footer .avg-label {
   color: var(--text-muted);
 }
+
 .absence-footer .avg-val {
   font-size: 20px;
   font-weight: 800;
   color: var(--accent);
 }
+
 .absence-footer .best-val {
   font-size: 12px;
   color: #2e7d32;

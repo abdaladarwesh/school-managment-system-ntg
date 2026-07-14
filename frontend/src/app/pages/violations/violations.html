@@ -5,15 +5,15 @@
       <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
         <div>
           <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+            <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
           </p>
-          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Violations</h1>
-          <p class="text-muted mb-0">Monitor, record, and manage student disciplinary cases</p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Violations' | translate }}</h1>
+          <p class="text-muted mb-0">{{ 'Monitor, record, and manage student disciplinary cases' | translate }}</p>
         </div>
       </div>
     </div>
     <button class="btn-register" (click)="openModal()">
-      <span class="btn-icon">+</span> Register Violation
+      <span class="btn-icon">+</span> {{ 'Register Violation' | translate }}
     </button>
   </div>
 
@@ -21,18 +21,18 @@
     <div class="stat-card">
       <div class="card-icon icon-danger"><i class="pi pi-shield"></i></div>
       <div class="card-number">{{ totalCount }}</div>
-      <div class="card-label">Total Violations</div>
-      <div class="card-link">All time records</div>
+      <div class="card-label">{{ 'Total Violations' | translate }}</div>
+      <div class="card-link">{{ 'All time records' | translate }}</div>
     </div>
     <div class="stat-card">
       <div class="card-icon icon-warning"><i class="pi pi-clock"></i></div>
       <div class="card-number">{{ parentalSummonsCount }}</div>
-      <div class="card-label">Parental Summons Required</div>
+      <div class="card-label">{{ 'Parental Summons Required' | translate }}</div>
     </div>
     <div class="stat-card">
       <div class="card-icon icon-info"><i class="pi pi-calendar"></i></div>
       <div class="card-number">{{ thisMonthCount }}</div>
-      <div class="card-label">This Month</div>
+      <div class="card-label">{{ 'This Month' | translate }}</div>
     </div>
   </div>
 
@@ -41,16 +41,16 @@
       <div class="filters-left">
         <div class="search-wrapper">
           <i class="pi pi-search search-icon"></i>
-          <input type="text" placeholder="Search by student name or violation..." class="search-input" [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+          <input type="text" [placeholder]="'Search by student name or violation...' | translate" class="search-input" [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
         </div>
         <select class="filter-select" [ngModel]="selectedClass()" (ngModelChange)="selectedClass.set($event)">
           @for (cls of classesList(); track $index) {
-            <option [value]="cls">{{ cls }}</option>
+            <option [value]="cls">{{ cls | translate }}</option>
           }
         </select>
       </div>
       <div class="filters-right">
-        <button class="results-badge"><i class="pi pi-filter"></i> {{ filteredViolations.length }} results</button>
+        <button class="results-badge"><i class="pi pi-filter"></i> {{ filteredViolations.length }} {{ 'results' | translate }}</button>
       </div>
     </div>
 
@@ -58,12 +58,12 @@
       <table class="data-table">
         <thead>
         <tr>
-          <th>Date</th>
-          <th>Student Name</th>
-          <th>Class</th>
-          <th>Violation</th>
-          <th>Parental Summons (Is Meeting)</th>
-          <th>Action</th>
+          <th>{{ 'Date' | translate }}</th>
+          <th>{{ 'Student Name' | translate }}</th>
+          <th>{{ 'Class' | translate }}</th>
+          <th>{{ 'Violation' | translate }}</th>
+          <th>{{ 'Parental Summons (Is Meeting)' | translate }}</th>
+          <th>{{ 'Action' | translate }}</th>
         </tr>
         </thead>
         <tbody>
@@ -72,32 +72,32 @@
               <td><span class="date-cell"><i class="pi pi-calendar"></i> {{ item.date }}</span></td>
               <td>
                 <div class="student-cell">
-                  <div class="student-avatar">{{ getInitials(item.studentName) }}</div>
+                   <div class="student-avatar">{{ getInitials(item.studentName) }}</div>
                   <span class="student-name">{{ item.studentName }}</span>
                 </div>
               </td>
-              <td><span class="class-badge">{{ item.class }}</span></td>
-              <td><span class="violation-badge"><span class="warning-emoji">⚠️</span> {{ item.violation }}</span></td>
+              <td><span class="class-badge">{{ item.class | translate }}</span></td>
+              <td><span class="violation-badge"><span class="warning-emoji">⚠️</span> {{ item.violation | translate }}</span></td>
               <td>
                 <span class="summons-cell">
                   <span [class]="item.parentalSummons ? 'dot-warning' : 'dot-success'" class="status-dot"></span>
-                  {{ item.parentalSummons ? 'Yes' : 'No' }}
+                  {{ (item.parentalSummons ? 'Yes' : 'No') | translate }}
                 </span>
               </td>
               <td>
                 <div class="action-buttons">
                   <button class="btn-action btn-parent" (click)="triggerSuccessMessage()">
-                    <span class="action-icon">✈</span> Send to Parent
+                    <span class="action-icon">✈</span> {{ 'Send to Parent' | translate }}
                   </button>
                   <button class="btn-action btn-student" (click)="triggerSuccessMessage()">
-                    <span class="action-icon">💬</span> Send to Student
+                    <span class="action-icon">💬</span> {{ 'Send to Student' | translate }}
                   </button>
                 </div>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td>There is no violations</td>
+              <td>{{ 'There is no violations' | translate }}</td>
             </tr>
           }
         </tbody>
@@ -112,8 +112,8 @@
           <div class="modal-header-left">
             <div class="modal-header-icon"><i class="pi pi-exclamation-circle"></i></div>
             <div>
-              <h2>Register Violation</h2>
-              <p>Fill in the violation details below</p>
+              <h2>{{ 'Register Violation' | translate }}</h2>
+              <p>{{ 'Fill in the violation details below' | translate }}</p>
             </div>
           </div>
           <button class="modal-close-btn" (click)="closeModal()">×</button>
@@ -123,65 +123,65 @@
           <div class="modal-body">
 
             <div class="form-group full-width" style="margin-bottom: 1rem;">
-              <label><i class="pi pi-user"></i> STUDENT NAME *</label>
+              <label><i class="pi pi-user"></i> {{ 'STUDENT NAME *' | translate }}</label>
               <app-student-search [students]="studentsList()" (studentSelected)="onStudentSelected($event)"></app-student-search>
               @if (violationForm.controls.studentId.invalid && violationForm.controls.studentId.touched) {
-                <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">Student selection is required.</span>
+                <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Please select a student.' | translate }}</span>
               }
             </div>
 
             <div class="form-grid">
               <div class="form-group">
-                <label><i class="pi pi-bell"></i> VIOLATION *</label>
+                <label><i class="pi pi-bell"></i> {{ 'VIOLATION *' | translate }}</label>
                 <input type="text" formControlName="violation" placeholder="e.g. testing" class="form-input">
                 @if (violationForm.controls.violation.invalid && violationForm.controls.violation.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">Required</span>
+                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
                 }
               </div>
 
               <div class="form-group">
-                <label><i class="pi pi-user-edit"></i> NAME OF VIOLATOR *</label>
+                <label><i class="pi pi-user-edit"></i> {{ 'NAME OF VIOLATOR *' | translate }}</label>
                 <input type="text" formControlName="nameOfViolator" placeholder="Name of violator" class="form-input">
                 @if (violationForm.controls.nameOfViolator.invalid && violationForm.controls.nameOfViolator.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">Required</span>
+                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
                 }
               </div>
 
               <div class="form-group">
-                <label><i class="pi pi-sitemap"></i> APPLICABLE PROCEDURE *</label>
+                <label><i class="pi pi-sitemap"></i> {{ 'APPLICABLE PROCEDURE *' | translate }}</label>
                 <input type="text" formControlName="applicableProcedure" placeholder="Procedure" class="form-input">
                 @if (violationForm.controls.applicableProcedure.invalid && violationForm.controls.applicableProcedure.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">Required</span>
+                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
                 }
               </div>
 
               <div class="form-group">
-                <label><i class="pi pi-id-card"></i> REFERRING AUTHORITY *</label>
+                <label><i class="pi pi-id-card"></i> {{ 'REFERRING AUTHORITY *' | translate }}</label>
                 <input type="text" formControlName="referringAuthority" placeholder="Referring authority" class="form-input">
                 @if (violationForm.controls.referringAuthority.invalid && violationForm.controls.referringAuthority.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">Required</span>
+                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
                 }
               </div>
             </div>
 
             <div class="form-group full-width" style="margin-top: 1rem;">
-              <label><i class="pi pi-users"></i> IS MEETING REQUIRED (SUMMONS)?</label>
+              <label><i class="pi pi-users"></i> {{ 'IS MEETING REQUIRED (SUMMONS)?' | translate }}</label>
               <div class="toggle-container">
-                <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === false" (click)="violationForm.patchValue({ ismeeting: false })">No</button>
-                <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === true" (click)="violationForm.patchValue({ ismeeting: true })">Yes</button>
+                <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === false" (click)="violationForm.patchValue({ ismeeting: false })">{{ 'No' | translate }}</button>
+                <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === true" (click)="violationForm.patchValue({ ismeeting: true })">{{ 'Yes' | translate }}</button>
               </div>
             </div>
 
             <div class="form-group full-width" style="margin-top: 1rem;">
-              <label><i class="pi pi-comment"></i> NOTES</label>
-              <textarea formControlName="notes" placeholder="Additional details..." class="form-textarea"></textarea>
+              <label><i class="pi pi-comment"></i> {{ 'NOTES' | translate }}</label>
+              <textarea formControlName="notes" [placeholder]="'Optional notes...' | translate" class="form-textarea"></textarea>
             </div>
 
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn-modal-cancel" (click)="closeModal()">× Cancel</button>
-            <button type="submit" class="btn-modal-save"><i class="pi pi-save"></i> Save Violation</button>
+            <button type="button" class="btn-modal-cancel" (click)="closeModal()">× {{ 'Cancel' | translate }}</button>
+            <button type="submit" class="btn-modal-save"><i class="pi pi-save"></i> {{ 'Save Violation' | translate }}</button>
           </div>
         </form>
       </div>
@@ -194,9 +194,9 @@
         <div class="success-icon-wrapper">
           <div class="success-checkmark">✓</div>
         </div>
-        <h3 class="success-title">Message Sent!</h3>
-        <p class="success-subtitle">Message Sent Successfully</p>
-        <button class="btn-success-close" (click)="closeSuccessModal()">Close</button>
+        <h3 class="success-title">{{ 'Message Sent!' | translate }}</h3>
+        <p class="success-subtitle">{{ 'Message Sent Successfully' | translate }}</p>
+        <button class="btn-success-close" (click)="closeSuccessModal()">{{ 'Close' | translate }}</button>
       </div>
     </div>
   }

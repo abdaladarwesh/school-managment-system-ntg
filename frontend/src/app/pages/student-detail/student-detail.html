@@ -5,20 +5,20 @@
       <!-- Header -->
       <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
-          <button class="btn btn-link btn-back p-0 mb-2" (click)="goBack()">← Back to Students</button>
+          <button class="btn btn-link btn-back p-0 mb-2" (click)="goBack()">← {{ 'Back to Students' | translate }}</button>
           <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+            <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
           </p>
           <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">
-            {{ data()! ? (data()!.studentResponse.user.firstName + ' ' + data()!.studentResponse.user.lastName) : 'Student Details' }}
+            {{ data()! ? (data()!.studentResponse.user.firstName + ' ' + data()!.studentResponse.user.lastName) : ('Student Details' | translate) }}
           </h1>
-          <p class="text-muted mb-0">Complete student profile information</p>
+          <p class="text-muted mb-0">{{ 'Complete student profile information' | translate }}</p>
         </div>
         <div class="d-flex gap-1">
           <button [class.disabled]="data()?.studentResponse?.user?.isDeleted" (click)="deleteStudent()"
-                  class="btn btn-danger fw-semibold">Delete Student
+                  class="btn btn-danger fw-semibold">{{ 'Delete Student' | translate }}
           </button>
-          <button type="button" class="btn fw-semibold" style="background-color: var(--blue) !important; color: white" (click)="editStudent()">+ Edit Student</button>
+          <button type="button" class="btn fw-semibold" style="background-color: var(--blue) !important; color: white" (click)="editStudent()">+ {{ 'Edit Student' | translate }}</button>
         </div>
       </div>
 
@@ -32,8 +32,8 @@
 
       <!-- Error state -->
       <div *ngIf="error && !loading" class="text-center py-5">
-        <p class="text-danger fw-semibold">Failed to load student details.</p>
-        <button class="btn btn-primary" (click)="goBack()">Return to Students List</button>
+        <p class="text-danger fw-semibold">{{ 'Something went wrong. Please try again.' | translate }}</p>
+        <button class="btn btn-primary" (click)="goBack()">{{ 'Back to Students' | translate }}</button>
       </div>
 
       <!-- Content -->
@@ -47,79 +47,79 @@
               <div class="panel-header">
                 <div class="panel-icon student-icon">👤</div>
                 <div>
-                  <h5 class="panel-title mb-0">Student Information</h5>
-                  <span class="panel-subtitle">Personal and academic details</span>
+                  <h5 class="panel-title mb-0">{{ 'Student Information' | translate }}</h5>
+                  <span class="panel-subtitle">{{ 'Personal and academic details' | translate }}</span>
                 </div>
               </div>
 
               <div class="row g-4">
                 <!-- Name -->
                 <div class="col-md-6">
-                  <p class="field-label">Full Name (English)</p>
+                  <p class="field-label">{{ 'FULL NAME (ENGLISH)' | translate }}</p>
                   <p
                     class="field-value">{{ data()!.studentResponse.user.firstName }} {{ data()!.studentResponse.user.lastName }}</p>
                 </div>
                 <div class="col-md-6">
-                  <p class="field-label">Full Name (Arabic)</p>
+                  <p class="field-label">{{ 'FULL NAME (ARABIC)' | translate }}</p>
                   <p
                     class="field-value">{{ data()!.studentResponse.user.firstNameInArabic }} {{ data()!.studentResponse.user.lastNameInArabic }}</p>
                 </div>
                 <!-- Email -->
                 <div class="col-md-6">
-                  <p class="field-label">Email</p>
+                  <p class="field-label">{{ 'Email' | translate }}</p>
                   <p class="field-value">{{ data()!.studentResponse.user.email }}</p>
                 </div>
                 <!-- Phone Numbers -->
                 <div class="col-md-6">
-                  <p class="field-label">Phone Numbers</p>
+                  <p class="field-label">{{ 'Phone Numbers' | translate }}</p>
                   <p class="mb-0" *ngIf="data()!.studentResponse.user.phoneNumbers.length">
                     <span *ngFor="let phone of data()!.studentResponse.user.phoneNumbers; let last = last"
                           class="badge class-chip fw-semibold me-1">+20{{ phone }}{{ !last ? '' : '' }}</span>
                   </p>
-                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.user.phoneNumbers.length">N/A</p>
+                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.user.phoneNumbers.length">{{ 'N/A' | translate }}</p>
                 </div>
                 <!-- Address -->
                 <div class="col-md-6">
-                  <p class="field-label">Address</p>
+                  <p class="field-label">{{ 'Address' | translate }}</p>
                   <p class="field-value">{{ data()!.studentResponse.user.address }}</p>
                 </div>
                 <!-- Birth Date -->
                 <div class="col-md-6">
-                  <p class="field-label">Birth Date</p>
+                  <p class="field-label">{{ 'Birth Date' | translate }}</p>
                   <p class="field-value">{{ formatDate(data()!.studentResponse.user.birthDate) }}</p>
                 </div>
                 <!-- National Number -->
                 <div class="col-md-4">
-                  <p class="field-label">National Number</p>
+                  <p class="field-label">{{ 'National Number' | translate }}</p>
                   <p class="field-value">{{ data()!.studentResponse.user.nationalNumber }}</p>
                 </div>
                 <!-- Governorate -->
                 <div class="col-md-4">
-                  <p class="field-label">Governorate</p>
-                  <p class="field-value">{{ data()!.studentResponse.governorate }}</p>
+                  <p class="field-label">{{ 'Governorate' | translate }}</p>
+                  <p class="field-value">{{ data()!.studentResponse.governorate | translate }}</p>
                 </div>
                 <!-- Nationality -->
                 <div class="col-md-4">
-                  <p class="field-label">Nationality</p>
-                  <p class="field-value">{{ data()!.studentResponse.user.nationality }}</p>
+                  <p class="field-label">{{ 'Nationality' | translate }}</p>
+                  <p class="field-value">{{ data()!.studentResponse.user.nationality | translate }}</p>
                 </div>
                 <!-- Place of Birth -->
                 <div class="col-md-6">
-                  <p class="field-label">Place of Birth</p>
-                  <p class="field-value">{{ data()!.studentResponse.placeOfBirth }}</p>
+                  <p class="field-label">{{ 'Place of Birth' | translate }}</p>
+                  <p class="field-value">{{ data()!.studentResponse.placeOfBirth | translate }}</p>
                 </div>
                 <!-- Academic Score -->
                 <div class="col-md-6">
-                  <p class="field-label">Academic Score (Middle School)</p>
+                  <p class="field-label">{{ 'Academic Score (Middle School)' | translate }}</p>
                   <p class="field-value">{{ data()!.studentResponse.academicScoreInMiddleSchool }}</p>
                 </div>
             @if (data()!.studentResponse.user.lastLogin == null) {
                 <button class="mt-5 btn btn-primary m-0"
-                        (click)="generatePassword(data()!.studentResponse.user.id)">Generate Password
+                        (click)="generatePassword(data()!.studentResponse.user.id)">{{ 'Generate Password' | translate }}
                 </button>
             } @else if (data()!.studentResponse.user.lastLogin != null){
               <button class="mt-5 btn btn-primary m-0"
-                      (click)="generatePassword(data()!.studentResponse.user.id)">Reset Password
+                      (click)="generatePassword(data()!.studentResponse.user.id)">{{ 'Reset Password' | translate }}
               </button>
             }
               </div>
@@ -134,35 +134,35 @@
               <div class="panel-header">
                 <div class="panel-icon additional-icon">ℹ️</div>
                 <div>
-                  <h5 class="panel-title mb-0">Additional Information</h5>
+                  <h5 class="panel-title mb-0">{{ 'Additional Information' | translate }}</h5>
                 </div>
               </div>
               <div class="row g-3">
                 <div class="col-6">
-                  <p class="field-label">Gender</p>
-                  <p class="field-value">{{ getGenderLabel(data()!.studentResponse.user.gender) }}</p>
+                  <p class="field-label">{{ 'Gender' | translate }}</p>
+                  <p class="field-value">{{ getGenderLabel(data()!.studentResponse.user.gender) | translate }}</p>
                 </div>
                 <div class="col-6">
-                  <p class="field-label">Religion</p>
-                  <p class="field-value">{{ data()!.studentResponse.user.religion }}</p>
+                  <p class="field-label">{{ 'Religion' | translate }}</p>
+                  <p class="field-value">{{ data()!.studentResponse.user.religion | translate }}</p>
                 </div>
                 <div class="col-12">
-                  <p class="field-label">Parents' Marital Status</p>
-                  <p class="field-value">{{ data()!.studentResponse.martialParentsStatus }}</p>
+                  <p class="field-label">{{ 'Parents\' Marital Status' | translate }}</p>
+                  <p class="field-value">{{ data()!.studentResponse.martialParentsStatus | regulateText | translate }}</p>
                 </div>
                 <div class="col-6">
-                  <p class="field-label">Class</p>
+                  <p class="field-label">{{ 'Class' | translate }}</p>
                   <p class="field-value" *ngIf="data()!.studentResponse.studentClass">
-                    {{ data()!.studentResponse.studentClass?.grade?.name ?? "Not Assigned" }}
-                    - {{ data()!.studentResponse.studentClass?.name ?? "Not Assigned" }}
+                    {{ data()!.studentResponse.studentClass?.grade?.name ?? ("Not Assigned" | translate) }}
+                    - {{ data()!.studentResponse.studentClass?.name ?? ("Not Assigned" | translate) }}
                   </p>
-                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.studentClass">Not Assigned</p>
+                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.studentClass">{{ 'Not Assigned' | translate }}</p>
                 </div>
                 <div class="col-6">
-                  <p class="field-label">Class Capacity</p>
+                  <p class="field-label">{{ 'Class Capacity' | translate }}</p>
                   <p class="field-value"
-                     *ngIf="data()!.studentResponse.studentClass">{{ data()!.studentResponse.studentClass?.capacity ?? "Not Assigned" }}</p>
-                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.studentClass">N/A</p>
+                     *ngIf="data()!.studentResponse.studentClass">{{ data()!.studentResponse.studentClass?.capacity ?? ("Not Assigned" | translate) }}</p>
+                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.studentClass">{{ 'N/A' | translate }}</p>
                 </div>
               </div>
             </div>
@@ -172,27 +172,27 @@
               <div class="panel-header">
                 <div class="panel-icon account-icon">🔐</div>
                 <div>
-                  <h5 class="panel-title mb-0">Account Status</h5>
+                  <h5 class="panel-title mb-0">{{ 'Account Status' | translate }}</h5>
                 </div>
               </div>
               <div class="row g-3">
                 <div class="col-12">
-                  <p class="field-label">Status</p>
+                  <p class="field-label">{{ 'Status' | translate }}</p>
                   <span class="badge rounded-pill"
                         [class.status-badge--active]="!data()!.studentResponse.user.isDeleted"
                         [class.status-badge--suspended]="data()!.studentResponse.user.isDeleted">
-                    {{ data()!.studentResponse.user.isDeleted ? 'Deleted' : 'Active' }}
+                    {{ (data()!.studentResponse.user.isDeleted ? 'Deleted' : 'Active') | translate }}
                   </span>
                 </div>
                 <div class="col-12">
-                  <p class="field-label">Created At</p>
+                  <p class="field-label">{{ 'Created At' | translate }}</p>
                   <p class="field-value">{{ formatDateTime(data()!.studentResponse.user.createdAt) }}</p>
                 </div>
                 <div class="col-12">
-                  <p class="field-label">Last Login</p>
+                  <p class="field-label">{{ 'Last Login' | translate }}</p>
                   <p class="field-value"
                      *ngIf="data()!.studentResponse.user.lastLogin">{{ formatDateTime(data()!.studentResponse.user.lastLogin) }}</p>
-                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.user.lastLogin">Never logged in</p>
+                  <p class="mb-0 text-muted" *ngIf="!data()!.studentResponse.user.lastLogin">{{ 'Never logged in' | translate }}</p>
                 </div>
               </div>
             </div>
@@ -202,17 +202,17 @@
               <div class="panel-header">
                 <div class="panel-icon medical-icon">🏥</div>
                 <div>
-                  <h5 class="panel-title mb-0">Medical History</h5>
-                  <span class="panel-subtitle">Recorded conditions</span>
+                  <h5 class="panel-title mb-0">{{ 'Medical History' | translate }}</h5>
+                  <span class="panel-subtitle">{{ 'Recorded conditions' | translate }}</span>
                 </div>
               </div>
               <div *ngIf="data()!.medicalHistories.length">
                 <span *ngFor="let condition of data()!.medicalHistories"
                       class="badge rounded-pill medical-chip me-2 mb-2">
-                  {{ condition }}
+                  {{ condition | translate }}
                 </span>
               </div>
-              <p class="text-muted mb-0" *ngIf="!data()!.medicalHistories.length">No medical history recorded.</p>
+              <p class="text-muted mb-0" *ngIf="!data()!.medicalHistories.length">{{ 'No medical history recorded.' | translate }}</p>
             </div>
 
           </div>
@@ -223,12 +223,12 @@
           <div class="panel-header">
             <div class="panel-icon parent-icon">👪</div>
             <div>
-              <h5 class="panel-title mb-0">Parents</h5>
-              <span class="panel-subtitle">Parent / guardian information</span>
+              <h5 class="panel-title mb-0">{{ 'Parents' | translate }}</h5>
+              <span class="panel-subtitle">{{ 'Parent / guardian information' | translate }}</span>
             </div>
           </div>
 
-          <div *ngIf="!data()!.parentsResponse.length" class="text-muted">No parent information available.</div>
+          <div *ngIf="!data()!.parentsResponse.length" class="text-muted">{{ 'No parent information available.' | translate }}</div>
 
           <ng-container *ngFor="let parent of data()!.parentsResponse; let i = index">
             <div class="parent-divider" *ngIf="i > 0"></div>
@@ -236,67 +236,70 @@
               <div class="col-12">
                 <p class="parent-label" [class.father-label]="parent.user.gender === 'M'"
                    [class.mother-label]="parent.user.gender === 'F'">
-                  {{ parent.user.gender === 'M' ? 'Father' : 'Mother' }}
+                  {{ (parent.user.gender === 'M' ? 'Father' : 'Mother') | translate }}
                 </p>
               </div>
               <!-- Name + Job -->
               <div class="col-md-6">
-                <p class="field-label">Full Name (English)</p>
+                <p class="field-label">{{ 'FULL NAME (ENGLISH)' | translate }}</p>
                 <p class="field-value">{{ parent.user.firstName }} {{ parent.user.lastName }}</p>
               </div>
               <div class="col-md-6">
-                <p class="field-label">Occupation</p>
+                <p class="field-label">{{ 'Occupation' | translate }}</p>
                 <p class="field-value">{{ parent.jobName }}</p>
               </div>
               <div class="col-md-6">
-                <p class="field-label">Full Name (Arabic)</p>
+                <p class="field-label">{{ 'FULL NAME (ARABIC)' | translate }}</p>
                 <p class="field-value">{{ parent.user.firstNameInArabic }} {{ parent.user.lastNameInArabic }}</p>
               </div>
               <!-- National Number + Phone -->
               <div class="col-md-6">
-                <p class="field-label">National Number</p>
+                <p class="field-label">{{ 'National Number' | translate }}</p>
                 <p class="field-value">{{ parent.user.nationalNumber }}</p>
               </div>
               <div class="col-md-6">
-                <p class="field-label">Phone Numbers</p>
+                <p class="field-label">{{ 'Phone Numbers' | translate }}</p>
                 <p class="mb-0" *ngIf="parent.user.phoneNumbers.length">
                   <span *ngFor="let phone of parent.user.phoneNumbers; let last = last"
                         class="badge class-chip fw-semibold me-1">+20{{ phone }}{{ !last ? '' : '' }}</span>
                 </p>
-                <p class="mb-0 text-muted" *ngIf="!parent.user.phoneNumbers.length">N/A</p>
+                <p class="mb-0 text-muted" *ngIf="!parent.user.phoneNumbers.length">{{ 'N/A' | translate }}</p>
               </div>
               <!-- Email -->
               <div class="col-md-6">
-                <p class="field-label">Email</p>
+                <p class="field-label">{{ 'Email' | translate }}</p>
                 <p class="field-value">{{ parent.user.email }}</p>
               </div>
               <!-- Address -->
               <div class="col-md-6">
-                <p class="field-label">Address</p>
+                <p class="field-label">{{ 'Address' | translate }}</p>
                 <p class="field-value">{{ parent.user.address }}</p>
               </div>
               <!-- Nationality / Religion / Birth Date -->
               <div class="col-md-4">
-                <p class="field-label">Nationality</p>
-                <p class="field-value">{{ parent.user.nationality }}</p>
+                <p class="field-label">{{ 'Nationality' | translate }}</p>
+                <p class="field-value">{{ parent.user.nationality | translate }}</p>
               </div>
               <div class="col-md-4">
-                <p class="field-label">Religion</p>
-                <p class="field-value">{{ parent.user.religion }}</p>
+                <p class="field-label">{{ 'Religion' | translate }}</p>
+                <p class="field-value">{{ parent.user.religion | translate }}</p>
               </div>
               <div class="col-md-4">
-                <p class="field-label">Birth Date</p>
+                <p class="field-label">{{ 'Birth Date' | translate }}</p>
                 <p class="field-value">{{ formatDate(parent.user.birthDate) }}</p>
-
+              </div>
+              <div class="col-md-4">
+                <p class="field-label">{{ 'Education Level' | translate }}</p>
+                <p class="field-value">{{ parent.educationLevel! | regulateText | translate }}</p>
               </div>
                 @if (data()!.studentResponse.user.lastLogin == null) {
                   <button class="mt-5 btn btn-primary m-0"
-                          (click)="generatePassword(data()!.studentResponse.user.id)">Generate Password
+                          (click)="generatePassword(data()!.studentResponse.user.id)">{{ 'Generate Password' | translate }}
                   </button>
                 } @else if (data()!.studentResponse.user.lastLogin != null){
 
                   <button class="mt-5 btn btn-primary m-0"
-                          (click)="generatePassword(data()!.studentResponse.user.id)">Reset Password
+                          (click)="generatePassword(data()!.studentResponse.user.id)">{{ 'Reset Password' | translate }}
                   </button>
                 }
             </div>
@@ -305,7 +308,7 @@
 
         <!-- Footer -->
         <footer class="d-flex justify-content-between align-items-center mt-4 px-1 small text-muted flex-wrap gap-2">
-          <span>NTG School - Student Affairs System © 2026</span>
+          <span>{{ 'NTG School - Student Affairs System © 2026' | translate }}</span>
         </footer>
       </ng-container>
     </main>

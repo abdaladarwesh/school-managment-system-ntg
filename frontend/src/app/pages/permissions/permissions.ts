@@ -5,11 +5,12 @@ import { AsyncPipe } from '@angular/common';
 import Swal from 'sweetalert2';
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-permission',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, StudentSearchComponent],
+  imports: [FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe],
   templateUrl: './permissions.html',
   styleUrl: './permissions.css',
 })

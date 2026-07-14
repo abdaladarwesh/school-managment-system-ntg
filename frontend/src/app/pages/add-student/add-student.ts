@@ -15,14 +15,18 @@ import {
   UserPayload,
   StudentDetailResponse,
   ParentResponse,
+  EducationLevel,
 } from '../student-page/service/student-service';
+
 import { ParentSearchComponent } from '../../components/parent-search/parent-search.component';
 import Swal from 'sweetalert2';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-add-student',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, ParentSearchComponent],
+  imports: [ReactiveFormsModule, CommonModule, ParentSearchComponent, TranslatePipe],
   templateUrl: './add-student.html',
   styleUrl: './add-student.css',
 })
@@ -30,7 +34,8 @@ export class AddStudent implements OnInit {
   private studentService = inject(StudentService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private editStudentId: number | null = null;
+  private translationService = inject(TranslationService);
+  private editStudentId = null as number | null;
   isEditMode = false;
 
   // --- Parent Search State ---
@@ -101,6 +106,7 @@ export class AddStudent implements OnInit {
         birthYear: new FormControl('', Validators.required),
       }),
       jobName: new FormControl('', Validators.required),
+      educationLevel: new FormControl<EducationLevel | null>(null),
     }),
     mother: new FormGroup({
       user: new FormGroup({
@@ -127,6 +133,7 @@ export class AddStudent implements OnInit {
         birthYear: new FormControl('', Validators.required),
       }),
       jobName: new FormControl('', Validators.required),
+      educationLevel: new FormControl<EducationLevel | null>(null),
     }),
     guardianType: new FormControl('FATHER', Validators.required),
     guardian: new FormGroup({
@@ -148,6 +155,7 @@ export class AddStudent implements OnInit {
         birthYear: new FormControl(''),
       }),
       jobName: new FormControl(''),
+      educationLevel: new FormControl<EducationLevel | null>(null),
     }),
   });
 
@@ -163,6 +171,14 @@ export class AddStudent implements OnInit {
   religions = ['Muslim', 'Christianity', 'Other'];
   maritalStatuses = ['MARRIED', 'DIVORCED'];
   guardianTypes = ['FATHER', 'MOTHER', 'OTHER'];
+
+  educationLevels: { value: EducationLevel; label: string }[] = [
+    { value: 'POSTGRADUATE',        label: 'Postgraduate (e.g. Master/PhD)' },
+    { value: 'UNIVERSITY',          label: 'University Degree' },
+    { value: 'ABOVE_INTERMEDIATE',  label: 'Above Intermediate' },
+    { value: 'INTERMEDIATE',        label: 'Intermediate' },
+    { value: 'BELOW_INTERMEDIATE',  label: 'Below Intermediate' },
+  ];
 
   governorates = [
     'Cairo',
@@ -316,10 +332,10 @@ export class AddStudent implements OnInit {
       next: (data) => this.patchFormFromDetail(data, id),
       error: () => {
         Swal.fire({
-          title: 'Error',
-          text: 'Could not load the student data for editing.',
+          title: this.translationService.translate('Error'),
+          text: this.translationService.translate('Could not load the student data for editing.'),
           icon: 'error',
-          confirmButtonText: 'Back',
+          confirmButtonText: this.translationService.translate('Back'),
         }).then(() => this.router.navigate(['/students', id]));
       },
     });
@@ -487,6 +503,7 @@ export class AddStudent implements OnInit {
       draft?.user?.phoneNumbers ?? user.phoneNumbers.map((phone) => this.normalizePhone(phone)),
     );
     group.get('jobName')?.setValue(draft?.jobName ?? jobName);
+    group.get('educationLevel')?.setValue(draft?.educationLevel ?? null);
   }
 
   private replacePhoneNumbers(array: FormArray, values: number[] | string[]) {
@@ -644,10 +661,10 @@ export class AddStudent implements OnInit {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       Swal.fire({
-        title: 'Validation Error',
-        text: 'Please fill in all required fields correctly.',
+        title: this.translationService.translate('Validation Error'),
+        text: this.translationService.translate('Please fill in all required fields correctly.'),
         icon: 'warning',
-        confirmButtonText: 'OK',
+        confirmButtonText: this.translationService.translate('OK'),
       });
       return;
     }
@@ -675,10 +692,12 @@ export class AddStudent implements OnInit {
       father: {
         user: this.buildUserPayload(this.father.get('user') as FormGroup),
         jobName: this.father.get('jobName')?.value || '',
+        educationLevel: this.father.get('educationLevel')?.value || null,
       },
       mother: {
         user: this.buildUserPayload(this.mother.get('user') as FormGroup),
         jobName: this.mother.get('jobName')?.value || '',
+        educationLevel: this.mother.get('educationLevel')?.value || null,
       },
       guardianType: this.guardianType.value as 'FATHER' | 'MOTHER' | 'OTHER',
       guardian: null,
@@ -688,6 +707,7 @@ export class AddStudent implements OnInit {
       payload.guardian = {
         user: this.buildUserPayload(this.guardian.get('user') as FormGroup),
         jobName: this.guardian.get('jobName')?.value || '',
+        educationLevel: this.guardian.get('educationLevel')?.value || null,
       };
     }
 
@@ -696,10 +716,10 @@ export class AddStudent implements OnInit {
         next: () => {
           this.studentService.clearStudentDraft(this.editStudentId!);
           Swal.fire({
-            title: 'Updated!',
-            text: 'Student information has been updated successfully.',
+            title: this.translationService.translate('Updated!'),
+            text: this.translationService.translate('Student information has been updated successfully.'),
             icon: 'success',
-            confirmButtonText: 'OK',
+            confirmButtonText: this.translationService.translate('OK'),
           }).then(() => {
             this.router.navigate(['/students', this.editStudentId]);
           });
@@ -707,17 +727,17 @@ export class AddStudent implements OnInit {
         error: (err) => {
           if (err.status === 401) {
             Swal.fire({
-              title: 'Session Expired',
-              text: 'Please login again.',
+              title: this.translationService.translate('Session Expired'),
+              text: this.translationService.translate('Please login again.'),
               icon: 'error',
-              confirmButtonText: 'Login',
+              confirmButtonText: this.translationService.translate('Login'),
             }).then(() => this.router.navigate(['/login']));
           } else {
             Swal.fire({
-              title: 'Error',
-              text: err.error?.message || 'Something went wrong. Please try again.',
+              title: this.translationService.translate('Error'),
+              text: err.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate('Something went wrong. Please try again.'),
               icon: 'error',
-              confirmButtonText: 'Try Again',
+              confirmButtonText: this.translationService.translate('Try Again'),
             });
           }
         },
@@ -728,10 +748,10 @@ export class AddStudent implements OnInit {
     this.studentService.createStudent(payload).subscribe({
       next: () => {
         Swal.fire({
-          title: 'Done!',
-          text: 'Student has been registered successfully.',
+          title: this.translationService.translate('Done!'),
+          text: this.translationService.translate('Student has been registered successfully.'),
           icon: 'success',
-          confirmButtonText: 'OK',
+          confirmButtonText: this.translationService.translate('OK'),
         }).then(() => {
           this.router.navigate(['/students']);
         });
@@ -739,17 +759,17 @@ export class AddStudent implements OnInit {
       error: (err) => {
         if (err.status === 401) {
           Swal.fire({
-            title: 'Session Expired',
-            text: 'Please login again.',
+            title: this.translationService.translate('Session Expired'),
+            text: this.translationService.translate('Please login again.'),
             icon: 'error',
-            confirmButtonText: 'Login',
+            confirmButtonText: this.translationService.translate('Login'),
           }).then(() => this.router.navigate(['/login']));
         } else {
           Swal.fire({
-            title: 'Error',
-            text: err.error?.message || 'Something went wrong. Please try again.',
+            title: this.translationService.translate('Error'),
+            text: err.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate('Something went wrong. Please try again.'),
             icon: 'error',
-            confirmButtonText: 'Try Again',
+            confirmButtonText: this.translationService.translate('Try Again'),
           });
         }
       },

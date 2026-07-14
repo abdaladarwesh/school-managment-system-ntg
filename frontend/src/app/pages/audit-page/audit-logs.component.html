@@ -1,13 +1,12 @@
-<div class="container-fluid py-4 bg-light min-vh-100 font-sans px-4" style="background: var(--background) !important;" dir="ltr" (click)="closeFilterMenu()">
+<div class="container-fluid py-4 bg-light min-vh-100 font-sans px-4" style="background: var(--background) !important;" (click)="closeFilterMenu()">
 
   <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
     <div>
       <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-        <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+        <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
       </p>
-      <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Audit logs</h1>
-      <p class="text-muted mb-0">Monitor security events, access attempts, and administrative changes across your
-        organization</p>
+      <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Audit Logs' | translate }}</h1>
+      <p class="text-muted mb-0">{{ 'Monitor security events, access attempts, and administrative changes across your organization' | translate }}</p>
     </div>
   </div>
 
@@ -18,7 +17,7 @@
         <div class="position-relative w-25">
           <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
           <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" class="form-control bg-light border-0 rounded-3 ps-5"
-                 placeholder="Search by user or module...">
+                 [placeholder]="'Search by user or module...' | translate">
           <button *ngIf="searchTerm()" type="button" (click)="clearSearch()"
                   class="btn btn-sm position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted border-0 bg-transparent"
                   aria-label="Clear search">
@@ -29,24 +28,24 @@
           <div class="position-relative" (click)="$event.stopPropagation()">
             <button type="button" (click)="toggleFilterMenu()"
                     class="btn btn-outline-secondary border-light-subtle bg-white text-dark rounded-3 px-3 d-flex align-items-center gap-2">
-              <i class="bi bi-funnel"></i> Filter
+              <i class="bi bi-funnel"></i> {{ 'Filter' | translate }}
               <span *ngIf="activeFilterCount() > 0" class="badge bg-primary rounded-pill">{{ activeFilterCount() }}</span>
             </button>
             <div *ngIf="isFilterMenuOpen()" class="dropdown-menu d-block shadow-sm border-0 rounded-3 mt-1 p-2"
                  style="position: absolute; right: 0; min-width: 180px; z-index: 1000;">
-              <div class="text-uppercase text-muted small fw-bold px-2 pb-1">Action Type</div>
+              <div class="text-uppercase text-muted small fw-bold px-2 pb-1">{{ 'Action Type' | translate }}</div>
               <button *ngFor="let option of actionOptions" type="button"
                       (click)="selectActionFilter(option)"
                       class="dropdown-item rounded-2 d-flex align-items-center justify-content-between"
                       [class.active]="selectedAction() === option">
-                {{ option }}
+                {{ option | translate }}
                 <i *ngIf="selectedAction() === option" class="bi bi-check-lg"></i>
               </button>
             </div>
           </div>
           <button (click)="exportAuditLogs()" [disabled]="filteredLogs().length === 0"
                   class="btn btn-outline-secondary border-light-subtle bg-white text-dark rounded-3 px-3 d-flex align-items-center gap-2">
-            <i class="bi bi-download"></i> Export Logs
+            <i class="bi bi-download"></i> {{ 'Export Logs' | translate }}
           </button>
         </div>
       </div>
@@ -55,11 +54,11 @@
         <table class="table align-middle custom-table text-start">
           <thead>
           <tr class="text-uppercase text-muted fs-7 border-bottom">
-            <th scope="col" class="pb-3">User (Who)</th>
-            <th scope="col" class="pb-3">Module (Where)</th>
-            <th scope="col" class="pb-3">Action Type</th>
-            <th scope="col" class="pb-3">Details & Changes (What)</th>
-            <th scope="col" class="pb-3">Timestamp (When)</th>
+            <th scope="col" class="pb-3">{{ 'User (Who)' | translate }}</th>
+            <th scope="col" class="pb-3">{{ 'Module (Where)' | translate }}</th>
+            <th scope="col" class="pb-3">{{ 'Action Type' | translate }}</th>
+            <th scope="col" class="pb-3">{{ 'Details & Changes (What)' | translate }}</th>
+            <th scope="col" class="pb-3">{{ 'Timestamp (When)' | translate }}</th>
           </tr>
           </thead>
           <tbody>
@@ -67,14 +66,14 @@
             <td class="py-3 fw-bold text-dark">
                {{ log.changedBy }}
             </td>
-            <td class="text-secondary fw-semibold">{{ log.tableName }}</td>
+            <td class="text-secondary fw-semibold">{{ log.tableName | translate }}</td>
             <td>
               <span class="badge px-2 py-1.5 rounded-2" [ngClass]="{
                 'bg-success-subtle text-success border border-success-subtle': log.action === 'INSERT',
                 'bg-primary-subtle text-primary border border-primary-subtle': log.action === 'UPDATE',
                 'bg-danger-subtle text-danger border border-danger-subtle': log.action === 'DELETE'
               }">
-                {{ log.action }}
+                {{ log.action | translate }}
               </span>
             </td>
             <td class="text-muted fs-7 text-wrap" style="max-width: 350px;">
@@ -90,7 +89,7 @@
           <tr *ngIf="filteredLogs().length === 0">
             <td colspan="5" class="text-center text-muted py-5">
               <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-              No audit logs match your search or filter.
+              {{ 'No audit logs match your search or filter.' | translate }}
             </td>
           </tr>
           </tbody>

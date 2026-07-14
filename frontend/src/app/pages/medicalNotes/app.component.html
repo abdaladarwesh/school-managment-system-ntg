@@ -6,16 +6,16 @@
         <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
           <div>
             <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-              <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+              <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
             </p>
-            <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Medical Cases</h1>
-            <p class="text-muted mb-0">Track and manage student medical cases
+            <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Medical Cases' | translate }}</h1>
+            <p class="text-muted mb-0">{{ 'Track and manage student medical cases' | translate }}
 
             </p>
           </div>
         </div>
         <button class="save-btn" (click)="openRegisterModal()">
-          <i class="bi bi-plus-lg me-1"></i>Register Medical Case
+          <i class="bi bi-plus-lg me-1"></i>{{ 'Register Medical Case' | translate }}
         </button>
       </div>
 
@@ -28,7 +28,7 @@
                 <input
                   class="form-control border-start-0 bg-body-tertiary rounded-end-pill"
                   type="text"
-                  placeholder="Filter table by name or illness..."
+                  [placeholder]="'Filter table by name or illness...' | translate"
                   [value]="searchQuery()"
                   (input)="onSearchInput($any($event.target).value)"
                 />
@@ -36,10 +36,10 @@
             </div>
             <div class="d-flex gap-2">
               <button class="btn btn-outline-secondary" (click)="toggleFilterPanel()">
-                <i class="bi bi-funnel me-1"></i>Filter
+                <i class="bi bi-funnel me-1"></i>{{ 'Filter' | translate }}
               </button>
               <button class="btn btn-outline-secondary" (click)="exportCases()">
-                <i class="bi bi-download me-1"></i>Export
+                <i class="bi bi-download me-1"></i>{{ 'Export' | translate }}
               </button>
             </div>
           </div>
@@ -47,29 +47,29 @@
           <div class="filter-panel mt-3 p-3 rounded" *ngIf="showFilterPanel()">
             <div class="row g-3 align-items-end">
               <div class="col-sm-4">
-                <label class="form-label small text-muted">Class</label>
+                <label class="form-label small text-muted">{{ 'Class' | translate }}</label>
                 <select
                   [ngModel]="filterClass()"
                   (ngModelChange)="filterClass.set($event); page.set(0)"
                   class="form-select form-select-sm">
-                  <option value="">All Classes</option>
-                  <option *ngFor="let cls of availableClasses()" [value]="cls">{{ cls }}</option>
+                  <option value="">{{ 'All Classes' | translate }}</option>
+                  <option *ngFor="let cls of availableClasses()" [value]="cls">{{ cls | translate }}</option>
                 </select>
               </div>
 
               <div class="col-sm-4">
-                <label class="form-label small text-muted">Illness type</label>
+                <label class="form-label small text-muted">{{ 'Illness type' | translate }}</label>
                 <select
                   [ngModel]="filterIllness()"
                   (ngModelChange)="filterIllness.set($event); page.set(0)"
                   class="form-select form-select-sm">
-                  <option value="">All Illnesses</option>
-                  <option *ngFor="let ill of availableIllnesses()" [value]="ill">{{ ill }}</option>
+                  <option value="">{{ 'All Illnesses' | translate }}</option>
+                  <option *ngFor="let ill of availableIllnesses()" [value]="ill">{{ ill | translate }}</option>
                 </select>
               </div>
 
               <div class="col-sm-4 d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm w-100" (click)="clearFilters()">Clear Filters</button>
+                <button class="btn btn-outline-secondary btn-sm w-100" (click)="clearFilters()">{{ 'Clear Filters' | translate }}</button>
               </div>
             </div>
           </div>
@@ -77,33 +77,33 @@
             <table class="table cases-table align-middle mb-0">
               <thead>
               <tr>
-                <th>Student Name</th>
-                <th>Class</th>
-                <th>Date</th>
-                <th>Student Phone</th>
-                <th>Parent Phone</th>
-                <th>Illness Type</th>
-                <th>Notes</th>
+                <th>{{ 'Student Name' | translate }}</th>
+                <th>{{ 'Class' | translate }}</th>
+                <th>{{ 'Date' | translate }}</th>
+                <th>{{ 'Student Phone' | translate }}</th>
+                <th>{{ 'Parent Phone' | translate }}</th>
+                <th>{{ 'Illness Type' | translate }}</th>
+                <th>{{ 'Notes' | translate }}</th>
                 <th></th>
               </tr>
               </thead>
               <tbody>
               <tr *ngIf="loading()">
-                <td colspan="8" class="text-center text-muted py-4">Loading...</td>
+                <td colspan="8" class="text-center text-muted py-4">{{ 'Loading...' | translate }}</td>
               </tr>
               <tr *ngIf="!loading() && loadError()">
-                <td colspan="8" class="text-center text-muted py-4">Couldn't load cases: {{ loadError }}</td>
+                <td colspan="8" class="text-center text-muted py-4">{{ "Couldn't load cases:" | translate }} {{ loadError }}</td>
               </tr>
               <tr *ngIf="!loading() && !loadError() && paginatedCases().length === 0">
-                <td colspan="8" class="text-center text-muted py-4">No medical cases found.</td>
+                <td colspan="8" class="text-center text-muted py-4">{{ 'No medical cases found.' | translate }}</td>
               </tr>
               <tr *ngFor="let c of paginatedCases()">
                 <td class="student-name">{{ getStudentFullName(c) }}</td>
-                <td>{{ getClassName(c) }}</td>
+                <td>{{ getClassName(c) | translate }}</td>
                 <td>{{ formatDate($any(c).date) }}</td>
                 <td>{{ getStudentPhone(c) }}</td>
                 <td>{{ getParentPhone(c) }}</td>
-                <td>{{ c.illnessType }}</td>
+                <td>{{ c.illnessType | translate }}</td>
                 <td>{{ $any(c).notes || '—' }}</td>
                 <td>
                   <div class="row-actions d-flex">
@@ -115,9 +115,9 @@
           </div>
 
           <div class="d-flex align-items-center justify-content-center gap-3 mt-3">
-            <button class="btn btn-outline-secondary btn-sm" [disabled]="page() <= 0" (click)="prevPage()">Prev</button>
-            <span class="text-muted small">Page {{ page() + 1 }} of {{ totalPages() }}</span>
-            <button class="btn btn-outline-secondary btn-sm" [disabled]="page() >= totalPages() - 1" (click)="nextPage()">Next</button>
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="page() <= 0" (click)="prevPage()">{{ 'Prev' | translate }}</button>
+            <span class="text-muted small">{{ 'Page' | translate }} {{ page() + 1 }} {{ 'of' | translate }} {{ totalPages() }}</span>
+            <button class="btn btn-outline-secondary btn-sm" [disabled]="page() >= totalPages() - 1" (click)="nextPage()">{{ 'Next' | translate }}</button>
           </div>
         </div>
       </div>
@@ -129,40 +129,40 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">{{ modalTitle }}</h5>
+        <h5 class="modal-title">{{ modalTitle | translate }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form (ngSubmit)="submitForm()">
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Student</label>
+            <label class="form-label">{{ 'Student' | translate }}</label>
             <select [(ngModel)]="formStudentId" name="student" class="form-select" required>
               <option *ngFor="let s of students()" [ngValue]="s.id">
-                {{ s.user.firstName }} {{ s.user.lastName }} — {{ s.studentClass?.name || 'No class' }}
+                {{ s.user.firstName }} {{ s.user.lastName }} — {{ s.studentClass?.name ? (s.studentClass!.name | translate) : ('No class' | translate) }}
               </option>
             </select>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Illness type</label>
-            <input [(ngModel)]="formIllness" name="illness" type="text" class="form-control" required placeholder="e.g. Headache" />
+            <label class="form-label">{{ 'Illness type' | translate }}</label>
+            <input [(ngModel)]="formIllness" name="illness" type="text" class="form-control" required [placeholder]="'e.g. Headache' | translate" />
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Date</label>
+            <label class="form-label">{{ 'Date' | translate }}</label>
             <input [(ngModel)]="formDate" name="date" type="date" class="form-control" />
           </div>
 
           <div class="mb-1">
-            <label class="form-label">Notes</label>
-            <textarea [(ngModel)]="formNotes" name="notes" class="form-control" rows="3" placeholder="Optional notes..."></textarea>
+            <label class="form-label">{{ 'Notes' | translate }}</label>
+            <textarea [(ngModel)]="formNotes" name="notes" class="form-control" rows="3" [placeholder]="'Optional notes...' | translate"></textarea>
           </div>
 
-          <p class="text-danger small mt-2 mb-0" *ngIf="formError">{{ formError }}</p>
+          <p class="text-danger small mt-2 mb-0" *ngIf="formError">{{ formError | translate }}</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'Cancel' | translate }}</button>
+          <button type="submit" class="btn btn-primary">{{ 'Save' | translate }}</button>
         </div>
       </form>
     </div>

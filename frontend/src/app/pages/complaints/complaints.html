@@ -1,4 +1,3 @@
-
 <div class="main-container">
 
 
@@ -7,16 +6,16 @@
       <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
         <div>
           <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+            <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
           </p>
-          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Complaints</h1>
-          <p class="text-muted mb-0">Review and respond to students, teachers and parents complaints and concerns
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Complaints' | translate }}</h1>
+          <p class="text-muted mb-0">{{ 'Review and respond to students, teachers and parents complaints and concerns' | translate }}
           </p>
         </div>
       </div>
       <div class="awaiting-box">
         <span class="awaiting-count">{{ pendingCount }}</span>
-        <span class="awaiting-text">AWAITING REPLY</span>
+        <span class="awaiting-text">{{ 'AWAITING REPLY' | translate }}</span>
       </div>
     </div>
 
@@ -26,7 +25,7 @@
           <span class="icon-bubble">💬</span>
         </div>
         <div class="stat-number">{{ totalCount }}</div>
-        <div class="stat-label">TOTAL COMPLAINTS</div>
+        <div class="stat-label">{{ 'TOTAL COMPLAINTS' | translate }}</div>
       </div>
 
       <div class="stat-card">
@@ -34,7 +33,7 @@
           <span class="icon-check">✓</span>
         </div>
         <div class="stat-number">{{ repliedCount }}</div>
-        <div class="stat-label">REPLIED</div>
+        <div class="stat-label">{{ 'REPLIED' | translate }}</div>
       </div>
 
       <div class="stat-card">
@@ -42,7 +41,7 @@
           <span class="icon-alert">!</span>
         </div>
         <div class="stat-number">{{ pendingCount }}</div>
-        <div class="stat-label">PENDING REPLY</div>
+        <div class="stat-label">{{ 'PENDING REPLY' | translate }}</div>
       </div>
     </div>
 
@@ -50,17 +49,17 @@
       <div class="search-bar-wrapper" style="width: 360px;">
         <input
           type="text"
-          placeholder="Search by student name or complaint title..."
+          [placeholder]="'Search by student name or complaint title...' | translate"
           class="search-input"
           [ngModel]="searchText()"
           (ngModelChange)="searchText.set($event)"
         >
       </div>
       <div class="filter-actions">
-        <button [class.active]="activeFilter() === 'All'" (click)="setFilter('All')" class="filter-btn">All</button>
-        <button [class.active]="activeFilter() === 'Pending'" (click)="setFilter('Pending')" class="filter-btn">Pending</button>
-        <button [class.active]="activeFilter() === 'Replied'" (click)="setFilter('Replied')" class="filter-btn">Replied</button>
-        <span class="results-badge">{{ filteredComplaints().length }} results</span>
+        <button [class.active]="activeFilter() === 'All'" (click)="setFilter('All')" class="filter-btn">{{ 'All' | translate }}</button>
+        <button [class.active]="activeFilter() === 'Pending'" (click)="setFilter('Pending')" class="filter-btn">{{ 'Pending' | translate }}</button>
+        <button [class.active]="activeFilter() === 'Replied'" (click)="setFilter('Replied')" class="filter-btn">{{ 'Replied' | translate }}</button>
+        <span class="results-badge">{{ filteredComplaints().length }} {{ 'results' | translate }}</span>
       </div>
     </div>
 
@@ -76,7 +75,7 @@
               </div>
             </div>
             <span class="status-badge" [ngClass]="item.status === 'Replied' ? 'status-replied' : 'status-pending'">
-              ● {{ item.status }}
+              ● {{ item.status | translate }}
             </span>
           </div>
 
@@ -87,7 +86,7 @@
 
             @if (item.status === 'Replied' && item.response) {
               <div class="reply-preview-box">
-                <span class="reply-preview-label">✔ Admin Reply:</span>
+                <span class="reply-preview-label">✔ {{ 'Admin Reply' | translate }}:</span>
                 <p class="reply-preview-text">{{ item.response }}</p>
               </div>
             }
@@ -96,12 +95,12 @@
           <div class="card-footer">
             @if (item.status === 'Pending') {
               <button (click)="openReplyModal(item)" class="btn-reply">
-                <span>💬</span> Reply to Complaint
+                <span>💬</span> {{ 'Reply to Complaint' | translate }}
               </button>
             }
             @if (item.status === 'Replied') {
               <button (click)="openReplyModal(item)" class="btn-view">
-                <span>👁</span> View / Edit Reply
+                <span>👁</span> {{ 'View / Edit Reply' | translate }}
               </button>
             }
           </div>
@@ -111,7 +110,7 @@
       @if (filteredComplaints().length === 0) {
         <div class="empty-state">
           <span class="empty-icon">📭</span>
-          <p>No complaints found.</p>
+          <p>{{ 'No complaints found.' | translate }}</p>
         </div>
       }
     </div>
@@ -124,7 +123,7 @@
           <div class="modal-header-title">
             <span class="modal-icon">💬</span>
             <div>
-              <h3>{{ selectedComplaint?.status === 'Replied' ? 'Edit Reply' : 'Reply to Complaint' }}</h3>
+              <h3>{{ (selectedComplaint?.status === 'Replied' ? 'Edit Reply' : 'Reply to Complaint') | translate }}</h3>
               <p>{{ selectedComplaint?.submitterName }} · {{ selectedComplaint?.category }}</p>
             </div>
           </div>
@@ -138,10 +137,10 @@
           </div>
 
           <div class="reply-input-group">
-            <label class="reply-label">➔ YOUR REPLY</label>
+            <label class="reply-label">➔ {{ 'YOUR REPLY' | translate }}</label>
             <textarea
               [(ngModel)]="replyText"
-              placeholder="Write your official response here..."
+              [placeholder]="'Write your official response here...' | translate"
               rows="4"
               class="reply-textarea"
             ></textarea>
@@ -149,8 +148,8 @@
         </div>
 
         <div class="modal-footer">
-          <button (click)="closeReplyModal()" class="btn-cancel">✕ Cancel</button>
-          <button (click)="submitReply()" [disabled]="!replyText.trim()" class="btn-submit">➔ Send Reply</button>
+          <button (click)="closeReplyModal()" class="btn-cancel">✕ {{ 'Cancel' | translate }}</button>
+          <button (click)="submitReply()" [disabled]="!replyText.trim()" class="btn-submit">➔ {{ 'Send Reply' | translate }}</button>
         </div>
       </div>
     </div>

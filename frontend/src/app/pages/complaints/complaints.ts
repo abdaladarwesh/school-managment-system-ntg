@@ -4,16 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { ComplaintService } from './service/complaint.service';
 import { BackendComplaint, ComplaintUI } from './service/complaint.models';
 import Swal from 'sweetalert2';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-complaints',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './complaints.html',
   styleUrls: ['./complaints.css'],
 })
 export class ComplaintsComponent implements OnInit {
   private complaintService = inject(ComplaintService);
+  private translationService = inject(TranslationService);
 
   // Signals
   complaints = signal<ComplaintUI[]>([]);
@@ -112,10 +115,18 @@ export class ComplaintsComponent implements OnInit {
         next: () => {
           this.fetchComplaints();
           this.closeReplyModal();
-          Swal.fire('Success!', 'Reply submitted successfully.', 'success');
+          Swal.fire(
+            this.translationService.translate('Success!'),
+            this.translationService.translate('Reply submitted successfully.'),
+            'success'
+          );
         },
         error: () => {
-          Swal.fire('Error!', 'Could not submit reply. Please try again.', 'error');
+          Swal.fire(
+            this.translationService.translate('Error!'),
+            this.translationService.translate('Could not submit reply. Please try again.'),
+            'error'
+          );
         },
       });
   }

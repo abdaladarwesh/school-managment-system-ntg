@@ -5,6 +5,7 @@ import { StudentResponse, StudentService } from './service/student-service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
 export type StudentStatus = 'Active' | 'Probation' | 'Suspended';
 
 export interface Student {
@@ -21,7 +22,7 @@ export interface Student {
 type StatusFilter = 'All' | StudentStatus;
 @Component({
   selector: 'app-student-page',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './student-page.html',
   styleUrl: './student-page.css',
 })
@@ -265,5 +266,4 @@ export class StudentPage implements OnInit {
   private normalize(value: string | null | undefined): string {
     return value && value.trim() ? value : this.NOT_ASSIGNED;
   }
-
 }

@@ -12,17 +12,20 @@ import { BackendDelay, LateRecord } from './service/delay.models';
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
 import Swal from 'sweetalert2';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-late',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe],
   templateUrl: './late.html',
   styleUrls: ['./late.css'],
 })
 export class LateComponent implements OnInit {
   private delayService = inject(DelayService);
   private studentService = inject(StudentService);
+  private translationService = inject(TranslationService);
 
   // Signals
   students = signal<LateRecord[]>([]);
@@ -59,10 +62,10 @@ export class LateComponent implements OnInit {
       },
       error: () => {
         Swal.fire({
-          title: 'Error!',
-          text: 'Failed to fetch late arrival records.',
+          title: this.translationService.translate('Error!'),
+          text: this.translationService.translate('Failed to fetch late arrival records.'),
           icon: 'error',
-          confirmButtonText: 'Try Again',
+          confirmButtonText: this.translationService.translate('Try Again'),
         });
       },
     });
@@ -152,10 +155,10 @@ export class LateComponent implements OnInit {
     if (this.lateForm.invalid) {
       this.lateForm.markAllAsTouched();
       Swal.fire({
-        title: 'Validation Error!',
-        text: 'Please select a student and specify the arrival date & time.',
+        title: this.translationService.translate('Validation Error!'),
+        text: this.translationService.translate('Please select a student and specify the arrival date & time.'),
         icon: 'warning',
-        confirmButtonText: 'OK',
+        confirmButtonText: this.translationService.translate('OK'),
       });
       return;
     }
@@ -180,10 +183,10 @@ export class LateComponent implements OnInit {
         next: () => {
           this.fetchDelays();
           this.closeLateArrivalModal();
-          Swal.fire({ title: 'Updated!', text: 'Record updated successfully.', icon: 'success' });
+          Swal.fire({ title: this.translationService.translate('Updated!'), text: this.translationService.translate('Record updated successfully.'), icon: 'success' });
         },
         error: () =>
-          Swal.fire({ title: 'Error!', text: 'Failed to update record.', icon: 'error' }),
+          Swal.fire({ title: this.translationService.translate('Error!'), text: this.translationService.translate('Failed to update record.'), icon: 'error' }),
       });
     } else {
       // Exact payload requested by your backend
@@ -198,13 +201,13 @@ export class LateComponent implements OnInit {
           this.fetchDelays();
           this.closeLateArrivalModal();
           Swal.fire({
-            title: 'Success!',
-            text: 'Late arrival registered successfully.',
+            title: this.translationService.translate('Success!'),
+            text: this.translationService.translate('Late arrival registered successfully.'),
             icon: 'success',
           });
         },
         error: () =>
-          Swal.fire({ title: 'Error!', text: 'Failed to register arrival.', icon: 'error' }),
+          Swal.fire({ title: this.translationService.translate('Error!'), text: this.translationService.translate('Failed to register arrival.'), icon: 'error' }),
       });
     }
   }
@@ -217,20 +220,20 @@ export class LateComponent implements OnInit {
     if (!record?.id) return;
 
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to delete this late arrival record?',
+      title: this.translationService.translate('Are you sure?'),
+      text: this.translationService.translate('Do you want to delete this late arrival record?'),
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#e53e3e',
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonText: this.translationService.translate('Yes, delete it!'),
     }).then((result) => {
       if (result.isConfirmed) {
         this.delayService.deleteDelay(record.id!).subscribe({
           next: () => {
             this.students.update((list) => list.filter((_, i) => i !== index));
-            Swal.fire('Deleted!', 'Record has been deleted.', 'success');
+            Swal.fire(this.translationService.translate('Deleted!'), this.translationService.translate('Record has been deleted.'), 'success');
           },
-          error: () => Swal.fire('Error!', 'Could not delete record.', 'error'),
+          error: () => Swal.fire(this.translationService.translate('Error!'), this.translationService.translate('Could not delete record.'), 'error'),
         });
       }
     });

@@ -1,9 +1,9 @@
 <div class="card">
 
-    <h2>{{ title }}</h2>
+    <h2>{{ title | translate }}</h2>
 
     <p class="subtitle">
-        {{ subtitle }}
+        {{ subtitle | translate}}
     </p>
 
     @for(item of data; track item.name){

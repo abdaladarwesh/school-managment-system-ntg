@@ -12,17 +12,20 @@ import { BackendViolation, ViolationRecordUI } from './service/violation.models'
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
 import Swal from 'sweetalert2';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-violations',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe],
   templateUrl: './violations.html',
   styleUrls: ['./violations.css'],
 })
 export class ViolationsComponent implements OnInit {
   private violationService = inject(ViolationService);
   private studentService = inject(StudentService);
+  private translationService = inject(TranslationService);
 
   // Signals for dynamic data
   violations = signal<ViolationRecordUI[]>([]);
@@ -59,7 +62,11 @@ export class ViolationsComponent implements OnInit {
         this.violations.set(data.map((item) => this.mapBackendToFrontend(item)));
       },
       error: () => {
-        Swal.fire('Error!', 'Failed to load violation records from server.', 'error');
+        Swal.fire(
+          this.translationService.translate('Error!'),
+          this.translationService.translate('Failed to load violation records from server.'),
+          'error'
+        );
       },
     });
   }
@@ -122,8 +129,8 @@ export class ViolationsComponent implements OnInit {
     if (this.violationForm.invalid) {
       this.violationForm.markAllAsTouched();
       Swal.fire({
-        title: 'Validation Error!',
-        text: 'Please fill in all required fields and select a student.',
+        title: this.translationService.translate('Validation Error!'),
+        text: this.translationService.translate('Please fill in all required fields and select a student.'),
         icon: 'warning',
       });
       return;
@@ -144,10 +151,18 @@ export class ViolationsComponent implements OnInit {
       next: () => {
         this.fetchViolations();
         this.closeModal();
-        Swal.fire('Success!', 'Violation recorded successfully.', 'success');
+        Swal.fire(
+          this.translationService.translate('Success!'),
+          this.translationService.translate('Violation recorded successfully.'),
+          'success'
+        );
       },
       error: () => {
-        Swal.fire('Error!', 'Could not save violation to server.', 'error');
+        Swal.fire(
+          this.translationService.translate('Error!'),
+          this.translationService.translate('Could not save violation to server.'),
+          'error'
+        );
       },
     });
   }
@@ -190,4 +205,14 @@ export class ViolationsComponent implements OnInit {
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return name.slice(0, 2).toUpperCase();
   }
+
+  // sendNotificationToParent(index:number){
+  //   this.violationService.createNotification({
+  //     title: "Parent Summouning notification",
+  //     body: this.violations()[index].violation,
+  //     priority: "HIGH",
+  //     type: "PARENT_SUMMON",
+  //     receiverId: this.
+  //   })
+  // }
 }

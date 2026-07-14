@@ -3,13 +3,13 @@
     <!-- Page heading -->
     <div class="mb-4">
       <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-        <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+        <span class="eyebrow-bar"></span> {{"STUDENT AFFAIRS" | translate}}
       </p>
       <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">
-        {{ isEditMode ? 'Edit Student' : 'Add New Student' }}
+        {{ (isEditMode ? 'Edit Student' : 'Add New Student') | translate }}
       </h1>
       <p class="text-muted mb-0">
-        {{ isEditMode ? 'Update the student record using the same validated form' : 'Fill in the form below to register a new student in the system' }}
+        {{( isEditMode ? 'Update the student record using the same validated form' : 'Fill in the form below to register a new student in the system' ) | translate}}
       </p>
     </div>
 
@@ -22,8 +22,8 @@
             <i class="bi bi-person-fill"></i>
           </div>
           <div>
-            <h5 class="mb-0 fw-bold section-title">Student Information</h5>
-            <small class="section-subtitle">Personal identification and contact details</small>
+            <h5 class="mb-0 fw-bold section-title">{{ "Student Information" | translate }}</h5>
+            <small class="section-subtitle">{{ "Personal identification and contact details" |  translate  }}</small>
           </div>
         </div>
         <div class="card-body" [formGroup]="form">
@@ -32,7 +32,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-person field-icon"></i> STUDENT NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-person field-icon"></i> {{ 'STUDENT NAME (ARABIC)' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="Student full name in Arabic"
                        formControlName="firstNameInArabic">
@@ -46,7 +46,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-person field-icon"></i> STUDENT NAME (ENGLISH) <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-person field-icon"></i> {{ 'STUDENT NAME (ENGLISH)' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="Full name in English"
                        formControlName="firstName">
@@ -60,7 +60,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-person field-icon"></i> LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-person field-icon"></i> {{ 'LAST NAME (ARABIC)' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="Last name in Arabic"
                        formControlName="lastNameInArabic">
@@ -74,7 +74,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-person field-icon"></i> LAST NAME (ENGLISH) <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-person field-icon"></i> {{ 'LAST NAME (ENGLISH)' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="Last name in English"
                        formControlName="lastName">
@@ -88,7 +88,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-geo-alt field-icon"></i> ADDRESS <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-geo-alt field-icon"></i> {{ 'ADDRESS' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="Full residential address"
                        formControlName="address">
@@ -102,7 +102,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-telephone field-icon"></i> STUDENT PHONE NUMBER <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-telephone field-icon"></i> {{ 'STUDENT PHONE NUMBER' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <div formArrayName="phoneNumbers">
                   @for (ctrl of studentPhoneNumbers.controls; track ctrl; let i = $index) {
@@ -119,7 +119,7 @@
                   }
                 </div>
                 <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('student')">
-                  <i class="bi bi-plus-circle"></i> Add another number
+                  <i class="bi bi-plus-circle"></i> {{ 'Add another number' | translate }}
                 </button>
                 @if (getError(studentPhoneNumbers.at(0), 'pattern')) {
                   <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
@@ -131,7 +131,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-envelope field-icon"></i> STUDENT EMAIL <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-envelope field-icon"></i> {{ 'STUDENT EMAIL' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="email" class="form-control form-field" placeholder="student@email.com"
                        formControlName="email">
@@ -148,7 +148,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-calendar field-icon"></i> DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-calendar field-icon"></i> {{ 'DATE OF BIRTH' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <div class="d-flex gap-2">
                   <select class="form-select form-field text-black" formControlName="birthDay">
@@ -180,7 +180,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-credit-card field-icon"></i> NATIONAL ID NUMBER <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-credit-card field-icon"></i> {{ 'NATIONAL ID NUMBER' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
                        formControlName="nationalNumber">
@@ -198,7 +198,7 @@
             <div class="col-md-6">
               <div formGroupName="student">
                 <label class="form-label field-label">
-                  <i class="bi bi-mortarboard field-icon"></i> PREPARATORY SCHOOL TOTAL SCORE <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-mortarboard field-icon"></i> {{ 'PREPARATORY SCHOOL TOTAL SCORE' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="number" class="form-control form-field" placeholder="e.g. 285"
                        formControlName="academicScoreInMiddleSchool">
@@ -212,7 +212,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-globe field-icon"></i> NATIONALITY <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-globe field-icon"></i> {{ 'NATIONALITY' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <select class="form-select form-field" formControlName="nationality">
                   <option value="" disabled selected>Select nationality</option>
@@ -230,7 +230,7 @@
             <div class="col-md-6">
               <div formGroupName="student">
                 <label class="form-label field-label">
-                  <i class="bi bi-building field-icon"></i> GOVERNORATE <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-building field-icon"></i> {{ 'GOVERNORATE' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <select class="form-select form-field" formControlName="governorate">
                   <option value="" disabled selected>Select governorate</option>
@@ -248,7 +248,7 @@
             <div class="col-md-6">
               <div formGroupName="student">
                 <label class="form-label field-label">
-                  <i class="bi bi-people field-icon"></i> PARENTS' MARITAL STATUS <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-people field-icon"></i> {{ "PARENTS' MARITAL STATUS" | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <select class="form-select form-field" formControlName="martialParentsStatus">
                   <option value="" disabled selected>Select marital status</option>
@@ -266,7 +266,7 @@
             <div class="col-md-6">
               <div formGroupName="student">
                 <label class="form-label field-label">
-                  <i class="bi bi-geo-alt field-icon"></i> PLACE OF BIRTH <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-geo-alt field-icon"></i> {{ 'PLACE OF BIRTH' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <input type="text" class="form-control form-field" placeholder="City / District of birth"
                        formControlName="placeOfBirth">
@@ -286,8 +286,8 @@
             <i class="bi bi-people-fill"></i>
           </div>
           <div>
-            <h5 class="mb-0 fw-bold section-title">Parent Information</h5>
-            <small class="section-subtitle">Father and mother contact and identification details</small>
+            <h5 class="mb-0 fw-bold section-title">{{ 'Parent Information' | translate }}</h5>
+            <small class="section-subtitle">{{ 'Father and mother contact and identification details' | translate }}</small>
           </div>
         </div>
         <div class="card-body">
@@ -296,16 +296,16 @@
             <!-- Father Column -->
             <div class="col-md-6" formGroupName="father">
               <h6 class="parent-label father-label mb-3">
-                <i class="bi bi-person-fill"></i> FATHER
+                <i class="bi bi-person-fill"></i> {{ 'FATHER' | translate }}
               </h6>
 
               <div class="mb-3">
                 <div class="btn-group w-100 shadow-sm" role="group">
                   <input type="radio" class="btn-check" name="fatherMode" id="fatherNew" [checked]="fatherMode() === 'new'" (change)="setMode('father', 'new')">
-                  <label class="btn btn-outline-secondary" for="fatherNew">Enter New Details</label>
+                  <label class="btn btn-outline-secondary" for="fatherNew">{{ 'Enter New Details' | translate }}</label>
 
                   <input type="radio" class="btn-check" name="fatherMode" id="fatherExisting" [checked]="fatherMode() === 'existing'" (change)="setMode('father', 'existing')">
-                  <label class="btn btn-outline-secondary" for="fatherExisting">Search Existing</label>
+                  <label class="btn btn-outline-secondary" for="fatherExisting">{{ 'Search Existing' | translate }}</label>
                 </div>
               </div>
 
@@ -317,8 +317,8 @@
                   <div class="alert alert-success py-2 d-flex align-items-center gap-2">
                     <i class="bi bi-check-circle-fill fs-4"></i>
                     <div>
-                      <strong>Selected:</strong> {{ selectedFather()?.user?.firstName }} {{ selectedFather()?.user?.lastName }} <br>
-                      <small>ID: {{ selectedFather()!.user.nationalNumber || selectedFather()?.user?.nationalNumber }}</small>
+                      <strong>{{ 'Selected:' | translate }}</strong> {{ selectedFather()?.user?.firstName }} {{ selectedFather()?.user?.lastName }} <br>
+                      <small>{{ 'ID:' | translate }} {{ selectedFather()!.user.nationalNumber || selectedFather()?.user?.nationalNumber }}</small>
                     </div>
                   </div>
                 }
@@ -328,7 +328,7 @@
                 <div formGroupName="user">
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> FATHER'S NAME <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "FATHER'S NAME" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Full name"
                            formControlName="firstName">
@@ -338,7 +338,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> FATHER'S LAST NAME <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "FATHER'S LAST NAME" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Last name"
                            formControlName="lastName">
@@ -348,9 +348,9 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> FATHER'S NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "FATHER'S NAME (ARABIC)" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
-                    <input type="text" class="form-control form-field" placeholder="الاسم بالعربي"
+                    <input type="text" class="form-control form-field" [placeholder]="'Name in Arabic' | translate"
                            formControlName="firstNameInArabic">
                     @if (getError(father.get('user.firstNameInArabic'), 'required')) {
                       <small class="text-danger">This field is required</small>
@@ -358,9 +358,9 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> FATHER'S LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "FATHER'S LAST NAME (ARABIC)" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
-                    <input type="text" class="form-control form-field" placeholder="اللقب بالعربي"
+                    <input type="text" class="form-control form-field" [placeholder]="'Last name in Arabic' | translate"
                            formControlName="lastNameInArabic">
                     @if (getError(father.get('user.lastNameInArabic'), 'required')) {
                       <small class="text-danger">This field is required</small>
@@ -368,7 +368,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-envelope field-icon"></i> FATHER'S EMAIL <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-envelope field-icon"></i> {{ "FATHER'S EMAIL" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="email" class="form-control form-field" placeholder="email@example.com"
                            formControlName="email">
@@ -381,7 +381,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-building field-icon"></i> FATHER'S OCCUPATION <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-building field-icon"></i> {{ "FATHER'S OCCUPATION" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="e.g. Engineer, Teacher..."
                            [formControl]="fatherJobName">
@@ -391,7 +391,18 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-geo-alt field-icon"></i> FATHER'S ADDRESS <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-mortarboard field-icon"></i> {{ 'FATHER\'S EDUCATION LEVEL' | translate }}
+                    </label>
+                    <select class="form-select form-field" formControlName="educationLevel">
+                      <option [value]="null">-- {{ 'Select Education Level' | translate }} --</option>
+                      @for (lvl of educationLevels; track lvl.value) {
+                        <option [value]="lvl.value">{{ lvl.label | translate }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label field-label">
+                      <i class="bi bi-geo-alt field-icon"></i> {{ "FATHER'S ADDRESS" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Full address"
                            formControlName="address">
@@ -401,7 +412,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-globe field-icon"></i> FATHER'S NATIONALITY <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-globe field-icon"></i> {{ "FATHER'S NATIONALITY" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="nationality">
                       <option value="" disabled selected>Select nationality</option>
@@ -415,7 +426,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-heart field-icon"></i> FATHER'S RELIGION <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-heart field-icon"></i> {{ "FATHER'S RELIGION" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="religion">
                       <option value="" disabled selected>Select religion</option>
@@ -429,7 +440,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-calendar field-icon"></i> FATHER'S DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-calendar field-icon"></i> {{ "FATHER'S DATE OF BIRTH" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <div class="d-flex gap-2">
                       <select class="form-select form-field" formControlName="birthDay">
@@ -457,7 +468,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-credit-card field-icon"></i> FATHER'S NATIONAL ID <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-credit-card field-icon"></i> {{ "FATHER'S NATIONAL ID" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
                            formControlName="nationalNumber">
@@ -470,7 +481,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-telephone field-icon"></i> FATHER'S PHONE NUMBER <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-telephone field-icon"></i> {{ "FATHER'S PHONE NUMBER" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <div formArrayName="phoneNumbers">
                       @for (ctrl of fatherPhoneNumbers.controls; track ctrl; let i = $index) {
@@ -487,7 +498,7 @@
                       }
                     </div>
                     <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('father')">
-                      <i class="bi bi-plus-circle"></i> Add another number
+                      <i class="bi bi-plus-circle"></i> {{ 'Add another number' | translate }}
                     </button>
                     @if (getError(fatherPhoneNumbers.at(0), 'pattern')) {
                       <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
@@ -500,16 +511,16 @@
             <!-- Mother Column -->
             <div class="col-md-6" formGroupName="mother">
               <h6 class="parent-label mother-label mb-3">
-                <i class="bi bi-person-fill"></i> MOTHER
+                <i class="bi bi-person-fill"></i> {{ 'MOTHER' | translate }}
               </h6>
 
               <div class="mb-3">
                 <div class="btn-group w-100 shadow-sm" role="group">
                   <input type="radio" class="btn-check" name="motherMode" id="motherNew" [checked]="motherMode() === 'new'" (change)="setMode('mother', 'new')">
-                  <label class="btn btn-outline-secondary" for="motherNew">Enter New Details</label>
+                  <label class="btn btn-outline-secondary" for="motherNew">{{ 'Enter New Details' | translate }}</label>
 
                   <input type="radio" class="btn-check" name="motherMode" id="motherExisting" [checked]="motherMode() === 'existing'" (change)="setMode('mother', 'existing')">
-                  <label class="btn btn-outline-secondary" for="motherExisting">Search Existing</label>
+                  <label class="btn btn-outline-secondary" for="motherExisting">{{ 'Search Existing' | translate }}</label>
                 </div>
               </div>
 
@@ -521,8 +532,8 @@
                   <div class="alert alert-success py-2 d-flex align-items-center gap-2">
                     <i class="bi bi-check-circle-fill fs-4"></i>
                     <div>
-                      <strong>Selected:</strong> {{ selectedMother()?.user?.firstName }} {{ selectedMother()?.user?.lastName }} <br>
-                      <small>ID: {{ selectedMother()!.user.nationalNumber || selectedMother()?.user?.nationalNumber }}</small>
+                      <strong>{{ 'Selected:' | translate }}</strong> {{ selectedMother()?.user?.firstName }} {{ selectedMother()?.user?.lastName }} <br>
+                      <small>{{ 'ID:' | translate }} {{ selectedMother()!.user.nationalNumber || selectedMother()?.user?.nationalNumber }}</small>
                     </div>
                   </div>
                 }
@@ -532,7 +543,7 @@
                 <div formGroupName="user">
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> MOTHER'S NAME <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "MOTHER'S NAME" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Full name"
                            formControlName="firstName">
@@ -542,7 +553,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> MOTHER'S LAST NAME <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "MOTHER'S LAST NAME" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Last name"
                            formControlName="lastName">
@@ -552,9 +563,9 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> MOTHER'S NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "MOTHER'S NAME (ARABIC)" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
-                    <input type="text" class="form-control form-field" placeholder="الاسم بالعربي"
+                    <input type="text" class="form-control form-field" [placeholder]="'Name in Arabic' | translate"
                            formControlName="firstNameInArabic">
                     @if (getError(mother.get('user.firstNameInArabic'), 'required')) {
                       <small class="text-danger">This field is required</small>
@@ -562,9 +573,9 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> MOTHER'S LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "MOTHER'S LAST NAME (ARABIC)" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
-                    <input type="text" class="form-control form-field" placeholder="اللقب بالعربي"
+                    <input type="text" class="form-control form-field" [placeholder]="'Last name in Arabic' | translate"
                            formControlName="lastNameInArabic">
                     @if (getError(mother.get('user.lastNameInArabic'), 'required')) {
                       <small class="text-danger">This field is required</small>
@@ -572,7 +583,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-envelope field-icon"></i> MOTHER'S EMAIL <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-envelope field-icon"></i> {{ "MOTHER'S EMAIL" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="email" class="form-control form-field" placeholder="email@example.com"
                            formControlName="email">
@@ -585,7 +596,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-building field-icon"></i> MOTHER'S OCCUPATION <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-building field-icon"></i> {{ "MOTHER'S OCCUPATION" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="e.g. Doctor, Housewife..."
                            [formControl]="motherJobName">
@@ -595,7 +606,18 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-geo-alt field-icon"></i> MOTHER'S ADDRESS <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-mortarboard field-icon"></i> {{ 'MOTHER\'S EDUCATION LEVEL' | translate }}
+                    </label>
+                    <select class="form-select form-field" formControlName="educationLevel">
+                      <option [value]="null">-- {{ 'Select Education Level' | translate }} --</option>
+                      @for (lvl of educationLevels; track lvl.value) {
+                        <option [value]="lvl.value">{{ lvl.label | translate }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label field-label">
+                      <i class="bi bi-geo-alt field-icon"></i> {{ "MOTHER'S ADDRESS" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Full address"
                            formControlName="address">
@@ -605,7 +627,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-globe field-icon"></i> MOTHER'S NATIONALITY <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-globe field-icon"></i> {{ "MOTHER'S NATIONALITY" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="nationality">
                       <option value="" disabled selected>Select nationality</option>
@@ -619,7 +641,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-heart field-icon"></i> MOTHER'S RELIGION <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-heart field-icon"></i> {{ "MOTHER'S RELIGION" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="religion">
                       <option value="" disabled selected>Select religion</option>
@@ -633,7 +655,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-calendar field-icon"></i> MOTHER'S DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-calendar field-icon"></i> {{ "MOTHER'S DATE OF BIRTH" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <div class="d-flex gap-2">
                       <select class="form-select form-field" formControlName="birthDay">
@@ -661,7 +683,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-credit-card field-icon"></i> MOTHER'S NATIONAL ID <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-credit-card field-icon"></i> {{ "MOTHER'S NATIONAL ID" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
                            formControlName="nationalNumber">
@@ -674,7 +696,7 @@
                   </div>
                   <div class="mb-3">
                     <label class="form-label field-label">
-                      <i class="bi bi-telephone field-icon"></i> MOTHER'S PHONE NUMBER <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-telephone field-icon"></i> {{ "MOTHER'S PHONE NUMBER" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <div formArrayName="phoneNumbers">
                       @for (ctrl of motherPhoneNumbers.controls; track ctrl; let i = $index) {
@@ -691,7 +713,7 @@
                       }
                     </div>
                     <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('mother')">
-                      <i class="bi bi-plus-circle"></i> Add another number
+                      <i class="bi bi-plus-circle"></i> {{ 'Add another number' | translate }}
                     </button>
                     @if (getError(motherPhoneNumbers.at(0), 'pattern')) {
                       <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
@@ -711,8 +733,8 @@
             <i class="bi bi-person-gear"></i>
           </div>
           <div>
-            <h5 class="mb-0 fw-bold section-title">Additional Information</h5>
-            <small class="section-subtitle">Demographic and classification data</small>
+            <h5 class="mb-0 fw-bold section-title">{{ 'Additional Information' | translate }}</h5>
+            <small class="section-subtitle">{{ 'Demographic and classification data' | translate }}</small>
           </div>
         </div>
         <div class="card-body" [formGroup]="form">
@@ -721,7 +743,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-people field-icon"></i> GENDER <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-people field-icon"></i> {{ 'GENDER' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <select class="form-select form-field" formControlName="gender">
                   <option value="" disabled selected>Select gender</option>
@@ -739,7 +761,7 @@
             <div class="col-md-6">
               <div formGroupName="studentUser">
                 <label class="form-label field-label">
-                  <i class="bi bi-heart field-icon"></i> RELIGION <span class="text-danger d-inline">*</span>
+                  <i class="bi bi-heart field-icon"></i> {{ 'RELIGION' | translate }} <span class="text-danger d-inline">*</span>
                 </label>
                 <select class="form-select form-field" formControlName="religion">
                   <option value="" disabled selected>Select religion</option>
@@ -756,7 +778,7 @@
             <!-- Guardian Type -->
             <div class="col-md-6">
               <label class="form-label field-label">
-                <i class="bi bi-shield-lock field-icon"></i> GUARDIAN <span class="text-danger d-inline">*</span>
+                <i class="bi bi-shield-lock field-icon"></i> {{ 'GUARDIAN' | translate }} <span class="text-danger d-inline">*</span>
               </label>
               <select class="form-select form-field" formControlName="guardianType">
                 @for (gt of guardianTypes; track gt) {
@@ -770,16 +792,16 @@
           @if (showGuardian) {
             <hr class="my-4">
             <h6 class="parent-label mb-3">
-              <i class="bi bi-person-fill"></i> GUARDIAN DETAILS
+              <i class="bi bi-person-fill"></i> {{ 'GUARDIAN DETAILS' | translate }}
             </h6>
 
             <div class="mb-3">
               <div class="btn-group w-100 shadow-sm" role="group">
                 <input type="radio" class="btn-check" name="guardianMode" id="guardianNew" [checked]="guardianMode() === 'new'" (change)="setMode('guardian', 'new')">
-                <label class="btn btn-outline-secondary" for="guardianNew">Enter New Details</label>
+                <label class="btn btn-outline-secondary" for="guardianNew">{{ 'Enter New Details' | translate }}</label>
 
                 <input type="radio" class="btn-check" name="guardianMode" id="guardianExisting" [checked]="guardianMode() === 'existing'" (change)="setMode('guardian', 'existing')">
-                <label class="btn btn-outline-secondary" for="guardianExisting">Search Existing</label>
+                <label class="btn btn-outline-secondary" for="guardianExisting">{{ 'Search Existing' | translate }}</label>
               </div>
             </div>
 
@@ -791,8 +813,8 @@
                 <div class="alert alert-success py-2 d-flex align-items-center gap-2">
                   <i class="bi bi-check-circle-fill fs-4"></i>
                   <div>
-                    <strong>Selected:</strong> {{ selectedGuardian()?.user?.firstName }} {{ selectedGuardian()?.user?.lastName }} <br>
-                    <small>ID: {{ selectedGuardian()!.user.nationalNumber || selectedGuardian()?.user?.nationalNumber }}</small>
+                    <strong>{{ 'Selected:' | translate }}</strong> {{ selectedGuardian()?.user?.firstName }} {{ selectedGuardian()?.user?.lastName }} <br>
+                    <small>{{ 'ID:' | translate }} {{ selectedGuardian()!.user.nationalNumber || selectedGuardian()?.user?.nationalNumber }}</small>
                   </div>
                 </div>
               }
@@ -803,7 +825,7 @@
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> GUARDIAN'S FIRST NAME <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "GUARDIAN'S FIRST NAME" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="First name"
                            formControlName="firstName">
@@ -813,7 +835,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> GUARDIAN'S LAST NAME <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "GUARDIAN'S LAST NAME" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Last name"
                            formControlName="lastName">
@@ -823,9 +845,9 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> GUARDIAN'S NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "GUARDIAN'S NAME (ARABIC)" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
-                    <input type="text" class="form-control form-field" placeholder="الاسم بالعربي"
+                    <input type="text" class="form-control form-field" [placeholder]="'Name in Arabic' | translate"
                            formControlName="firstNameInArabic">
                     @if (getError(guardian.get('user.firstNameInArabic'), 'required')) {
                       <small class="text-danger">This field is required</small>
@@ -833,9 +855,9 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-person field-icon"></i> GUARDIAN'S LAST NAME (ARABIC) <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-person field-icon"></i> {{ "GUARDIAN'S LAST NAME (ARABIC)" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
-                    <input type="text" class="form-control form-field" placeholder="اللقب بالعربي"
+                    <input type="text" class="form-control form-field" [placeholder]="'Last name in Arabic' | translate"
                            formControlName="lastNameInArabic">
                     @if (getError(guardian.get('user.lastNameInArabic'), 'required')) {
                       <small class="text-danger">This field is required</small>
@@ -843,7 +865,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-people field-icon"></i> GUARDIAN'S GENDER <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-people field-icon"></i> {{ "GUARDIAN'S GENDER" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="gender">
                       <option value="" disabled selected>Select gender</option>
@@ -857,7 +879,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-envelope field-icon"></i> GUARDIAN'S EMAIL <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-envelope field-icon"></i> {{ "GUARDIAN'S EMAIL" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="email" class="form-control form-field" placeholder="email@example.com"
                            formControlName="email">
@@ -870,7 +892,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-building field-icon"></i> GUARDIAN'S OCCUPATION <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-building field-icon"></i> {{ "GUARDIAN'S OCCUPATION" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Occupation"
                            [formControl]="guardianJobName">
@@ -880,7 +902,19 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-geo-alt field-icon"></i> GUARDIAN'S ADDRESS <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-mortarboard field-icon"></i> {{ 'GUARDIAN\'S EDUCATION LEVEL' | translate }}
+                    </label>
+                    <select class="form-select form-field" formControlName="educationLevel">
+                      <option [value]="null">-- {{ 'Select Education Level' | translate }} --</option>
+                      @for (lvl of educationLevels; track lvl.value) {
+                        <option [value]="lvl.value">{{ lvl.label | translate }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label field-label">
+                      <i class="bi bi-geo-alt field-icon"></i> {{ "GUARDIAN'S ADDRESS" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="Full address"
                            formControlName="address">
@@ -890,7 +924,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-globe field-icon"></i> GUARDIAN'S NATIONALITY <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-globe field-icon"></i> {{ "GUARDIAN'S NATIONALITY" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="nationality">
                       <option value="" disabled selected>Select nationality</option>
@@ -904,7 +938,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-heart field-icon"></i> GUARDIAN'S RELIGION <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-heart field-icon"></i> {{ "GUARDIAN'S RELIGION" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <select class="form-select form-field" formControlName="religion">
                       <option value="" disabled selected>Select religion</option>
@@ -918,7 +952,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-calendar field-icon"></i> GUARDIAN'S DATE OF BIRTH <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-calendar field-icon"></i> {{ "GUARDIAN'S DATE OF BIRTH" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <div class="d-flex gap-2">
                       <select class="form-select form-field" formControlName="birthDay">
@@ -946,7 +980,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-credit-card field-icon"></i> GUARDIAN'S NATIONAL ID <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-credit-card field-icon"></i> {{ "GUARDIAN'S NATIONAL ID" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <input type="text" class="form-control form-field" placeholder="00000000000000" maxlength="14"
                            formControlName="nationalNumber">
@@ -959,7 +993,7 @@
                   </div>
                   <div class="col-md-6">
                     <label class="form-label field-label">
-                      <i class="bi bi-telephone field-icon"></i> GUARDIAN'S PHONE NUMBER <span class="text-danger d-inline">*</span>
+                      <i class="bi bi-telephone field-icon"></i> {{ "GUARDIAN'S PHONE NUMBER" | translate }} <span class="text-danger d-inline">*</span>
                     </label>
                     <div formArrayName="phoneNumbers">
                       @for (ctrl of guardianPhoneNumbers.controls; track ctrl; let i = $index) {
@@ -976,7 +1010,7 @@
                       }
                     </div>
                     <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" (click)="addPhoneNumber('guardian')">
-                      <i class="bi bi-plus-circle"></i> Add another number
+                      <i class="bi bi-plus-circle"></i> {{ 'Add another number' | translate }}
                     </button>
                     @if (getError(guardianPhoneNumbers.at(0), 'pattern')) {
                       <small class="text-danger">Must be 11 digits starting with 010, 011, 012, or 015</small>
@@ -996,8 +1030,8 @@
             <i class="bi bi-heart-pulse-fill"></i>
           </div>
           <div>
-            <h5 class="mb-0 fw-bold section-title">Medical Information</h5>
-            <small class="section-subtitle">Optional health and medical notes</small>
+            <h5 class="mb-0 fw-bold section-title">{{ 'Medical Information' | translate }}</h5>
+            <small class="section-subtitle">{{ 'Optional health and medical notes' | translate }}</small>
           </div>
         </div>
         <div class="card-body" [formGroup]="form">
@@ -1005,7 +1039,7 @@
             <div class="col-12">
               <div formGroupName="student">
                 <label class="form-label field-label">
-                  <i class="bi bi-heart field-icon"></i> HEALTH STATUS
+                  <i class="bi bi-heart field-icon"></i> {{ 'HEALTH STATUS' | translate }}
                 </label>
                 <textarea class="form-control form-field" rows="4" formControlName="medicalHistoryText"
                           placeholder="Describe any chronic conditions, allergies, disabilities, or relevant medical notes..."></textarea>
@@ -1019,10 +1053,10 @@
       <!-- ===================== Footer Buttons ===================== -->
       <div class="d-flex justify-content-end gap-3 mb-4">
         <button type="button" class="btn btn-outline-secondary px-4 py-2 fw-semibold" (click)="cancel()">
-          <i class="bi bi-x-lg me-1"></i> Cancel
+          <i class="bi bi-x-lg me-1"></i> {{ 'Cancel' | translate }}
         </button>
         <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold" style="background: var(--blue) !important;">
-          <i class="bi bi-floppy me-1"></i> {{ isEditMode ? 'Save Changes' : 'Save Student' }}
+          <i class="bi bi-floppy me-1"></i> {{ (isEditMode ? 'Save Changes' : 'Save Student') | translate }}
         </button>
       </div>
 
@@ -1030,7 +1064,7 @@
 
     <!-- Page footer -->
     <footer class="d-flex justify-content-between align-items-center mt-4 px-1 small text-muted flex-wrap gap-2">
-      <span>NTG School - Student Affairs System &copy; 2026</span>
+      <span>{{ 'NTG School - Student Affairs System © 2026' | translate }}</span>
     </footer>
   </main>
 </div>

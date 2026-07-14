@@ -5,17 +5,17 @@
       <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
         <div>
           <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+            <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
           </p>
-          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Attendance Records</h1>
-          <p class="text-muted mb-0">Track, review and manage daily student attendance across all grades</p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Attendance Records' | translate }}</h1>
+          <p class="text-muted mb-0">{{ 'Track, review and manage daily student attendance across all grades' | translate }}</p>
         </div>
       </div>
     </div>
     <div class="top-actions">
       <button class="btn btn-outline-secondary p-2 px-3" (click)="exportReport()">
         <i class="bi bi-download"></i>
-        Export Report
+        {{ 'Export Report' | translate }}
       </button>
     </div>
   </div>
@@ -24,32 +24,32 @@
     <div class="card present-card">
       <div class="icon green"><i class="bi bi-check-circle-fill"></i></div>
       <h1>{{ presentCount() }}</h1>
-      <span>PRESENT</span>
+      <span>{{ 'PRESENT' | translate }}</span>
     </div>
 
     <div class="card absent-card">
       <div class="icon red"><i class="bi bi-x-circle-fill"></i></div>
       <h1>{{ absentCount() }}</h1>
-      <span>ABSENT</span>
+      <span>{{ 'ABSENT' | translate }}</span>
     </div>
 
     <div class="card late-card">
       <div class="icon orange"><i class="bi bi-clock"></i></div>
       <h1>{{ lateCount() }}</h1>
-      <span>LATE</span>
+      <span>{{ 'LATE' | translate }}</span>
     </div>
 
     <div class="card excused-card">
       <div class="icon blue"><i class="bi bi-file-earmark-text"></i></div>
       <h1>{{ excusedCount() }}</h1>
-      <span>EXCUSED</span>
+      <span>{{ 'EXCUSED' | translate }}</span>
     </div>
 
     <div class="card rate-card">
       <div class="icon white"><i class="bi bi-graph-up"></i></div>
       <h1>{{ attendanceRate() }}%</h1>
-      <span style="color: white">ATTENDANCE RATE</span>
-      <small>{{ totalRecords() }} records</small>
+      <span style="color: white">{{ 'ATTENDANCE RATE' | translate }}</span>
+      <small>{{ totalRecords() }} {{ 'records' | translate }}</small>
     </div>
   </div>
 
@@ -57,7 +57,7 @@
     <div class="search-box">
       <input
         type="text"
-        placeholder="Search by student name..."
+        [placeholder]="'Search by student name...' | translate"
         [ngModel]="searchText()"
         (ngModelChange)="searchText.set($event)"
       >
@@ -67,23 +67,23 @@
       [ngModel]="selectedGradeId()"
       (ngModelChange)="selectedGradeId.set($event)"
     >
-      <option value="all">All Grades</option>
-      <option *ngFor="let grade of allGrades()" [value]="grade.id">{{ grade.name }}</option>
+      <option value="all">{{ 'All Grades' | translate }}</option>
+      <option *ngFor="let grade of allGrades()" [value]="grade.id">{{ grade.name | translate }}</option>
     </select>
 
     <select
       [ngModel]="selectedClassId()"
       (ngModelChange)="selectedClassId.set($event); onFilterChange()"
     >
-      <option value="all">All Classes</option>
-      <option *ngFor="let cls of allClasses()" [value]="cls.id">{{ cls.name }}</option>
+      <option value="all">{{ 'All Classes' | translate }}</option>
+      <option *ngFor="let cls of allClasses()" [value]="cls.id">{{ cls.name | translate }}</option>
     </select>
 
     <select
       [ngModel]="selectedYear()"
       (ngModelChange)="selectedYear.set($event)"
     >
-      <option value="all">All Years</option>
+      <option value="all">{{ 'All Years' | translate }}</option>
       <option *ngFor="let yr of allYears()" [value]="yr">{{ yr }}</option>
     </select>
 
@@ -97,29 +97,29 @@
       [ngModel]="selectedStatus()"
       (ngModelChange)="selectedStatus.set($event)"
     >
-      <option value="all">All Statuses</option>
-      <option value="Present">Present</option>
-      <option value="Absent">Absent</option>
-      <option value="Late">Late</option>
-      <option value="Excused">Excused</option>
-      <option value="Not Marked">Not Marked</option>
+      <option value="all">{{ 'All Statuses' | translate }}</option>
+      <option value="Present">{{ 'Present' | translate }}</option>
+      <option value="Absent">{{ 'Absent' | translate }}</option>
+      <option value="Late">{{ 'Late' | translate }}</option>
+      <option value="Excused">{{ 'Excused' | translate }}</option>
+      <option value="Not Marked">{{ 'Not Marked' | translate }}</option>
     </select>
 
-    <button class="btn btn-outline-secondary p-2 px-3" (click)="resetFilters()">Reset</button>
-    <div class="records-count">{{ totalRecords() }} records</div>
+    <button class="btn btn-outline-secondary p-2 px-3" (click)="resetFilters()">{{ 'Reset' | translate }}</button>
+    <div class="records-count">{{ totalRecords() }} {{ 'records' | translate }}</div>
   </div>
 
   <div class="table-container">
     <table>
       <thead>
       <tr>
-        <th>STUDENT NAME</th>
-        <th>GRADE</th>
-        <th>CLASS</th>
-        <th>ACADEMIC YEAR</th>
-        <th>DATE</th>
-        <th>ATTENDANCE STATUS</th>
-        <th>ACTIONS</th>
+        <th>{{ 'STUDENT NAME' | translate }}</th>
+        <th>{{ 'GRADE' | translate }}</th>
+        <th>{{ 'CLASS' | translate }}</th>
+        <th>{{ 'ACADEMIC YEAR' | translate }}</th>
+        <th>{{ 'DATE' | translate }}</th>
+        <th>{{ 'ATTENDANCE STATUS' | translate }}</th>
+        <th>{{ 'ACTIONS' | translate }}</th>
       </tr>
       </thead>
       <tbody>
@@ -130,8 +130,8 @@
             <span>{{ student.name }}</span>
           </div>
         </td>
-        <td>{{ student.grade }}</td>
-        <td><span class="class-badge">{{ student.class }}</span></td>
+        <td>{{ student.grade | translate }}</td>
+        <td><span class="class-badge">{{ student.class | translate }}</span></td>
         <td>{{ student.academicYear }}</td>
         <td>
           <div class="date-box">
@@ -143,7 +143,7 @@
         </td>
         <td>
           <span class="status" [ngClass]="student.status.toLowerCase().replace(' ', '-')">
-            {{ student.status }}
+            {{ student.status | translate }}
           </span>
         </td>
         <td>
@@ -159,7 +159,7 @@
       </tr>
       <tr *ngIf="filteredStudents().length === 0">
         <td colspan="7" style="text-align: center; color: #64748b; padding: 2rem;">
-          No matching student attendance logs found for this context.
+          {{ 'No matching student attendance logs found for this context.' | translate }}
         </td>
       </tr>
       </tbody>
@@ -175,7 +175,7 @@
         <div class="avatar">{{ student.initials }}</div>
         <div class="user-info">
           <h3>{{ student.name }}</h3>
-          <p>{{ student.grade }} · {{ student.class }} · {{ student.academicYear }}</p>
+          <p>{{ student.grade | translate }} · {{ student.class | translate }} · {{ student.academicYear }}</p>
         </div>
       </div>
       <div class="close-icon-wrapper" (click)="closeAllModals()">
@@ -188,9 +188,9 @@
     <div class="sidebar-body">
       <div class="card attendance-rate-card">
         <div class="rate-header">
-          <span class="rate-title">ATTENDANCE RATE</span>
+          <span class="rate-title">{{ 'ATTENDANCE RATE' | translate }}</span>
           <span class="badge-excellent" [style.background-color]="student.attendanceRate! >= 75 ? '#e2f6ea' : '#fdebeb'" [style.color]="student.attendanceRate! >= 75 ? '#15803d' : '#b91c1c'">
-            {{ student.statusBadge }}
+            {{ student.statusBadge! | translate }}
           </span>
         </div>
         <div class="rate-value">{{ student.attendanceRate || 0 }}%</div>
@@ -199,34 +199,34 @@
         </div>
         <div class="progress-footer">
           <span>0%</span>
-          <span class="recorded-days">{{ student.recordedDays || 0 }} school days logged</span>
+          <span class="recorded-days">{{ student.recordedDays || 0 }} {{ 'school days logged' | translate }}</span>
           <span>100%</span>
         </div>
       </div>
 
       <div class="stats-grid-mini" *ngIf="student.stats">
         <div class="stat-box present">
-          <div>{{ student.stats.present }}</div><span>PRESENT</span>
+          <div>{{ student.stats.present }}</div><span>{{ 'PRESENT' | translate }}</span>
         </div>
         <div class="stat-box absent">
-          <div>{{ student.stats.absent }}</div><span>ABSENT</span>
+          <div>{{ student.stats.absent }}</div><span>{{ 'ABSENT' | translate }}</span>
         </div>
         <div class="stat-box late">
-          <div>{{ student.stats.late }}</div><span>LATE</span>
+          <div>{{ student.stats.late }}</div><span>{{ 'LATE' | translate }}</span>
         </div>
         <div class="stat-box excused">
-          <div>{{ student.stats.excused }}</div><span>EXCUSED</span>
+          <div>{{ student.stats.excused }}</div><span>{{ 'EXCUSED' | translate }}</span>
         </div>
       </div>
 
       <div class="view-toggle-container">
-        <div class="toggle-action" [class.active]="currentHistoryView() === 'calendar'" (click)="switchHistoryView('calendar')">Calendar View</div>
-        <div class="toggle-action" [class.active]="currentHistoryView() === 'daily'" (click)="switchHistoryView('daily')">Daily List</div>
+        <div class="toggle-action" [class.active]="currentHistoryView() === 'calendar'" (click)="switchHistoryView('calendar')">{{ 'Calendar View' | translate }}</div>
+        <div class="toggle-action" [class.active]="currentHistoryView() === 'daily'" (click)="switchHistoryView('daily')">{{ 'Daily List' | translate }}</div>
       </div>
 
       <div class="card calendar-card" *ngIf="currentHistoryView() === 'calendar'">
         <div class="calendar-header">
-          <span class="month-title">{{ getReadableMonthYear() }} — Performance Summary</span>
+          <span class="month-title">{{ getReadableMonthYear() | translate }} — {{ 'Performance Summary' | translate }}</span>
         </div>
         <div class="days-grid">
           <div *ngFor="let day of student.calendarGrid" class="day-cell" [ngClass]="{
@@ -249,11 +249,11 @@
             <span class="badge rounded-pill px-2 py-1"
                   [style.background-color]="item.status === 'P' ? '#e2f6ea' : item.status === 'A' ? '#fdebeb' : item.status === 'L' ? '#fff3e0' : '#e0f2fe'"
                   [style.color]="item.status === 'P' ? '#15803d' : item.status === 'A' ? '#b91c1c' : item.status === 'L' ? '#b45309' : '#0369a1'">
-              {{ item.status === 'P' ? 'Present' : item.status === 'A' ? 'Absent' : item.status === 'L' ? 'Late' : item.status === 'E' ? 'Excused' : 'Pending' }}
+              {{ (item.status === 'P' ? 'Present' : item.status === 'A' ? 'Absent' : item.status === 'L' ? 'Late' : item.status === 'E' ? 'Excused' : 'Pending') | translate }}
             </span>
           </div>
           <p *ngIf="!student.historyDays || student.historyDays.length === 0" style="text-align: center; color: #64748b; font-size: 13px; padding: 1rem 0;">
-            No historical items recorded.
+            {{ 'No historical items recorded.' | translate }}
           </p>
         </div>
       </div>
@@ -264,7 +264,7 @@
 <div class="edit-modal-backdrop" *ngIf="showEditModal() && selectedStudent() as student">
   <div class="edit-modal-box">
     <div class="edit-modal-header">
-      <h2 class="edit-modal-title">Edit Attendance Record</h2>
+      <h2 class="edit-modal-title">{{ 'Edit Attendance Record' | translate }}</h2>
       <div class="edit-close-wrapper" (click)="closeAllModals()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="edit-close-svg">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -274,41 +274,33 @@
 
     <div class="edit-modal-body">
       <div class="form-field-group">
-        <label class="field-label">STUDENT NAME *</label>
+        <label class="field-label">{{ 'STUDENT NAME *' | translate }}</label>
         <input type="text" [value]="student.name" class="readonly-date-input" readonly />
       </div>
 
       <div class="form-field-group">
-        <label class="field-label">DATE *</label>
+        <label class="field-label">{{ 'DATE *' | translate }}</label>
         <input type="text" [value]="student.date" class="readonly-date-input" readonly />
       </div>
 
       <div class="form-field-group">
-        <label class="field-label">ATTENDANCE STATUS *</label>
+        <label class="field-label">{{ 'ATTENDANCE STATUS *' | translate }}</label>
         <div class="status-options-grid">
           <label class="status-option-label" [class.selected-present]="student.status === 'Present'">
             <input type="radio" name="attendanceStatus" value="Present" [checked]="student.status === 'Present'" (change)="setSelectedStatus('Present')" class="hidden-radio" />
-            <span class="status-indicator"></span> Present
+            <span class="status-indicator"></span> {{ 'Present' | translate }}
           </label>
           <label class="status-option-label" [class.selected-absent]="student.status === 'Absent'">
             <input type="radio" name="attendanceStatus" value="Absent" [checked]="student.status === 'Absent'" (change)="setSelectedStatus('Absent')" class="hidden-radio" />
-            <span class="status-indicator"></span> Absent
-          </label>
-          <label class="status-option-label" [class.selected-late]="student.status === 'Late'">
-            <input type="radio" name="attendanceStatus" value="Late" [checked]="student.status === 'Late'" (change)="setSelectedStatus('Late')" class="hidden-radio" />
-            <span class="status-indicator"></span> Late
-          </label>
-          <label class="status-option-label" [class.selected-excused]="student.status === 'Excused'">
-            <input type="radio" name="attendanceStatus" value="Excused" [checked]="student.status === 'Excused'" (change)="setSelectedStatus('Excused')" class="hidden-radio" />
-            <span class="status-indicator"></span> Excused
+            <span class="status-indicator"></span> {{ 'Absent' | translate }}
           </label>
         </div>
       </div>
     </div>
 
     <div class="edit-modal-footer">
-      <button class="action-dismiss-trigger" (click)="closeAllModals()">Cancel</button>
-      <button class="action-submit-trigger" (click)="updateRecord()">Update Record</button>
+      <button class="action-dismiss-trigger" (click)="closeAllModals()">{{ 'Cancel' | translate }}</button>
+      <button class="action-submit-trigger" (click)="updateRecord()">{{ 'Update Record' | translate }}</button>
     </div>
   </div>
 </div>

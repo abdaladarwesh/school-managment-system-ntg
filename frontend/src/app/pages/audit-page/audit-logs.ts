@@ -3,17 +3,20 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuditLog } from './audit-model';
 import { AuditLogsService } from './audit-logs.service';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-audit-logs',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './audit-logs.component.html',
   styleUrls: ['./audit-logs.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class AuditLogsComponent implements OnInit {
   auditLogsService = inject(AuditLogsService);
+  private translationService = inject(TranslationService);
 
   // --- Writable Signals for State ---
   searchTerm = signal<string>('');
@@ -82,13 +85,13 @@ export class AuditLogsComponent implements OnInit {
   // Helper method to generate human-readable details (unchanged as it's a pure function)
   getLogDetails(log: AuditLog): string {
     if (log.action === 'INSERT') {
-      return `Created new record in ${log.tableName} for ${log.editedUserName || 'User ID: ' + log.recordId}.`;
+      return `${this.translationService.translate('Created new record in')} ${log.tableName} ${this.translationService.translate('for')} ${log.editedUserName || this.translationService.translate('User ID:') + ' ' + log.recordId}.`;
     } else if (log.action === 'DELETE') {
-      return `Deleted record from ${log.tableName} for ${log.editedUserName || 'User ID: ' + log.recordId}.`;
+      return `${this.translationService.translate('Deleted record from')} ${log.tableName} ${this.translationService.translate('for')} ${log.editedUserName || this.translationService.translate('User ID:') + ' ' + log.recordId}.`;
     } else if (log.action === 'UPDATE' && log.changedFields) {
-      return `Updated fields: [${log.changedFields}] for ${log.editedUserName || 'Record ID: ' + log.recordId}.`;
+      return `${this.translationService.translate('Updated fields:')} [${log.changedFields}] ${this.translationService.translate('for')} ${log.editedUserName || this.translationService.translate('Record ID:') + ' ' + log.recordId}.`;
     }
-    return 'Modified record.';
+    return this.translationService.translate('Modified record.');
   }
 
   toggleFilterMenu(): void {

@@ -1,24 +1,41 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  FormsModule,
+} from '@angular/forms';
 import { AuthService } from './service/auth-service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { ViolationService } from '../violations/service/violation.service';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, TranslatePipe],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
 export class Login {
   private AuthService = inject(AuthService);
   private router = inject(Router);
+  private translationService = inject(TranslationService);
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
 
-    password: new FormControl('', [Validators.required, ]),
+    password: new FormControl('', [Validators.required]),
   });
+
+  private notificationService = inject(ViolationService);
+
+  get currentLang() {
+    return this.translationService.currentLang();
+  }
+
   submit() {
     this.loginForm.markAllAsTouched();
     if (this.loginForm.valid) {
@@ -29,33 +46,34 @@ export class Login {
         next: (value) => {
           console.log(value);
           Swal.fire({
-            title: 'Done!',
-            text: 'Your action has been completed successfully.',
+            title: this.translationService.translate('Done!'),
+            text: this.translationService.translate('Your action has been completed successfully.'),
             icon: 'success',
-            confirmButtonText: 'OK',
+            confirmButtonText: this.translationService.translate('OK'),
           });
-          localStorage.setItem("token", value.token)
-          localStorage.setItem("role", value.role)
-          this.router.navigate(['/dashboard'])
-
+          localStorage.setItem('token', value.token);
+          localStorage.setItem('role', value.role);
+          this.router.navigate(['/dashboard']);
         },
-        error(err) {
-          if (err.status == 401){
+        error: (err) => {
+          if (err.status == 401) {
             Swal.fire({
-              title: 'Login Failed',
-              text: 'The username or password you entered is incorrect. Please double-check your spelling and try again.',
+              title: this.translationService.translate('Login Failed'),
+              text: this.translationService.translate(
+                'The username or password you entered is incorrect. Please double-check your spelling and try again.',
+              ),
               icon: 'error',
-              confirmButtonText: 'Try again',
+              confirmButtonText: this.translationService.translate('Try again'),
             });
-          }
-          else {
+          } else {
             Swal.fire({
-              title: 'Error!',
-              text: 'Something went wrong with your request please check your internet.',
+              title: this.translationService.translate('Error!'),
+              text: this.translationService.translate(
+                'Something went wrong with your request please check your internet.',
+              ),
               icon: 'error',
-              confirmButtonText: 'Try Again'
+              confirmButtonText: this.translationService.translate('Try Again'),
             });
-
           }
         },
       });
@@ -64,13 +82,39 @@ export class Login {
     }
   }
   private navigateByRole(role: string) {
-  switch (role) {
-    case 'STUDENT_AFFAIRS':
-      this.router.navigate(['/dashboard']);
-      break;
+    switch (role) {
+      case 'STUDENT_AFFAIRS':
+        this.router.navigate(['/dashboard']);
+        break;
 
-    default:
-      this.router.navigate(['/']);
+      default:
+        this.router.navigate(['/']);
+    }
   }
-}
+
+
+  isEn(): boolean {
+    return this.currentLang === 'en';
+  }
+
+  isAr(): boolean {
+    return this.currentLang === 'ar';
+  }
+
+  toggleLanguage(lang: 'en' | 'ar'): void {
+    this.translationService.setLanguage(lang);
+  }
+
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  // Closes the sidebar when a user clicks a link (only matters on mobile)
+  closeSidebar() {
+    if (window.innerWidth <= 768) {
+      this.isSidebarOpen = false;
+    }
+  }
 }

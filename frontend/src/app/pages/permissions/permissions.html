@@ -4,21 +4,20 @@
     <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
       <div>
         <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-          <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+          <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
         </p>
-        <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Permissions</h1>
-        <p class="text-muted mb-0">Manage and track student leave permission requests
-        </p>
+        <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Permissions' | translate }}</h1>
+        <p class="text-muted mb-0">{{ 'Manage and track student leave permission requests' | translate }}</p>
       </div>
     </div>
-    <button class="save-btn" (click)="openPopup()">+ New Permission Request</button>
+    <button class="save-btn" (click)="openPopup()">{{ '+ New Permission Request' | translate }}</button>
   </div>
 
   <div class="card">
     <div class="card-icon icon-total">📄</div>
     <div class="card-info">
       <span class="card-value">{{ totalRequest }}</span>
-      <span class="card-label">TOTAL REQUESTS</span>
+      <span class="card-label">{{ 'TOTAL REQUESTS' | translate }}</span>
     </div>
     <div class="card-blob blob-red"></div>
   </div>
@@ -26,105 +25,104 @@
   <div class="filter-bar-container">
     <div class="search-box-wrapper">
       <span>🔍</span>
-      <input type="text" placeholder="Search by student name..." [(ngModel)]="searchQuery" />
+      <input type="text" [placeholder]="'Search by student name...' | translate" [(ngModel)]="searchQuery" />
     </div>
     <div class="filter-dropdowns">
       <select [(ngModel)]="selectedGrade" class="filter-select">
         @for (item of grades(); track $index) {
-          <option [value]="item">{{item}}</option>
+        <option [value]="item">{{item}}</option>
         }
-        <option value="">All Grades</option>
+        <option value="">{{ 'All Grades' | translate }}</option>
       </select>
 
       <select [(ngModel)]="selectedClass" class="filter-select">
         @for (item of classes(); track $index) {
-          <option [value]="item">{{item}}</option>
+        <option [value]="item">{{item}}</option>
         }
-        <option value="">All Classes</option>
+        <option value="">{{ 'All Classes' | translate }}</option>
       </select>
 
-      <button class="btn-filter-results">⏳ {{ filteredPermission.length }} results</button>
+      <button class="btn-filter-results">⏳ {{ filteredPermission.length }} {{ 'results' | translate }}</button>
     </div>
   </div>
 
   <div class="table-container">
     <table>
       <thead>
-      <tr>
-        <th>STUDENT NAME</th>
-        <th>CLASS</th>
-        <th>DAY</th>
-        <th>LEAVE REQUEST REASON</th>
-        <th>NOTES</th>
-      </tr>
+        <tr>
+          <th>{{ 'STUDENT NAME' | translate }}</th>
+          <th>{{ 'CLASS' | translate }}</th>
+          <th>{{ 'DAY' | translate }}</th>
+          <th>{{ 'LEAVE REQUEST REASON' | translate }}</th>
+          <th>{{ 'NOTES' | translate }}</th>
+        </tr>
       </thead>
       <tbody>
         @for (item of filteredPermission; track item.student) {
-          <tr>
-            <td>
-              <div class="student-cell">
-                <span class="avatar">{{ item.student.user.firstName.charAt(0) }}</span>
-                <span class="student-name">{{ item.student.user.firstName }}</span>
-              </div>
-            </td>
-            <td><span class="badge-class">{{ item.student.studentClass?.grade?.name }} - {{ item.student.studentClass?.name }}</span></td>
-            <td><span class="table-icon">📅</span> {{ item.date }}</td>
-            <td><span class="table-icon-flag">🏳</span> {{ item.reason }}</td>
-            <td>
-              <span class="student-name">{{ item.notes ?? "No Notes" }}</span>
-            </td>
-          </tr>
+        <tr>
+          <td>
+            <div class="student-cell">
+              <span class="avatar">{{ item.student.user.firstName.charAt(0) }}</span>
+              <span class="student-name">{{ item.student.user.firstName }}</span>
+            </div>
+          </td>
+          <td><span class="badge-class">{{ item.student.studentClass?.grade?.name }} - {{
+              item.student.studentClass?.name }}</span></td>
+          <td><span class="table-icon">📅</span> {{ item.date }}</td>
+          <td><span class="table-icon-flag">🏳</span> {{ item.reason }}</td>
+          <td>
+            <span class="student-name">{{ item.notes ?? ("No Notes" | translate) }}</span>
+          </td>
+        </tr>
         } @empty {
-          <tr>
-            <td>There is no Permissions</td>
-          </tr>
+        <tr>
+          <td colspan="5">{{ 'There is no Permissions' | translate }}</td>
+        </tr>
         }
       </tbody>
     </table>
-    <div class="table-footer">Showing {{ filteredPermission.length }} of {{ totalRequest }} records</div>
+    <div class="table-footer">{{ 'Showing' | translate }} {{ filteredPermission.length }} {{ 'of' | translate }} {{ totalRequest }} {{ 'records' | translate }}</div>
   </div>
 
   @if (showPopup) {
-    <div class="modal-overlay">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>📄 New Permission Request</h3>
-          <button class="close-x" (click)="closePopup()">✕</button>
-        </div>
+  <div class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>📄 {{ 'New Permission Request' | translate }}</h3>
+        <button class="close-x" (click)="closePopup()">✕</button>
+      </div>
 
-        <form [formGroup]="requestForm" (ngSubmit)="saveRequest()">
-          <div class="modal-body">
-            <div class="form-grid">
-              <div class="form-group">
-                <label>STUDENT NAME *</label>
-                <app-student-search
-                  [students]="students()"
-                  (studentSelected)="onStudentSelected($event)">
-                </app-student-search>
-                @if (requestForm.controls.studentId.invalid && requestForm.controls.studentId.touched) {
-                  <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">Please select a student.</span>
-                }
-              </div>
-            </div>
-            <div class="form-group full-width">
-              <label>LEAVE REQUEST REASON *</label>
-              <input type="text" formControlName="reason">
-              @if (requestForm.controls.reason.invalid && requestForm.controls.reason.touched) {
-                <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">Reason is required.</span>
+      <form [formGroup]="requestForm" (ngSubmit)="saveRequest()">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>{{ 'STUDENT NAME' | translate }} *</label>
+              <app-student-search [students]="students()" (studentSelected)="onStudentSelected($event)">
+              </app-student-search>
+              @if (requestForm.controls.studentId.invalid && requestForm.controls.studentId.touched) {
+              <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">{{ 'Please select a student.' | translate }}</span>
               }
             </div>
-            <div class="form-group full-width mt-3">
-              <label>NOTES </label>
-              <input type="text" formControlName="notes">
-            </div>
           </div>
+          <div class="form-group full-width">
+            <label>{{ 'LEAVE REQUEST REASON' | translate }} *</label>
+            <input type="text" formControlName="reason">
+            @if (requestForm.controls.reason.invalid && requestForm.controls.reason.touched) {
+            <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">{{ 'Reason is required.' | translate }}</span>
+            }
+          </div>
+          <div class="form-group full-width mt-3">
+            <label>{{ 'NOTES' | translate }} </label>
+            <input type="text" formControlName="notes">
+          </div>
+        </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn-cancel" (click)="closePopup()">✕ Cancel</button>
-            <button type="submit" class="btn-save">💾 Save Request</button>
-          </div>
-        </form>
-      </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closePopup()">✕ {{ 'Cancel' | translate }}</button>
+          <button type="submit" class="btn-save">💾 {{ 'Save Request' | translate }}</button>
+        </div>
+      </form>
     </div>
+  </div>
   }
 </div>

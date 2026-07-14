@@ -1,60 +1,156 @@
 <nav id="sidebar">
-  <div class="sidebar-brand">
-    <img src="/ntg.png" alt="NTG Logo">
+  <div class="sidebar-top-section">
+    <div class="sidebar-brand">
+      <img src="/ntg.png" alt="NTG Logo">
+    </div>
+
+    <div class="sidebar-label">{{ 'Main Menu' | translate }}</div>
+
+    <ul class="nav flex-column nav-sidebar">
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="dashboard">
+          <i class="bi bi-grid-1x2-fill"></i> {{ 'Dashboard' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/students">
+          <i class="bi bi-people-fill"></i> {{ 'Students' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/attendance">
+          <i class="bi bi-calendar-check"></i> {{ 'Attendance' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/attendance-records">
+          <i class="bi bi-journal-text"></i> {{ 'Attendance Records' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/late-arrivals">
+          <i class="bi bi-clock-history"></i> {{ 'Late Arrivals' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/violations">
+          <i class="bi bi-exclamation-circle"></i> {{ 'Violations' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/permissions">
+          <i class="bi bi-shield-check"></i> {{ 'Permissions' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/complaints">
+          <i class="bi bi-chat-left-text"></i> {{ 'Complaints' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/medical-cases">
+          <i class="bi bi-heart-pulse"></i> {{ 'Medical Cases' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/audit-logs">
+          <i class="bi bi-heart-pulse"></i> {{ 'Audit Logs' | translate }}
+        </a>
+      </li>
+    </ul>
   </div>
 
-  <div class="sidebar-label">Main Menu</div>
+  <div class="sidebar-footer">
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lang-switch">
+      <button type="button" class="lang-btn" [class.active]="isEn()" (click)="toggleLanguage('en')">
+        EN
+      </button>
+      <span class="lang-separator">|</span>
+      <button type="button" class="lang-btn" [class.active]="isAr()" (click)="toggleLanguage('ar')">
+        العربية
+      </button>
+    </div>
+  </div>
+</nav>
+<!-- Added [class.mobile-open] to allow toggling on mobile -->
+<nav id="sidebar" [class.mobile-open]="isSidebarOpen">
 
-  <ul class="nav flex-column nav-sidebar">
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="dashboard">
-        <i class="bi bi-grid-1x2-fill"></i> Dashboard
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/students">
-        <i class="bi bi-people-fill"></i> Students
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/attendance">
-        <i class="bi bi-calendar-check"></i> Attendance
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/attendance-records">
-        <i class="bi bi-journal-text"></i> Attendance Records
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/late-arrivals">
-        <i class="bi bi-clock-history"></i> Late Arrivals
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/violations">
-        <i class="bi bi-exclamation-circle"></i> Violations
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/permissions">
-        <i class="bi bi-shield-check"></i> Permissions
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/complaints">
-        <i class="bi bi-chat-left-text"></i> Complaints
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/medical-cases">
-        <i class="bi bi-heart-pulse"></i> Medical Cases
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" routerLinkActive="active" routerLink="/audit-logs">
-        <i class="bi bi-heart-pulse"></i> Audit Logs
-      </a>
-    </li>
-  </ul>
+  <div class="sidebar-top-section">
+    <div class="sidebar-brand">
+      <img src="/ntg.png" alt="NTG Logo">
+
+      <!-- Optional: A close button that only shows on mobile (you'll need to style this or hide it on desktop) -->
+      <!-- <button class="d-md-none btn btn-sm" (click)="toggleSidebar()"><i class="bi bi-x"></i></button> -->
+    </div>
+
+    <div class="sidebar-label">{{ 'Main Menu' | translate }}</div>
+
+    <ul class="nav flex-column nav-sidebar">
+      <!-- Auto-close sidebar on mobile when a link is clicked -->
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="dashboard" (click)="closeSidebar()">
+          <i class="bi bi-grid-1x2-fill"></i> {{ 'Dashboard' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/students" (click)="closeSidebar()">
+          <i class="bi bi-people-fill"></i> {{ 'Students' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/attendance" (click)="closeSidebar()">
+          <i class="bi bi-calendar-check"></i> {{ 'Attendance' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/attendance-records" (click)="closeSidebar()">
+          <i class="bi bi-journal-text"></i> {{ 'Attendance Records' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/late-arrivals" (click)="closeSidebar()">
+          <i class="bi bi-clock-history"></i> {{ 'Late Arrivals' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/violations" (click)="closeSidebar()">
+          <i class="bi bi-exclamation-circle"></i> {{ 'Violations' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/permissions" (click)="closeSidebar()">
+          <i class="bi bi-shield-check"></i> {{ 'Permissions' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/complaints" (click)="closeSidebar()">
+          <i class="bi bi-chat-left-text"></i> {{ 'Complaints' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/medical-cases" (click)="closeSidebar()">
+          <i class="bi bi-heart-pulse"></i> {{ 'Medical Cases' | translate }}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLinkActive="active" routerLink="/audit-logs" (click)="closeSidebar()">
+          <i class="bi bi-heart-pulse"></i> {{ 'Audit Logs' | translate }}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-lang-switch">
+      <button type="button" class="lang-btn" [class.active]="isEn()" (click)="toggleLanguage('en')">
+        EN
+      </button>
+      <span class="lang-separator">|</span>
+      <button type="button" class="lang-btn" [class.active]="isAr()" (click)="toggleLanguage('ar')">
+        العربية
+      </button>
+    </div>
+  </div>
 </nav>

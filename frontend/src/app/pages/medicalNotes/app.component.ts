@@ -14,13 +14,15 @@ import { MedicalCase, MedicalCaseRequest } from './models/medical-case.model';
 import { MedicalCaseService } from './services/medical-case.service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, StudentSearchComponent],
+  imports: [CommonModule, FormsModule, StudentSearchComponent, TranslatePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -105,6 +107,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(
     private medicalCaseService: MedicalCaseService,
     private studentService: StudentService,
+    private translationService: TranslationService,
   ) {}
 
   ngOnInit(): void {
@@ -206,11 +209,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   submitForm(): void {
     this.formError = '';
     if (!this.formStudentId) {
-      this.formError = 'Please choose a student.';
+      this.formError = this.translationService.translate('Please choose a student.');
       return;
     }
     if (!this.formIllness.trim()) {
-      this.formError = 'Please enter an illness type.';
+      this.formError = this.translationService.translate('Please enter an illness type.');
       return;
     }
 
@@ -226,19 +229,20 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.modalInstance.hide();
       },
       error: (err) => {
-        this.formError = err?.error?.message || 'Could not save this medical case.';
+        this.formError = err?.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate('Could not save this medical case.');
       },
     });
   }
 
   deleteCase(record: MedicalCase): void {
-    if (!confirm(`Delete the medical case for ${this.getStudentFullName(record)}?`)) return;
+    const confirmMsg = this.translationService.translate('Delete the medical case for') + ' ' + this.getStudentFullName(record) + '?';
+    if (!confirm(confirmMsg)) return;
     this.medicalCaseService.delete(record.id).subscribe({
       next: () => {
         // Remove from signal state immediately
         this.allCases.update((current) => current.filter((c) => c.id !== record.id));
       },
-      error: (err) => alert(err?.error?.message || "Couldn't delete this case."),
+      error: (err) => alert(err?.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate("Couldn't delete this case.")),
     });
   }
 
@@ -247,7 +251,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     const dataToExport = this.filteredCases();
 
     if (dataToExport.length === 0) {
-      alert('No records available to export.');
+      alert(this.translationService.translate('No records available to export.'));
       return;
     }
 

@@ -95,7 +95,7 @@
 .field-label {
   font-size: 0.68rem;
   font-weight: 700;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   letter-spacing: 0.04em;
   color: #8a8589;
   margin-bottom: 0.3rem;

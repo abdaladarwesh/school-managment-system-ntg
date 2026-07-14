@@ -3,6 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 // ─── API shapes (mirror the backend DTOs) ────────────────────────────────────
 
@@ -44,13 +46,14 @@ interface AttendanceGridResponse {
 @Component({
   selector: 'app-attendance',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './attendance.html',
   styleUrl: './attendance.css',
 })
 export class Attendance implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private translationService = inject(TranslationService);
 
   // ── State ─────────────────────────────────────────────────────────────────
   readonly today = new Date();
@@ -224,10 +227,10 @@ export class Attendance implements OnInit {
         this.saving.set(false);
         this.grid.set(updated);
         Swal.fire({
-          title: 'Saved!',
-          text: 'Attendance has been saved successfully.',
+          title: this.translationService.translate('Saved!'),
+          text: this.translationService.translate('Attendance has been saved successfully.'),
           icon: 'success',
-          confirmButtonText: 'OK',
+          confirmButtonText: this.translationService.translate('OK'),
         });
       },
     });
@@ -237,17 +240,17 @@ export class Attendance implements OnInit {
   private handleError(err: { status: number }): void {
     if (err.status === 401) {
       Swal.fire({
-        title: 'Session expired',
-        text: 'Please login again.',
+        title: this.translationService.translate('Session Expired'),
+        text: this.translationService.translate('Please login again.'),
         icon: 'error',
-        confirmButtonText: 'Login',
+        confirmButtonText: this.translationService.translate('Login'),
       }).then(() => this.router.navigate(['/login']));
     } else {
       Swal.fire({
-        title: 'Something went wrong',
-        text: 'Please try again later.',
+        title: this.translationService.translate('Something went wrong'),
+        text: this.translationService.translate('Please try again later.'),
         icon: 'error',
-        confirmButtonText: 'OK',
+        confirmButtonText: this.translationService.translate('OK'),
       });
     }
   }

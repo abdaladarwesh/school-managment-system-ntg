@@ -202,6 +202,7 @@ public class StudentServiceImpl implements StudentsService {
         Parent parent = new Parent();
         parent.setUser(newUser);
         parent.setJobName(requestInfo.getJobName());
+        parent.setEducationLevel(requestInfo.getEducationLevel());
 
         return parentRepository.saveAndFlush(parent);
     }
@@ -394,6 +395,11 @@ public class StudentServiceImpl implements StudentsService {
         // This does NOT overwrite their existing User profile data if they are found.
         Role parentRole = getOrCreateRole("PARENT");
         Parent targetParent = getOrCreateParent(requestInfo, parentRole);
+
+        // Update mutable parent fields (job and education level) if they changed
+        targetParent.setJobName(requestInfo.getJobName());
+        targetParent.setEducationLevel(requestInfo.getEducationLevel());
+        parentRepository.save(targetParent);
 
         // 2. Find if this student already has a parent linked for this specific role
         StudentsParent existingLink = studentsParentRepository.findByStudentIdAndParentRole(student.getId(), roleName)

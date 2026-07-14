@@ -2,16 +2,23 @@ import { Component, computed, inject } from '@angular/core';
 import { AttendanceChartComponent } from './components/attendance-chart/attendance-chart';
 import { DashboardService } from './service/dashboard-service';
 import Swal from 'sweetalert2';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { DASHBOARD_INITIAL } from './service/dashboard-service';
 import { ViolationChartComponent } from './components/violation-chart/violation-chart';
 import { AbsenceChartComponent } from './components/absence-chart-component/absence-chart-component';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [AttendanceChartComponent, AttendanceChartComponent, AbsenceChartComponent],
+  imports: [
+    AttendanceChartComponent,
+    AttendanceChartComponent,
+    AbsenceChartComponent,
+    RouterLink,
+    TranslatePipe,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { TranslatePipe } from '../../../../core/pipes/translate.pipe';
 export interface AbsenceClass {
   name: string;
   value: number;
@@ -6,12 +7,11 @@ export interface AbsenceClass {
 }
 @Component({
   selector: 'app-absence-chart-component',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './absence-chart-component.html',
   styleUrl: './absence-chart-component.css',
 })
 export class AbsenceChartComponent {
-
   @Input() title = 'Avg. Absence per Grade';
   @Input() subtitle = 'Days absent per student — Today';
 
@@ -34,10 +34,10 @@ export class AbsenceChartComponent {
 
     if (!this.data.length) return 1;
 
-    return Math.max(...this.data.map(x => x.value));
+    return Math.max(...this.data.map((x) => x.value));
   }
 
   percentage(value: number): number {
-    return value / this.getMax() * 100;
+    return (value / this.getMax()) * 100;
   }
 }

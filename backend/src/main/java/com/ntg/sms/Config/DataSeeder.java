@@ -286,6 +286,7 @@ public class DataSeeder implements CommandLineRunner {
                 seed.email(), seed.nationalNumber(), seed.gender(), LocalDate.of(1978, 1, 1),
                 "Cairo, Egypt", seed.phoneNumbers()));
         parentInfo.setJobName(seed.jobName());
+        parentInfo.setEducationLevel(EducationLevel.ABOVE_INTERMEDIATE);
         return parentInfo;
     }
 

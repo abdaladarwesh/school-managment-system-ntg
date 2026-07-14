@@ -7,10 +7,13 @@ import {
   ParentResponse,
 } from '../student-page/service/student-service';
 import Swal from 'sweetalert2';
+import { RegulateTextPipe } from '../../core/pipes/regulate-text-pipe';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-student-detail',
-  imports: [CommonModule],
+  imports: [CommonModule, RegulateTextPipe, TranslatePipe],
   templateUrl: './student-detail.html',
   styleUrl: './student-detail.css',
 })
@@ -18,6 +21,7 @@ export class StudentDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private studentService = inject(StudentService);
+  private translationService = inject(TranslationService);
 
   data = signal<StudentDetailResponse | null>(null);
   loading = true;
@@ -52,26 +56,25 @@ export class StudentDetail implements OnInit {
       error: (err) => {
         if (err.status === 401) {
           Swal.fire({
-            title: 'Your session expired',
-            text: 'Please login again to continue using the application',
+            title: this.translationService.translate('Your session expired'),
+            text: this.translationService.translate('Please login again to continue using the application'),
             icon: 'error',
-            confirmButtonText: 'Continue',
+            confirmButtonText: this.translationService.translate('Continue'),
           }).then(() => this.router.navigate(['/login']));
         } else {
           Swal.fire({
-            title: 'Unexpected error — please try again later',
-            text: 'We are sorry, please try again later',
+            title: this.translationService.translate('Unexpected error — please try again later'),
+            text: this.translationService.translate('We are sorry, please try again later'),
             icon: 'error',
-            confirmButtonText: 'Try again',
+            confirmButtonText: this.translationService.translate('Try again'),
           });
         }
       },
       next: (res) => {
         // Standard SweetAlert2 Success Example
         Swal.fire({
-          title: 'done',
-          text:
-            'Your data has been saved successfully.',
+          title: this.translationService.translate('Done'),
+          text: this.translationService.translate('Your data has been saved successfully.'),
           icon: 'success',
         });
       },
@@ -160,22 +163,21 @@ export class StudentDetail implements OnInit {
     this.studentService.deleteStudent(this.id()).subscribe({
       error: () => {
         Swal.fire({
-          title: 'Error!',
-          text: 'Something went wrong. Please try again.',
+          title: this.translationService.translate('Error!'),
+          text: this.translationService.translate('Something went wrong. Please try again.'),
           icon: 'error',
-          confirmButtonText: 'Close',
+          confirmButtonText: this.translationService.translate('Close'),
         });
       },
       next: () => {
         Swal.fire({
-          title: 'Done',
-          text: 'Student has been deleted successfully',
+          title: this.translationService.translate('Done'),
+          text: this.translationService.translate('Student has been deleted successfully'),
           icon: 'success',
-          confirmButtonText: 'Ok',
+          confirmButtonText: this.translationService.translate('Ok'),
         }).then(() => {
           this.router.navigate(['/students']);
         });
-
       },
     });
   }

@@ -5,15 +5,15 @@
       <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
         <div>
           <p class="text-maroon fw-bold small mb-1 d-flex align-items-center gap-2">
-            <span class="eyebrow-bar"></span> STUDENT AFFAIRS
+            <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
           </p>
-          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">Late Arrivals</h1>
-          <p class="text-muted mb-0">Track and register student late arrival records</p>
+          <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">{{ 'Late Arrivals' | translate }}</h1>
+          <p class="text-muted mb-0">{{ 'Track and register student late arrival records' | translate }}</p>
         </div>
       </div>
     </div>
     <button class="btn-register" (click)="openLateArrivalModal()">
-      <span class="plus-icon">+</span> Register Late Arrival
+      <span class="plus-icon">+</span> {{ 'Register Late Arrival' | translate }}
     </button>
   </div>
 
@@ -21,32 +21,32 @@
     <div class="stat-card">
       <div class="card-icon">⏰</div>
       <div class="card-value text-dark-red">{{ totalRecords }}</div>
-      <div class="card-label">TOTAL RECORDS</div>
+      <div class="card-label">{{ 'TOTAL RECORDS' | translate }}</div>
     </div>
     <div class="stat-card">
       <div class="card-icon">📅</div>
       <div class="card-value">{{ todayCount }}</div>
-      <div class="card-label">TODAY</div>
+      <div class="card-label">{{ 'TODAY' | translate }}</div>
     </div>
     <div class="stat-card">
       <div class="card-icon">📖</div>
       <div class="card-value">{{ classesAffectedCount }}</div>
-      <div class="card-label">CLASSES AFFECTED</div>
+      <div class="card-label">{{ 'CLASSES AFFECTED' | translate }}</div>
     </div>
   </div>
 
   <div class="search-filter-bar">
     <div class="search-wrapper">
       <span class="search-icon">🔍</span>
-      <input type="text" placeholder="Search by student name..." [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+      <input type="text" [placeholder]="'Search by student name...' | translate" [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
     </div>
     <div class="filter-controls">
       <select [ngModel]="selectedClass()" (ngModelChange)="selectedClass.set($event)" class="class-select">
         @for (cls of classes(); track $index) {
-          <option [value]="cls">{{ cls }}</option>
+          <option [value]="cls">{{ cls | translate }}</option>
         }
       </select>
-      <div class="results-badge">🌐 {{ filteredStudents.length }} results</div>
+      <div class="results-badge">🌐 {{ filteredStudents.length }} {{ 'results' | translate }}</div>
     </div>
   </div>
 
@@ -54,12 +54,12 @@
     <table class="custom-table">
       <thead>
       <tr>
-        <th>STUDENT NAME</th>
-        <th>CLASS</th>
-        <th>DATE</th>
-        <th>ARRIVAL TIME</th>
-        <th>NOTES</th>
-        <th>STATUS</th>
+        <th>{{ 'STUDENT NAME' | translate }}</th>
+        <th>{{ 'CLASS' | translate }}</th>
+        <th>{{ 'DATE' | translate }}</th>
+        <th>{{ 'ARRIVAL TIME' | translate }}</th>
+        <th>{{ 'NOTES' | translate }}</th>
+        <th>{{ 'STATUS' | translate }}</th>
       </tr>
       </thead>
       <tbody>
@@ -69,21 +69,21 @@
               <div class="avatar">{{ getInitials(student.name) }}</div>
               <span class="student-name">{{ student.name }}</span>
             </td>
-            <td><span class="class-badge">{{ student.class }}</span></td>
+            <td><span class="class-badge">{{ student.class | translate }}</span></td>
             <td><div class="date-container"><span class="calendar-icon">📅</span> {{ student.date }}</div></td>
             <td><div class="time-container"><span class="time-icon">🕒</span> {{ student.arrivalTime }}</div></td>
-            <td class="notes-text">{{ student.notes || "No Notes" }}</td>
+            <td class="notes-text">{{ (student.notes || "No Notes") | translate }}</td>
             <td>
               <div class="status-action-row">
                 <span class="status-pill" [ngClass]="student.status === 'Very Late' ? 'very-late' : 'late'">
-                  <span class="dot">•</span> {{ student.status }}
+                  <span class="dot">•</span> {{ student.status | translate }}
                 </span>
                 <div class="dropdown-container" (click)="toggleDropdown(i, $event)">
                   <span>⋮</span>
                   @if (activeDropdownIndex === i) {
                     <div class="dropdown-menu">
-                      <div class="menu-item" (click)="openEditModal(student, i, $event)">Edit Record</div>
-                      <div class="menu-item delete-item" (click)="deleteRecord(i, $event)">Delete</div>
+                      <div class="menu-item" (click)="openEditModal(student, i, $event)">{{ 'Edit Record' | translate }}</div>
+                      <div class="menu-item delete-item" (click)="deleteRecord(i, $event)">{{ 'Delete' | translate }}</div>
                     </div>
                   }
                 </div>
@@ -92,7 +92,7 @@
           </tr>
         } @empty {
           <tr>
-            <td class="text-align-center d-flex">There is no Late Arrivals</td>
+            <td class="text-align-center d-flex">{{ 'There is no Late Arrivals' | translate }}</td>
           </tr>
         }
       </tbody>
@@ -104,39 +104,39 @@
       <div class="modal-window">
         <div class="modal-header header-blue-intense">
           <div class="header-info">
-            <h2>{{ isEditMode ? 'Edit Late Arrival' : 'Register Late Arrival' }}</h2>
+            <h2>{{ (isEditMode ? 'Edit Late Arrival' : 'Register Late Arrival') | translate }}</h2>
           </div>
           <span class="close-btn" (click)="closeLateArrivalModal()">×</span>
         </div>
 
         <form [formGroup]="lateForm" (ngSubmit)="saveRecord()">
           <div class="modal-body">
-            <div class="form-group full-width">
-              <label>STUDENT NAME *</label>
+            <div class="form-group full-width" style="margin-bottom: 1rem;">
+              <label>{{ 'STUDENT NAME *' | translate }}</label>
               <app-student-search [students]="studentsList()" (studentSelected)="onStudentSelected($event)"></app-student-search>
               @if (lateForm.controls.studentId.invalid && lateForm.controls.studentId.touched) {
-                <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">Please select a student.</span>
+                <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">{{ 'Please select a student.' | translate }}</span>
               }
             </div>
 
             <div class="form-grid">
               <div class="form-group full-width">
-                <label>ARRIVAL DATE & TIME *</label>
+                <label>{{ 'ARRIVAL DATE & TIME *' | translate }}</label>
                 <input type="datetime-local" formControlName="timeOfArrival">
                 @if (lateForm.controls.timeOfArrival.invalid && lateForm.controls.timeOfArrival.touched) {
-                  <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">Arrival Date & Time is required.</span>
+                  <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">{{ 'Arrival Date & Time is required.' | translate }}</span>
                 }
               </div>
             </div>
 
             <div class="form-group full-width">
-              <label>NOTES</label>
+              <label>{{ 'NOTES' | translate }}</label>
               <textarea formControlName="notes"></textarea>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn-cancel" (click)="closeLateArrivalModal()">Cancel</button>
-            <button type="submit" class="btn-submit ">Save</button>
+            <button type="button" class="btn-cancel" (click)="closeLateArrivalModal()">{{ 'Cancel' | translate }}</button>
+            <button type="submit" class="btn-submit ">{{ 'Save' | translate }}</button>
           </div>
         </form>
       </div>

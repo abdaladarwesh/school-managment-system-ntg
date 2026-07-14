@@ -3,6 +3,14 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Student } from '../student-page';
 
+export type EducationLevel =
+  | 'UNIVERSITY'
+  | 'ABOVE_INTERMEDIATE'
+  | 'INTERMEDIATE'
+  | 'BELOW_INTERMEDIATE'
+  | 'POSTGRADUATE';
+
+
 export interface UserPayload {
   firstName: string;
   lastName: string;
@@ -30,17 +38,21 @@ export interface CreateStudentRequest {
   father: {
     user: UserPayload;
     jobName: string;
+    educationLevel: EducationLevel | null;
   };
   mother: {
     user: UserPayload;
     jobName: string;
+    educationLevel: EducationLevel | null;
   };
   guardianType: 'FATHER' | 'MOTHER' | 'OTHER';
   guardian: {
     user: UserPayload;
     jobName: string;
+    educationLevel: EducationLevel | null;
   } | null;
 }
+
 
 interface UserResponse {
   id: number;
@@ -65,7 +77,9 @@ export interface ParentResponse {
   id: number;
   user: UserResponse;
   jobName: string;
+  educationLevel: EducationLevel | null;
 }
+
 
 export interface StudentDetailResponse {
   parentsResponse: ParentResponse[];

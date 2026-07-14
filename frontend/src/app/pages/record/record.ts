@@ -6,6 +6,8 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import * as XLSX from 'xlsx';
 import Swal from 'sweetalert2';
+import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 // ==========================================
 // API RESPONSE INTERFACES
@@ -104,12 +106,13 @@ interface StudentAttendance {
 @Component({
   selector: 'app-attendance',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './record.html',
   styleUrls: ['./record.css'],
 })
 export class AttendanceComponent implements OnInit {
   private http = inject(HttpClient);
+  private translationService = inject(TranslationService);
 
   // ==========================================
   // FILTER STATE (signals)
@@ -451,13 +454,21 @@ export class AttendanceComponent implements OnInit {
     this.loading.set(true);
     this.http.put('http://localhost:8080/api/v1/attendance', body).subscribe({
       next: () => {
-        Swal.fire('Updated!', 'Attendance record updated successfully.', 'success');
+        Swal.fire(
+          this.translationService.translate('Updated!'),
+          this.translationService.translate('Attendance record updated successfully.'),
+          'success'
+        );
         this.loadRecords();
         this.closeAllModals();
       },
       error: (err) => {
         console.error('Failed to update record', err);
-        Swal.fire('Error', 'Failed to update attendance record.', 'error');
+        Swal.fire(
+          this.translationService.translate('Error'),
+          this.translationService.translate('Something went wrong. Please try again.'),
+          'error'
+        );
         this.loading.set(false);
         this.closeAllModals();
       },
@@ -472,8 +483,8 @@ export class AttendanceComponent implements OnInit {
 
     if (recordsToExport.length === 0) {
       Swal.fire(
-        'No Data',
-        'There are no records to export matching your current filters.',
+        this.translationService.translate('Error'),
+        this.translationService.translate('No students match the current filters.'),
         'warning',
       );
       return;
