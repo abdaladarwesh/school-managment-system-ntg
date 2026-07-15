@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+
 :root {
   --sidebar-bg: #7a0a0a;
   --sidebar-hover: #5e0808;
@@ -32,6 +34,8 @@
   --font-stack: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
+
 .eyebrow-bar {
   width: 4px;
   height: 14px;
@@ -52,6 +56,10 @@ html[dir="rtl"] #sidebar {
   right: 0 !important;
 }
 
+html[dir="rtl"] * {
+  font-family: 'IBM Plex Sans Arabic', serif;
+}
+
 html[dir="rtl"] .main-content {
   margin-left: 0 !important;
   margin-right: 250px !important;
@@ -65,3 +73,4 @@ html[dir="rtl"] .nav-link {
 html[dir="rtl"] .nav-link.active {
   border-right-color: var(--sidebar-active-border) !important;
 }
+

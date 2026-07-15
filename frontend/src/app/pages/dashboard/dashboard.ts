@@ -9,6 +9,7 @@ import { DASHBOARD_INITIAL } from './service/dashboard-service';
 import { ViolationChartComponent } from './components/violation-chart/violation-chart';
 import { AbsenceChartComponent } from './components/absence-chart-component/absence-chart-component';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,6 +26,7 @@ import { TranslatePipe } from '../../core/pipes/translate.pipe';
 export class Dashboard {
   private dashboardService = inject(DashboardService);
   private router = inject(Router);
+  private translationService = inject(TranslationService);
 
   // ── Single source of truth: the raw signal from the service ───────────────
   private readonly _data = toSignal(
@@ -32,17 +34,17 @@ export class Dashboard {
       catchError((err) => {
         if (err.status === 401) {
           Swal.fire({
-            title: 'Your session expired',
-            text: 'Please login again to continue using the application',
+            title: this.translationService.translate('Your session expired'),
+            text: this.translationService.translate('Please login again to continue using the application'),
             icon: 'error',
-            confirmButtonText: 'Continue',
+            confirmButtonText: this.translationService.translate('Continue'),
           }).then(() => this.router.navigate(['/login']));
         } else {
           Swal.fire({
-            title: 'Unexpected error — please try again later',
-            text: 'We are sorry, please try again later',
+            title: this.translationService.translate('Unexpected error — please try again later'),
+            text: this.translationService.translate('We are sorry, please try again later'),
             icon: 'error',
-            confirmButtonText: 'Try again',
+            confirmButtonText: this.translationService.translate('Try again'),
           });
         }
         return of(DASHBOARD_INITIAL);

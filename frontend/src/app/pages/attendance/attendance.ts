@@ -92,8 +92,7 @@ export class Attendance implements OnInit {
   loadClasses(): void {
     this.http.get<ClassResponse[]>('http://localhost:8080/api/v1/attendance/classes').subscribe({
       error: (err) => {
-        console.log(err);
-        this.handleError(err);
+        console.error('Failed to load classes', err);
       },
       next: (classes) => {
         this.allClasses.set(classes);
@@ -120,9 +119,8 @@ export class Attendance implements OnInit {
       })
       .subscribe({
         error: (err) => {
+          console.error('Failed to load grid', err);
           this.loading.set(false);
-          this.handleError(err);
-          console.log(err);
         },
         next: (gridData) => {
           this.grid.set(gridData);
@@ -219,9 +217,8 @@ export class Attendance implements OnInit {
     this.saving.set(true);
     this.http.put<AttendanceGridResponse>('http://localhost:8080/api/v1/attendance', body).subscribe({
       error: (err) => {
+        console.error('Failed to save attendance', err);
         this.saving.set(false);
-        console.log(err);
-        this.handleError(err);
       },
       next: (updated) => {
         this.saving.set(false);
@@ -236,22 +233,4 @@ export class Attendance implements OnInit {
     });
   }
 
-  // ── Error helper ──────────────────────────────────────────────────────────
-  private handleError(err: { status: number }): void {
-    if (err.status === 401) {
-      Swal.fire({
-        title: this.translationService.translate('Session Expired'),
-        text: this.translationService.translate('Please login again.'),
-        icon: 'error',
-        confirmButtonText: this.translationService.translate('Login'),
-      }).then(() => this.router.navigate(['/login']));
-    } else {
-      Swal.fire({
-        title: this.translationService.translate('Something went wrong'),
-        text: this.translationService.translate('Please try again later.'),
-        icon: 'error',
-        confirmButtonText: this.translationService.translate('OK'),
-      });
-    }
-  }
 }

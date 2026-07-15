@@ -60,13 +60,8 @@ export class LateComponent implements OnInit {
       next: (data: BackendDelay[]) => {
         this.students.set(data.map((item) => this.mapBackendToFrontend(item)));
       },
-      error: () => {
-        Swal.fire({
-          title: this.translationService.translate('Error!'),
-          text: this.translationService.translate('Failed to fetch late arrival records.'),
-          icon: 'error',
-          confirmButtonText: this.translationService.translate('Try Again'),
-        });
+      error: (err) => {
+        console.error('Failed to fetch late arrival records', err);
       },
     });
   }
@@ -185,8 +180,7 @@ export class LateComponent implements OnInit {
           this.closeLateArrivalModal();
           Swal.fire({ title: this.translationService.translate('Updated!'), text: this.translationService.translate('Record updated successfully.'), icon: 'success' });
         },
-        error: () =>
-          Swal.fire({ title: this.translationService.translate('Error!'), text: this.translationService.translate('Failed to update record.'), icon: 'error' }),
+        error: (err) => console.error('Failed to update late arrival record', err),
       });
     } else {
       // Exact payload requested by your backend
@@ -206,8 +200,7 @@ export class LateComponent implements OnInit {
             icon: 'success',
           });
         },
-        error: () =>
-          Swal.fire({ title: this.translationService.translate('Error!'), text: this.translationService.translate('Failed to register arrival.'), icon: 'error' }),
+        error: (err) => console.error('Failed to register late arrival', err),
       });
     }
   }
@@ -233,7 +226,7 @@ export class LateComponent implements OnInit {
             this.students.update((list) => list.filter((_, i) => i !== index));
             Swal.fire(this.translationService.translate('Deleted!'), this.translationService.translate('Record has been deleted.'), 'success');
           },
-          error: () => Swal.fire(this.translationService.translate('Error!'), this.translationService.translate('Could not delete record.'), 'error'),
+          error: (err) => console.error('Could not delete late arrival record', err),
         });
       }
     });

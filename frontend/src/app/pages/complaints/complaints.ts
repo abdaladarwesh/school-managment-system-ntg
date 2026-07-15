@@ -40,8 +40,8 @@ export class ComplaintsComponent implements OnInit {
         console.log(data);
         this.complaints.set(data.map((item) => this.mapToUI(item)));
       },
-      error: () => {
-        Swal.fire('Error!', 'Failed to load complaints from server.', 'error');
+      error: (err) => {
+        console.error('Failed to load complaints', err);
       },
     });
   }
@@ -121,12 +121,8 @@ export class ComplaintsComponent implements OnInit {
             'success'
           );
         },
-        error: () => {
-          Swal.fire(
-            this.translationService.translate('Error!'),
-            this.translationService.translate('Could not submit reply. Please try again.'),
-            'error'
-          );
+        error: (err) => {
+          console.error('Failed to submit reply', err);
         },
       });
   }

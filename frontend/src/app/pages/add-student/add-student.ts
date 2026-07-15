@@ -330,13 +330,9 @@ export class AddStudent implements OnInit {
   private loadEditData(id: number) {
     this.studentService.getStudentById(id).subscribe({
       next: (data) => this.patchFormFromDetail(data, id),
-      error: () => {
-        Swal.fire({
-          title: this.translationService.translate('Error'),
-          text: this.translationService.translate('Could not load the student data for editing.'),
-          icon: 'error',
-          confirmButtonText: this.translationService.translate('Back'),
-        }).then(() => this.router.navigate(['/students', id]));
+      error: (err) => {
+        console.error('Failed to load student data', err);
+        this.router.navigate(['/students', id]);
       },
     });
   }
@@ -725,21 +721,7 @@ export class AddStudent implements OnInit {
           });
         },
         error: (err) => {
-          if (err.status === 401) {
-            Swal.fire({
-              title: this.translationService.translate('Session Expired'),
-              text: this.translationService.translate('Please login again.'),
-              icon: 'error',
-              confirmButtonText: this.translationService.translate('Login'),
-            }).then(() => this.router.navigate(['/login']));
-          } else {
-            Swal.fire({
-              title: this.translationService.translate('Error'),
-              text: err.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate('Something went wrong. Please try again.'),
-              icon: 'error',
-              confirmButtonText: this.translationService.translate('Try Again'),
-            });
-          }
+          console.error('Failed to update student info', err);
         },
       });
       return;
@@ -757,21 +739,7 @@ export class AddStudent implements OnInit {
         });
       },
       error: (err) => {
-        if (err.status === 401) {
-          Swal.fire({
-            title: this.translationService.translate('Session Expired'),
-            text: this.translationService.translate('Please login again.'),
-            icon: 'error',
-            confirmButtonText: this.translationService.translate('Login'),
-          }).then(() => this.router.navigate(['/login']));
-        } else {
-          Swal.fire({
-            title: this.translationService.translate('Error'),
-            text: err.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate('Something went wrong. Please try again.'),
-            icon: 'error',
-            confirmButtonText: this.translationService.translate('Try Again'),
-          });
-        }
+        console.error('Failed to create student', err);
       },
     });
   }

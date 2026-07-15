@@ -54,21 +54,7 @@ export class StudentDetail implements OnInit {
   generatePassword(userId: number) {
     this.studentService.generatePassword(userId).subscribe({
       error: (err) => {
-        if (err.status === 401) {
-          Swal.fire({
-            title: this.translationService.translate('Your session expired'),
-            text: this.translationService.translate('Please login again to continue using the application'),
-            icon: 'error',
-            confirmButtonText: this.translationService.translate('Continue'),
-          }).then(() => this.router.navigate(['/login']));
-        } else {
-          Swal.fire({
-            title: this.translationService.translate('Unexpected error — please try again later'),
-            text: this.translationService.translate('We are sorry, please try again later'),
-            icon: 'error',
-            confirmButtonText: this.translationService.translate('Try again'),
-          });
-        }
+        console.error('Failed to generate password', err);
       },
       next: (res) => {
         // Standard SweetAlert2 Success Example
@@ -161,13 +147,8 @@ export class StudentDetail implements OnInit {
   }
   deleteStudent() {
     this.studentService.deleteStudent(this.id()).subscribe({
-      error: () => {
-        Swal.fire({
-          title: this.translationService.translate('Error!'),
-          text: this.translationService.translate('Something went wrong. Please try again.'),
-          icon: 'error',
-          confirmButtonText: this.translationService.translate('Close'),
-        });
+      error: (err) => {
+        console.error('Failed to delete student', err);
       },
       next: () => {
         Swal.fire({

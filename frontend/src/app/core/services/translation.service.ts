@@ -620,6 +620,8 @@ export class TranslationService {
       Done: 'تم',
       'Student has been deleted successfully': 'تم حذف الطالب بنجاح',
       'Your session expired': 'انتهت جلستك',
+      'Done!': "تم !",
+      "Your action has been completed successfully.": "تم تسجيل دخولك بنجاح",
       'Please login again to continue using the application': 'يرجى تسجيل الدخول مرة أخرى للمتابعة',
       Continue: 'متابعة',
       'Unexpected error — please try again later': 'خطأ غير متوقع - يرجى المحاولة لاحقاً',
@@ -660,10 +662,10 @@ export class TranslationService {
       Governorate: 'المحافظة',
       Nationality: 'الجنسية',
       'Place of Birth': 'مكان الولادة',
-"Religion": "الديانة",
-      "Parents' Marital Status": "الحالة الإجتماعية",
-      "Created At": "تاريخ الإضافة",
-      "Last Login": "اخر تسجيل دخول",
+      Religion: 'الديانة',
+      "Parents' Marital Status": 'الحالة الإجتماعية',
+      'Created At': 'تاريخ الإضافة',
+      'Last Login': 'اخر تسجيل دخول',
       // record additions
       'Track, review and manage daily student attendance across all grades':
         'تتبع ومراجعة وإدارة الحضور اليومي للطلاب في جميع الصفوف',

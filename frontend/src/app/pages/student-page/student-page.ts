@@ -33,21 +33,7 @@ export class StudentPage implements OnInit {
   loadStudents() {
     this.studentService.getAllStudents().subscribe({
       error: (err) => {
-        if (err.status === 401) {
-          Swal.fire({
-            title: 'Your session expired',
-            text: 'Please login again to continue using the application',
-            icon: 'error',
-            confirmButtonText: 'Continue',
-          }).then(() => this.router.navigate(['/login']));
-        } else {
-          Swal.fire({
-            title: 'Unexpected error — please try again later',
-            text: 'We are sorry, please try again later',
-            icon: 'error',
-            confirmButtonText: 'Try again',
-          });
-        }
+        console.error('Failed to load students', err);
       },
       next: (req) => {
         console.log(req);

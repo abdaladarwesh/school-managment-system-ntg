@@ -56,25 +56,7 @@ export class Login {
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          if (err.status == 401) {
-            Swal.fire({
-              title: this.translationService.translate('Login Failed'),
-              text: this.translationService.translate(
-                'The username or password you entered is incorrect. Please double-check your spelling and try again.',
-              ),
-              icon: 'error',
-              confirmButtonText: this.translationService.translate('Try again'),
-            });
-          } else {
-            Swal.fire({
-              title: this.translationService.translate('Error!'),
-              text: this.translationService.translate(
-                'Something went wrong with your request please check your internet.',
-              ),
-              icon: 'error',
-              confirmButtonText: this.translationService.translate('Try Again'),
-            });
-          }
+          console.error('Login error:', err);
         },
       });
     } else {

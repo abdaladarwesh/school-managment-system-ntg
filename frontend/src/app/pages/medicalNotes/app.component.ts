@@ -242,7 +242,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         // Remove from signal state immediately
         this.allCases.update((current) => current.filter((c) => c.id !== record.id));
       },
-      error: (err) => alert(err?.error?.message ? this.translationService.translate(err.error.message) : this.translationService.translate("Couldn't delete this case.")),
+      error: (err) => console.error('Failed to delete medical case', err),
     });
   }
 

@@ -61,12 +61,8 @@ export class ViolationsComponent implements OnInit {
       next: (data: BackendViolation[]) => {
         this.violations.set(data.map((item) => this.mapBackendToFrontend(item)));
       },
-      error: () => {
-        Swal.fire(
-          this.translationService.translate('Error!'),
-          this.translationService.translate('Failed to load violation records from server.'),
-          'error'
-        );
+      error: (err) => {
+        console.error('Failed to load violations', err);
       },
     });
   }
@@ -157,12 +153,8 @@ export class ViolationsComponent implements OnInit {
           'success'
         );
       },
-      error: () => {
-        Swal.fire(
-          this.translationService.translate('Error!'),
-          this.translationService.translate('Could not save violation to server.'),
-          'error'
-        );
+      error: (err) => {
+        console.error('Failed to save violation', err);
       },
     });
   }

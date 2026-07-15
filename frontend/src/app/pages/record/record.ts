@@ -464,11 +464,6 @@ export class AttendanceComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to update record', err);
-        Swal.fire(
-          this.translationService.translate('Error'),
-          this.translationService.translate('Something went wrong. Please try again.'),
-          'error'
-        );
         this.loading.set(false);
         this.closeAllModals();
       },

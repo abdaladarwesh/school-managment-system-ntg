@@ -17,26 +17,16 @@ import { TranslatePipe } from '../../core/pipes/translate.pipe';
 export class PermissionComponent implements OnInit {
   ngOnInit(): void {
     this.permissionService.getAllPermissions().subscribe({
-      error: () => {
-        Swal.fire({
-          title: 'Error!',
-          text: 'Something went wrong with your request.',
-          icon: 'error',
-          confirmButtonText: 'Try Again',
-        });
+      error: (err) => {
+        console.error('Failed to load permissions', err);
       },
       next: (res) => {
         this.permission.set(res);
       },
     });
     this.studentService.getAllStudents().subscribe({
-      error: () => {
-        Swal.fire({
-          title: 'Error!',
-          text: 'Something went wrong with your request.',
-          icon: 'error',
-          confirmButtonText: 'Try Again',
-        });
+      error: (err) => {
+        console.error('Failed to load students', err);
       },
       next: (res) => {
         this.students.set(res);
@@ -137,14 +127,9 @@ export class PermissionComponent implements OnInit {
           confirmButtonText: 'OK'
         });
       },
-      error: () => {
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to create request. Please try again.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
+      error: (err) => {
+        console.error('Failed to create permission request', err);
+      },
     });
   }
 }
