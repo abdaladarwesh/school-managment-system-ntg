@@ -25,6 +25,8 @@ export interface BackendViolation {
 // Flat interface for easy HTML table rendering
 export interface ViolationRecordUI {
   id: number;
+  studentId: number;
+  studentUserId: number;
   date: string;
   studentName: string;
   class: string;

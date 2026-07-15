@@ -57,7 +57,7 @@ html[dir="rtl"] #sidebar {
 }
 
 html[dir="rtl"] * {
-  font-family: 'IBM Plex Sans Arabic', serif;
+  font-family: 'IBM Plex Sans Arabic', serif, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html[dir="rtl"] .main-content {

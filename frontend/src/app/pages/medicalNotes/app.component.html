@@ -92,7 +92,7 @@
                 <td colspan="8" class="text-center text-muted py-4">{{ 'Loading...' | translate }}</td>
               </tr>
               <tr *ngIf="!loading() && loadError()">
-                <td colspan="8" class="text-center text-muted py-4">{{ "Couldn't load cases:" | translate }} {{ loadError }}</td>
+                <td colspan="8" class="text-center text-muted py-4">{{ "Couldn't load cases:" | translate }} {{ loadError() }}</td>
               </tr>
               <tr *ngIf="!loading() && !loadError() && paginatedCases().length === 0">
                 <td colspan="8" class="text-center text-muted py-4">{{ 'No medical cases found.' | translate }}</td>

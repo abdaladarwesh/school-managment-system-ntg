@@ -22,7 +22,7 @@ declare const bootstrap: any;
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, StudentSearchComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

@@ -14,6 +14,7 @@ import { StudentSearchComponent } from '../../components/student-search/student-
 import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-violations',
@@ -35,8 +36,8 @@ export class ViolationsComponent implements OnInit {
   selectedClass = signal('All Classes');
 
   // UI States
-  isModalOpen: boolean = false;
-  isSuccessModalOpen: boolean = false;
+  isModalOpen = signal(false);
+  isSuccessModalOpen = signal(false);
 
   // Reactive Form specifically mapping your requested inputs
   violationForm = new FormGroup({
@@ -79,6 +80,8 @@ export class ViolationsComponent implements OnInit {
       `${item.student?.user?.firstName || ''} ${item.student?.user?.lastName || ''}`.trim();
     return {
       id: item.id,
+      studentId: item.student?.id || 0,
+      studentUserId: item.student?.user?.id || 0,
       date: item.date ? item.date.split('T')[0] : 'N/A',
       studentName: fullName || 'Unknown Student',
       class: item.student?.studentClass?.name || 'N/A',
@@ -107,18 +110,18 @@ export class ViolationsComponent implements OnInit {
       ismeeting: false,
       notes: '',
     });
-    this.isModalOpen = true;
+    this.isModalOpen.set(true);
   }
-
+ 
   closeModal() {
-    this.isModalOpen = false;
+    this.isModalOpen.set(false);
   }
-
+ 
   triggerSuccessMessage() {
-    this.isSuccessModalOpen = true;
+    this.isSuccessModalOpen.set(true);
   }
   closeSuccessModal() {
-    this.isSuccessModalOpen = false;
+    this.isSuccessModalOpen.set(false);
   }
 
   saveViolation() {
@@ -126,7 +129,9 @@ export class ViolationsComponent implements OnInit {
       this.violationForm.markAllAsTouched();
       Swal.fire({
         title: this.translationService.translate('Validation Error!'),
-        text: this.translationService.translate('Please fill in all required fields and select a student.'),
+        text: this.translationService.translate(
+          'Please fill in all required fields and select a student.',
+        ),
         icon: 'warning',
       });
       return;
@@ -150,7 +155,7 @@ export class ViolationsComponent implements OnInit {
         Swal.fire(
           this.translationService.translate('Success!'),
           this.translationService.translate('Violation recorded successfully.'),
-          'success'
+          'success',
         );
       },
       error: (err) => {
@@ -198,13 +203,92 @@ export class ViolationsComponent implements OnInit {
     return name.slice(0, 2).toUpperCase();
   }
 
-  // sendNotificationToParent(index:number){
-  //   this.violationService.createNotification({
-  //     title: "Parent Summouning notification",
-  //     body: this.violations()[index].violation,
-  //     priority: "HIGH",
-  //     type: "PARENT_SUMMON",
-  //     receiverId: this.
-  //   })
-  // }
+  sendNotificationToParent(record: ViolationRecordUI) {
+    if (!record.studentId) {
+      Swal.fire({
+        title: this.translationService.translate('Error'),
+        text: this.translationService.translate('Student ID not found.'),
+        icon: 'error',
+      });
+      return;
+    }
+
+    this.studentService.getStudentById(record.studentId).subscribe({
+      next: (res) => {
+        if (!res.parentsResponse || res.parentsResponse.length === 0) {
+          Swal.fire({
+            title: this.translationService.translate('Error'),
+            text: this.translationService.translate('No parents found for this student.'),
+            icon: 'error',
+          });
+          return;
+        }
+
+        const requests = res.parentsResponse.map((parent) => {
+          return this.violationService.createNotification({
+            title: 'Parent Summoning notification',
+            body: record.violation,
+            priority: 'HIGH',
+            type: 'PARENT_SUMMON',
+            receiverId: parent.user.id,
+          });
+        });
+
+        forkJoin(requests).subscribe({
+          next: () => {
+            this.triggerSuccessMessage();
+          },
+          error: (err) => {
+            console.error('Failed to send notifications to parents', err);
+            Swal.fire({
+              title: this.translationService.translate('Error'),
+              text: this.translationService.translate('Failed to send notification to one or more parents.'),
+              icon: 'error',
+            });
+          },
+        });
+      },
+      error: (err) => {
+        console.error('Failed to fetch student details', err);
+        Swal.fire({
+          title: this.translationService.translate('Error'),
+          text: this.translationService.translate('Failed to retrieve parent information.'),
+          icon: 'error',
+        });
+      },
+    });
+  }
+
+  sendNotificationToStudent(record: ViolationRecordUI) {
+    if (!record.studentUserId) {
+      Swal.fire({
+        title: this.translationService.translate('Error'),
+        text: this.translationService.translate('Student user ID not found.'),
+        icon: 'error',
+      });
+      return;
+    }
+
+    this.violationService
+      .createNotification({
+        title: 'Disciplinary Violation Notification',
+        body: record.violation,
+        priority: 'HIGH',
+        type: 'STUDENT_VIOLATION',
+        receiverId: record.studentUserId,
+      })
+      .subscribe({
+        next: () => {
+          this.triggerSuccessMessage();
+        },
+        error: (err) => {
+          console.error('Failed to send notification to student', err);
+          Swal.fire({
+            title: this.translationService.translate('Error'),
+            text: this.translationService.translate('Failed to send notification to student.'),
+            icon: 'error',
+          });
+        },
+      });
+  }
 }

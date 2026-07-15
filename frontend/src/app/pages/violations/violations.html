@@ -41,164 +41,181 @@
       <div class="filters-left">
         <div class="search-wrapper">
           <i class="pi pi-search search-icon"></i>
-          <input type="text" [placeholder]="'Search by student name or violation...' | translate" class="search-input" [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
+          <input type="text" [placeholder]="'Search by student name or violation...' | translate" class="search-input"
+            [ngModel]="searchText()" (ngModelChange)="searchText.set($event)">
         </div>
         <select class="filter-select" [ngModel]="selectedClass()" (ngModelChange)="selectedClass.set($event)">
           @for (cls of classesList(); track $index) {
-            <option [value]="cls">{{ cls | translate }}</option>
+          <option [value]="cls">{{ cls | translate }}</option>
           }
         </select>
       </div>
       <div class="filters-right">
-        <button class="results-badge"><i class="pi pi-filter"></i> {{ filteredViolations.length }} {{ 'results' | translate }}</button>
+        <button class="results-badge"><i class="pi pi-filter"></i> {{ filteredViolations.length }} {{ 'results' |
+          translate }}</button>
       </div>
     </div>
 
     <div class="table-responsive">
       <table class="data-table">
         <thead>
-        <tr>
-          <th>{{ 'Date' | translate }}</th>
-          <th>{{ 'Student Name' | translate }}</th>
-          <th>{{ 'Class' | translate }}</th>
-          <th>{{ 'Violation' | translate }}</th>
-          <th>{{ 'Parental Summons (Is Meeting)' | translate }}</th>
-          <th>{{ 'Action' | translate }}</th>
-        </tr>
+          <tr>
+            <th>{{ 'Date' | translate }}</th>
+            <th>{{ 'Student Name' | translate }}</th>
+            <th>{{ 'Class' | translate }}</th>
+            <th>{{ 'Violation' | translate }}</th>
+            <th>{{ 'Parental Summons (Is Meeting)' | translate }}</th>
+            <th>{{ 'Action' | translate }}</th>
+          </tr>
         </thead>
         <tbody>
           @for (item of filteredViolations; track item.id) {
-            <tr>
-              <td><span class="date-cell"><i class="pi pi-calendar"></i> {{ item.date }}</span></td>
-              <td>
-                <div class="student-cell">
-                   <div class="student-avatar">{{ getInitials(item.studentName) }}</div>
-                  <span class="student-name">{{ item.studentName }}</span>
-                </div>
-              </td>
-              <td><span class="class-badge">{{ item.class | translate }}</span></td>
-              <td><span class="violation-badge"><span class="warning-emoji">⚠️</span> {{ item.violation | translate }}</span></td>
-              <td>
-                <span class="summons-cell">
-                  <span [class]="item.parentalSummons ? 'dot-warning' : 'dot-success'" class="status-dot"></span>
-                  {{ (item.parentalSummons ? 'Yes' : 'No') | translate }}
-                </span>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-action btn-parent" (click)="triggerSuccessMessage()">
-                    <span class="action-icon">✈</span> {{ 'Send to Parent' | translate }}
-                  </button>
-                  <button class="btn-action btn-student" (click)="triggerSuccessMessage()">
-                    <span class="action-icon">💬</span> {{ 'Send to Student' | translate }}
-                  </button>
-                </div>
-              </td>
-            </tr>
+          <tr>
+            <td><span class="date-cell"><i class="pi pi-calendar"></i> {{ item.date }}</span></td>
+            <td>
+              <div class="student-cell">
+                <div class="student-avatar">{{ getInitials(item.studentName) }}</div>
+                <span class="student-name">{{ item.studentName }}</span>
+              </div>
+            </td>
+            <td><span class="class-badge">{{ item.class | translate }}</span></td>
+            <td><span class="violation-badge"><span class="warning-emoji">⚠️</span> {{ item.violation | translate
+                }}</span></td>
+            <td>
+              <span class="summons-cell">
+                <span [class]="item.parentalSummons ? 'dot-warning' : 'dot-success'" class="status-dot"></span>
+                {{ (item.parentalSummons ? 'Yes' : 'No') | translate }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-action btn-parent" (click)="sendNotificationToParent(item)">
+                  <span class="action-icon">✈</span> {{ 'Send to Parent' | translate }}
+                </button>
+                <button class="btn-action btn-student" (click)="sendNotificationToStudent(item)">
+                  <span class="action-icon">💬</span> {{ 'Send to Student' | translate }}
+                </button>
+              </div>
+            </td>
+          </tr>
           } @empty {
-            <tr>
-              <td>{{ 'There is no violations' | translate }}</td>
-            </tr>
+          <tr>
+            <td>{{ 'There is no violations' | translate }}</td>
+          </tr>
           }
         </tbody>
       </table>
     </div>
   </div>
 
-  @if (isModalOpen) {
-    <div class="modal-overlay">
-      <div class="modal-card">
-        <div class="modal-header">
-          <div class="modal-header-left">
-            <div class="modal-header-icon"><i class="pi pi-exclamation-circle"></i></div>
-            <div>
-              <h2>{{ 'Register Violation' | translate }}</h2>
-              <p>{{ 'Fill in the violation details below' | translate }}</p>
-            </div>
+  @if (isModalOpen()) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-header-icon"><i class="pi pi-exclamation-circle"></i></div>
+          <div>
+            <h2>{{ 'Register Violation' | translate }}</h2>
+            <p>{{ 'Fill in the violation details below' | translate }}</p>
           </div>
-          <button class="modal-close-btn" (click)="closeModal()">×</button>
         </div>
+        <button class="modal-close-btn" (click)="closeModal()">×</button>
+      </div>
 
-        <form [formGroup]="violationForm" (ngSubmit)="saveViolation()">
-          <div class="modal-body">
+      <form [formGroup]="violationForm" (ngSubmit)="saveViolation()">
+        <div class="modal-body">
 
-            <div class="form-group full-width" style="margin-bottom: 1rem;">
-              <label><i class="pi pi-user"></i> {{ 'STUDENT NAME *' | translate }}</label>
-              <app-student-search [students]="studentsList()" (studentSelected)="onStudentSelected($event)"></app-student-search>
-              @if (violationForm.controls.studentId.invalid && violationForm.controls.studentId.touched) {
-                <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Please select a student.' | translate }}</span>
+          <div class="form-group full-width" style="margin-bottom: 1rem;">
+            <label><i class="pi pi-user"></i> {{ 'STUDENT NAME *' | translate }}</label>
+            <app-student-search [students]="studentsList()"
+              (studentSelected)="onStudentSelected($event)"></app-student-search>
+            @if (violationForm.controls.studentId.invalid && violationForm.controls.studentId.touched) {
+            <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Please select a
+              student.' | translate }}</span>
+            }
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label><i class="pi pi-bell"></i> {{ 'VIOLATION *' | translate }}</label>
+              <input type="text" formControlName="violation" placeholder="e.g. repititave late arrival"
+                class="form-input">
+              @if (violationForm.controls.violation.invalid && violationForm.controls.violation.touched) {
+              <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate
+                }}</span>
               }
             </div>
 
-            <div class="form-grid">
-              <div class="form-group">
-                <label><i class="pi pi-bell"></i> {{ 'VIOLATION *' | translate }}</label>
-                <input type="text" formControlName="violation" placeholder="e.g. testing" class="form-input">
-                @if (violationForm.controls.violation.invalid && violationForm.controls.violation.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
-                }
-              </div>
-
-              <div class="form-group">
-                <label><i class="pi pi-user-edit"></i> {{ 'NAME OF VIOLATOR *' | translate }}</label>
-                <input type="text" formControlName="nameOfViolator" placeholder="Name of violator" class="form-input">
-                @if (violationForm.controls.nameOfViolator.invalid && violationForm.controls.nameOfViolator.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
-                }
-              </div>
-
-              <div class="form-group">
-                <label><i class="pi pi-sitemap"></i> {{ 'APPLICABLE PROCEDURE *' | translate }}</label>
-                <input type="text" formControlName="applicableProcedure" placeholder="Procedure" class="form-input">
-                @if (violationForm.controls.applicableProcedure.invalid && violationForm.controls.applicableProcedure.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
-                }
-              </div>
-
-              <div class="form-group">
-                <label><i class="pi pi-id-card"></i> {{ 'REFERRING AUTHORITY *' | translate }}</label>
-                <input type="text" formControlName="referringAuthority" placeholder="Referring authority" class="form-input">
-                @if (violationForm.controls.referringAuthority.invalid && violationForm.controls.referringAuthority.touched) {
-                  <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate }}</span>
-                }
-              </div>
+            <div class="form-group">
+              <label><i class="pi pi-user-edit"></i> {{ 'NAME OF VIOLATOR *' | translate }}</label>
+              <input type="text" formControlName="nameOfViolator" placeholder="Name of violator" class="form-input">
+              @if (violationForm.controls.nameOfViolator.invalid && violationForm.controls.nameOfViolator.touched) {
+              <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate
+                }}</span>
+              }
             </div>
 
-            <div class="form-group full-width" style="margin-top: 1rem;">
-              <label><i class="pi pi-users"></i> {{ 'IS MEETING REQUIRED (SUMMONS)?' | translate }}</label>
-              <div class="toggle-container">
-                <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === false" (click)="violationForm.patchValue({ ismeeting: false })">{{ 'No' | translate }}</button>
-                <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === true" (click)="violationForm.patchValue({ ismeeting: true })">{{ 'Yes' | translate }}</button>
-              </div>
+            <div class="form-group">
+              <label><i class="pi pi-sitemap"></i> {{ 'APPLICABLE PROCEDURE *' | translate }}</label>
+              <input type="text" formControlName="applicableProcedure" placeholder="Procedure" class="form-input">
+              @if (violationForm.controls.applicableProcedure.invalid &&
+              violationForm.controls.applicableProcedure.touched) {
+              <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate
+                }}</span>
+              }
             </div>
 
-            <div class="form-group full-width" style="margin-top: 1rem;">
-              <label><i class="pi pi-comment"></i> {{ 'NOTES' | translate }}</label>
-              <textarea formControlName="notes" [placeholder]="'Optional notes...' | translate" class="form-textarea"></textarea>
+            <div class="form-group">
+              <label><i class="pi pi-id-card"></i> {{ 'REFERRING AUTHORITY *' | translate }}</label>
+              <input type="text" formControlName="referringAuthority" placeholder="Referring authority"
+                class="form-input">
+              @if (violationForm.controls.referringAuthority.invalid &&
+              violationForm.controls.referringAuthority.touched) {
+              <span style="color: #e53e3e; font-size: 12px; margin-top: 4px; display: block;">{{ 'Required' | translate
+                }}</span>
+              }
             </div>
-
           </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn-modal-cancel" (click)="closeModal()">× {{ 'Cancel' | translate }}</button>
-            <button type="submit" class="btn-modal-save"><i class="pi pi-save"></i> {{ 'Save Violation' | translate }}</button>
+          <div class="form-group full-width" style="margin-top: 1rem;">
+            <label><i class="pi pi-users"></i> {{ 'IS MEETING REQUIRED (SUMMONS)?' | translate }}</label>
+            <div class="toggle-container">
+              <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === false"
+                (click)="violationForm.patchValue({ ismeeting: false })">{{ 'No' | translate }}</button>
+              <button type="button" class="toggle-btn" [class.active]="violationForm.controls.ismeeting.value === true"
+                (click)="violationForm.patchValue({ ismeeting: true })">{{ 'Yes' | translate }}</button>
+            </div>
           </div>
-        </form>
-      </div>
+
+          <div class="form-group full-width" style="margin-top: 1rem;">
+            <label><i class="pi pi-comment"></i> {{ 'NOTES' | translate }}</label>
+            <textarea formControlName="notes" [placeholder]="'Optional notes...' | translate"
+              class="form-textarea"></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeModal()">× {{ 'Cancel' | translate }}</button>
+          <button type="submit" class="btn-modal-save"><i class="pi pi-save"></i> {{ 'Save Violation' | translate
+            }}</button>
+        </div>
+      </form>
     </div>
+  </div>
   }
 
-  @if (isSuccessModalOpen) {
-    <div class="modal-overlay">
-      <div class="success-alert-card">
-        <div class="success-icon-wrapper">
-          <div class="success-checkmark">✓</div>
-        </div>
-        <h3 class="success-title">{{ 'Message Sent!' | translate }}</h3>
-        <p class="success-subtitle">{{ 'Message Sent Successfully' | translate }}</p>
-        <button class="btn-success-close" (click)="closeSuccessModal()">{{ 'Close' | translate }}</button>
+  @if (isSuccessModalOpen()) {
+  <div class="modal-overlay">
+    <div class="success-alert-card">
+      <div class="success-icon-wrapper">
+        <div class="success-checkmark">✓</div>
       </div>
+      <h3 class="success-title">{{ 'Message Sent!' | translate }}</h3>
+      <p class="success-subtitle">{{ 'Message Sent Successfully' | translate }}</p>
+      <button class="btn-success-close" (click)="closeSuccessModal()">{{ 'Close' | translate }}</button>
     </div>
+  </div>
   }
 
 </div>
