@@ -1,17 +1,15 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import * as XLSX from 'xlsx';
-import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
-
-// ==========================================
-// API RESPONSE INTERFACES
-// ==========================================
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
 
 interface TermResponse {
   term: number;
@@ -43,6 +41,7 @@ interface SessionAttendanceResponse {
 interface StudentAttendanceRowResponse {
   studentId: number;
   fullName: string;
+  fullNameAr?: string;
   initials: string;
   className: string;
   sessions: SessionAttendanceResponse[];
@@ -58,7 +57,7 @@ interface AttendanceGridResponse {
 }
 
 interface StudentHistoryDay {
-  date: string; // e.g., "2026-06-01"
+  date: string;
   status: 'P' | 'A' | 'L' | 'E' | '';
 }
 
@@ -75,13 +74,10 @@ interface CalendarCell {
   status: 'P' | 'A' | 'L' | 'E' | '';
 }
 
-// ==========================================
-// FRONTEND MODEL INTERFACE
-// ==========================================
-
 interface StudentAttendance {
   studentId: number;
   name: string;
+  nameAr?: string;
   initials: string;
   grade: string;
   gradeId: number;
@@ -106,17 +102,16 @@ interface StudentAttendance {
 @Component({
   selector: 'app-attendance',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, LocalizeNamePipe],
   templateUrl: './record.html',
   styleUrls: ['./record.css'],
 })
 export class AttendanceComponent implements OnInit {
-  private http = inject(HttpClient);
-  private translationService = inject(TranslationService);
+  private readonly http = inject(HttpClient);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  // ==========================================
-  // FILTER STATE (signals)
-  // ==========================================
   searchText = signal('');
   selectedGradeId = signal<number | 'all'>('all');
   selectedClassId = signal<number | 'all'>('all');
@@ -124,28 +119,19 @@ export class AttendanceComponent implements OnInit {
   selectedStatus = signal<string>('all');
   filterDate = signal(new Date().toISOString().split('T')[0]);
 
-  // ==========================================
-  // DATA STATE (signals)
-  // ==========================================
   allClasses = signal<ClassResponse[]>([]);
   allGrades = signal<GradeResponse[]>([]);
   allYears = signal<number[]>([]);
   students = signal<StudentAttendance[]>([]);
 
-  // ==========================================
-  // MODAL / UI STATE (signals)
-  // ==========================================
   selectedStudent = signal<StudentAttendance | null>(null);
   showMarkAttendanceModal = signal(false);
   showEditModal = signal(false);
   showHistoryModal = signal(false);
   loading = signal(false);
   currentHistoryView = signal<'calendar' | 'daily'>('calendar');
-  today = new Date(); // static per render, no need for a signal
+  today = new Date();
 
-  // ==========================================
-  // DERIVED STATE (computed)
-  // ==========================================
   filteredStudents = computed(() => {
     const search = this.searchText().toLowerCase();
     const classId = this.selectedClassId();
@@ -191,37 +177,33 @@ export class AttendanceComponent implements OnInit {
     this.loadClasses();
   }
 
-  /**
-   * Fetches classes and dynamically extracts unique Grades and Academic Years
-   */
   loadClasses(): void {
-    this.http.get<ClassResponse[]>('http://localhost:8080/api/v1/classes').subscribe({
-      next: (classes) => {
-        this.allClasses.set(classes);
+    this.http.get<ClassResponse[]>('http://localhost:8080/api/v1/classes')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (classes) => {
+          this.allClasses.set(classes);
 
-        const uniqueGradesMap = new Map<number, GradeResponse>();
-        classes.forEach((c) => {
-          if (c.grade && !uniqueGradesMap.has(c.grade.id)) {
-            uniqueGradesMap.set(c.grade.id, c.grade);
-          }
-        });
-        this.allGrades.set(Array.from(uniqueGradesMap.values()));
+          const uniqueGradesMap = new Map<number, GradeResponse>();
+          classes.forEach((c) => {
+            if (c.grade && !uniqueGradesMap.has(c.grade.id)) {
+              uniqueGradesMap.set(c.grade.id, c.grade);
+            }
+          });
+          this.allGrades.set(Array.from(uniqueGradesMap.values()));
 
-        const yearsSet = new Set<number>();
-        classes.forEach((c) => {
-          c.grade?.terms?.forEach((t) => yearsSet.add(t.year));
-        });
-        this.allYears.set(Array.from(yearsSet));
+          const yearsSet = new Set<number>();
+          classes.forEach((c) => {
+            c.grade?.terms?.forEach((t) => yearsSet.add(t.year));
+          });
+          this.allYears.set(Array.from(yearsSet));
 
-        this.loadRecords();
-      },
-      error: (err) => console.error('Failed to load classes', err),
-    });
+          this.loadRecords();
+        },
+        error: (err) => console.error('Failed to load classes', err),
+      });
   }
 
-  /**
-   * Loads attendance grid records based on the selected Class ID and Date
-   */
   loadRecords(): void {
     this.loading.set(true);
     const classId = this.selectedClassId();
@@ -236,27 +218,31 @@ export class AttendanceComponent implements OnInit {
 
       const requests = this.allClasses().map((cls) => this.fetchGrid(cls.id, date));
 
-      forkJoin(requests).subscribe({
-        next: (grids) => {
-          this.students.set(grids.flatMap((grid) => this.mapGridToStudents(grid)));
-          this.loading.set(false);
-        },
-        error: (err) => {
-          console.error('Failed to load grids', err);
-          this.loading.set(false);
-        },
-      });
+      forkJoin(requests)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (grids) => {
+            this.students.set(grids.flatMap((grid) => this.mapGridToStudents(grid)));
+            this.loading.set(false);
+          },
+          error: (err) => {
+            console.error('Failed to load grids', err);
+            this.loading.set(false);
+          },
+        });
     } else {
-      this.fetchGrid(Number(classId), date).subscribe({
-        next: (grid) => {
-          this.students.set(grid ? this.mapGridToStudents(grid) : []);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          console.error('Failed to load grid', err);
-          this.loading.set(false);
-        },
-      });
+      this.fetchGrid(Number(classId), date)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (grid) => {
+            this.students.set(grid ? this.mapGridToStudents(grid) : []);
+            this.loading.set(false);
+          },
+          error: (err) => {
+            console.error('Failed to load grid', err);
+            this.loading.set(false);
+          },
+        });
     }
   }
 
@@ -286,9 +272,6 @@ export class AttendanceComponent implements OnInit {
       );
   }
 
-  /**
-   * Maps backend grid rows to frontend StudentAttendance objects, cleanly checking for missing data
-   */
   private mapGridToStudents(grid: AttendanceGridResponse | null): StudentAttendance[] {
     if (!grid) return [];
 
@@ -316,6 +299,7 @@ export class AttendanceComponent implements OnInit {
       return {
         studentId: row.studentId,
         name: row.fullName,
+        nameAr: row.fullNameAr,
         initials: row.initials,
         grade: gradeName,
         gradeId: gradeId,
@@ -334,24 +318,16 @@ export class AttendanceComponent implements OnInit {
     });
   }
 
-  // ==========================================
-  // MODAL ACTIONS & BACKEND UPDATES
-  // ==========================================
-
   openEditModal(student: StudentAttendance) {
     this.selectedStudent.set({ ...student });
     this.showEditModal.set(true);
   }
 
-  /**
-   * Opens history view and fetches overall historical data values for the specific student
-   */
   openHistoryModal(student: StudentAttendance) {
     this.selectedStudent.set({ ...student });
     this.currentHistoryView.set('calendar');
     this.showHistoryModal.set(true);
 
-    // 1. Generate empty grid immediately (for instant UI feedback)
     const targetDate = new Date(student.date);
     const year = targetDate.getFullYear();
     const month = targetDate.getMonth();
@@ -374,7 +350,6 @@ export class AttendanceComponent implements OnInit {
 
     this.selectedStudent.update((s) => (s ? { ...s, calendarGrid: grid } : null));
 
-    // 2. Fetch and merge data
     this.http
       .get<StudentHistoryResponse>(
         `http://localhost:8080/api/v1/attendance/student/${this.selectedStudent()?.studentId}/history`,
@@ -382,6 +357,7 @@ export class AttendanceComponent implements OnInit {
           params: new HttpParams().set('date', student.date),
         },
       )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((historyData) => {
         this.selectedStudent.update((s) => {
           if (!s) return null;
@@ -419,11 +395,11 @@ export class AttendanceComponent implements OnInit {
     this.showMarkAttendanceModal.set(false);
     this.showEditModal.set(false);
     this.showHistoryModal.set(false);
-    this.selectedStudent.set(null); // FIX: was `this.selectedStudent = null`, which clobbered the signal itself
+    this.selectedStudent.set(null);
   }
 
   updateRecord() {
-    const student = this.selectedStudent(); // FIX: was reading `.status`/`.originalSessions` off the signal fn, not its value
+    const student = this.selectedStudent();
     if (!student || !student.originalSessions) {
       this.closeAllModals();
       return;
@@ -434,8 +410,6 @@ export class AttendanceComponent implements OnInit {
     else if (student.status === 'Absent') newStatusBackend = 'A';
     else if (student.status === 'Excused') newStatusBackend = 'E';
     else if (student.status === 'Late') newStatusBackend = 'L';
-
-
 
     const entries = student.originalSessions.map((session) => ({
       studentId: student.studentId,
@@ -449,39 +423,28 @@ export class AttendanceComponent implements OnInit {
       entries: entries,
     };
 
-    console.log(body);
-
     this.loading.set(true);
-    this.http.put('http://localhost:8080/api/v1/attendance', body).subscribe({
-      next: () => {
-        Swal.fire(
-          this.translationService.translate('Updated!'),
-          this.translationService.translate('Attendance record updated successfully.'),
-          'success'
-        );
-        this.loadRecords();
-        this.closeAllModals();
-      },
-      error: (err) => {
-        console.error('Failed to update record', err);
-        this.loading.set(false);
-        this.closeAllModals();
-      },
-    });
+    this.http.put('http://localhost:8080/api/v1/attendance', body)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.notificationService.handle200('Attendance record updated successfully.');
+          this.loadRecords();
+          this.closeAllModals();
+        },
+        error: (err) => {
+          console.error('Failed to update record', err);
+          this.loading.set(false);
+          this.closeAllModals();
+        },
+      });
   }
 
-  /**
-   * Dynamic Excel Export handler
-   */
   exportReport(): void {
     const recordsToExport = this.filteredStudents();
 
     if (recordsToExport.length === 0) {
-      Swal.fire(
-        this.translationService.translate('Error'),
-        this.translationService.translate('No students match the current filters.'),
-        'warning',
-      );
+      this.notificationService.warning('No students match the current filters.', 'Warning');
       return;
     }
 
@@ -516,9 +479,6 @@ export class AttendanceComponent implements OnInit {
     XLSX.writeFile(workbook, fileName);
   }
 
-  /**
-   * Helper utility inside the template to cleanly format target dates contextually
-   */
   getReadableMonthYear(): string {
     const date = this.filterDate();
     if (!date) return 'Selected Month';

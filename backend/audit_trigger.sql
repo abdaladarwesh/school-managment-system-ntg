@@ -1,5 +1,5 @@
 -- 1. Recreate the Audit Table clean
-DROP TABLE AUDIT_LOGS;
+-- DROP TABLE AUDIT_LOGS;
 
 CREATE TABLE AUDIT_LOGS
 (
@@ -366,4 +366,4 @@ BEGIN
 END;
 /
 
-select * from AUDIT_LOGS;
+select * from PARENT;

@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { DashboardLayout } from './layouts/dashboard-layout/dashboard-layout';
+import { studentAffairsGuard } from './core/guards/student-affairs-guard';
+import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   {
@@ -20,6 +22,7 @@ export const routes: Routes = [
   },
   {
     path: '',
+    canActivate: [authGuard, studentAffairsGuard],
     component: DashboardLayout,
     children: [
       {

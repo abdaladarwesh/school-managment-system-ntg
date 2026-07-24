@@ -127,7 +127,7 @@
         <td>
           <div class="student-info">
             <div class="avatar">{{ student.initials }}</div>
-            <span>{{ student.name }}</span>
+            <span>{{ student.name | localizeName: student.nameAr }}</span>
           </div>
         </td>
         <td>{{ student.grade | translate }}</td>
@@ -174,7 +174,7 @@
       <div class="profile-section">
         <div class="avatar">{{ student.initials }}</div>
         <div class="user-info">
-          <h3>{{ student.name }}</h3>
+          <h3>{{ student.name | localizeName: student.nameAr }}</h3>
           <p>{{ student.grade | translate }} · {{ student.class | translate }} · {{ student.academicYear }}</p>
         </div>
       </div>
@@ -275,7 +275,7 @@
     <div class="edit-modal-body">
       <div class="form-field-group">
         <label class="field-label">{{ 'STUDENT NAME *' | translate }}</label>
-        <input type="text" [value]="student.name" class="readonly-date-input" readonly />
+        <input type="text" [value]="student.name | localizeName: student.nameAr" class="readonly-date-input" readonly />
       </div>
 
       <div class="form-field-group">

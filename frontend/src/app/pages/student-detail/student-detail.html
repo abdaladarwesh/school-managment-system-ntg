@@ -10,7 +10,7 @@
             <span class="eyebrow-bar"></span> {{ 'STUDENT AFFAIRS' | translate }}
           </p>
           <h1 class="text-maroon fw-bold mb-1" style="font-size: 1.85rem;">
-            {{ data()! ? (data()!.studentResponse.user.firstName + ' ' + data()!.studentResponse.user.lastName) : ('Student Details' | translate) }}
+            {{ data()! ? ((data()!.studentResponse.user.firstName + ' ' + data()!.studentResponse.user.lastName) | localizeName: (data()!.studentResponse.user.firstNameInArabic + ' ' + data()!.studentResponse.user.lastNameInArabic)) : ('Student Details' | translate) }}
           </h1>
           <p class="text-muted mb-0">{{ 'Complete student profile information' | translate }}</p>
         </div>
@@ -290,7 +290,7 @@
               </div>
               <div class="col-md-4">
                 <p class="field-label">{{ 'Education Level' | translate }}</p>
-                <p class="field-value">{{ parent.educationLevel! | regulateText | translate }}</p>
+                <p class="field-value">{{ parent.educationLevel! | translate }}</p>
               </div>
                 @if (data()!.studentResponse.user.lastLogin == null) {
                   <button class="mt-5 btn btn-primary m-0"

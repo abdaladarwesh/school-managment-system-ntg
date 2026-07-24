@@ -28,9 +28,8 @@ public class Parent {
     @Column(name = "JOB_NAME", length = 60)
     private String jobName;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "EDUCATION_LEVEL", length = 30)
-    private EducationLevel educationLevel;
+    private String educationLevel;
 
 }
 

@@ -40,6 +40,7 @@ export interface RespondToComplaintRequest {
 export interface ComplaintUI {
   id: number;
   submitterName: string;
+  submitterNameAr?: string;
   date: string;
   title: string;
   description: string;

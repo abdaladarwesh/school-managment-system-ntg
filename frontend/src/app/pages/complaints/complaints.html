@@ -70,7 +70,7 @@
             <div class="student-info">
               <div class="avatar">{{ getInitials(item.submitterName) }}</div>
               <div>
-                <h3 class="student-name">{{ item.submitterName }}</h3>
+                <h3 class="student-name">{{ item.submitterName | localizeName: item.submitterNameAr }}</h3>
                 <p class="student-class">{{ item.category }}</p>
               </div>
             </div>
@@ -80,7 +80,7 @@
           </div>
 
           <div class="card-body">
-            <span class="complaint-date">📅 {{ item.date }}</span>
+            <span class="complaint-date">📅 {{ item.date  | date:'dd/MM/yyyy hh:mm a':'':'ar-EG' }}</span>
             <h4 class="complaint-title">{{ item.title }}</h4>
             <p class="complaint-text">{{ item.description }}</p>
 
@@ -124,7 +124,7 @@
             <span class="modal-icon">💬</span>
             <div>
               <h3>{{ (selectedComplaint?.status === 'Replied' ? 'Edit Reply' : 'Reply to Complaint') | translate }}</h3>
-              <p>{{ selectedComplaint?.submitterName }} · {{ selectedComplaint?.category }}</p>
+              <p>{{ (selectedComplaint?.submitterName | localizeName: selectedComplaint?.submitterNameAr) }} · {{ selectedComplaint?.category }}</p>
             </div>
           </div>
           <button (click)="closeReplyModal()" class="close-btn">✕</button>

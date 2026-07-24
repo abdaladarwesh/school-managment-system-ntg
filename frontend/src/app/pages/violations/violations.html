@@ -60,22 +60,21 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>{{ 'Date' | translate }}</th>
             <th>{{ 'Student Name' | translate }}</th>
             <th>{{ 'Class' | translate }}</th>
             <th>{{ 'Violation' | translate }}</th>
             <th>{{ 'Parental Summons (Is Meeting)' | translate }}</th>
+            <th>{{ 'Date' | translate }}</th>
             <th>{{ 'Action' | translate }}</th>
           </tr>
         </thead>
         <tbody>
           @for (item of filteredViolations; track item.id) {
           <tr>
-            <td><span class="date-cell"><i class="pi pi-calendar"></i> {{ item.date }}</span></td>
             <td>
               <div class="student-cell">
                 <div class="student-avatar">{{ getInitials(item.studentName) }}</div>
-                <span class="student-name">{{ item.studentName }}</span>
+                <span class="student-name">{{ item.studentName | localizeName: item.studentNameAr }}</span>
               </div>
             </td>
             <td><span class="class-badge">{{ item.class | translate }}</span></td>
@@ -87,6 +86,7 @@
                 {{ (item.parentalSummons ? 'Yes' : 'No') | translate }}
               </span>
             </td>
+            <td><span class="date-cell"><i class="pi pi-calendar"></i> {{ item.date }}</span></td>
             <td>
               <div class="action-buttons">
                 <button class="btn-action btn-parent" (click)="sendNotificationToParent(item)">

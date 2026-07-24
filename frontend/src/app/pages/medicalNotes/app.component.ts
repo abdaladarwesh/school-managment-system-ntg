@@ -16,13 +16,14 @@ import { StudentSearchComponent } from '../../components/student-search/student-
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
 
 declare const bootstrap: any;
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, LocalizeNamePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -153,9 +154,16 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   // ---------- UI Actions ----------
   onStudentSearchSelected(student: StudentResponse): void {
-    this.searchQuery.set(
-      student ? `${student.user.firstName} ${student.user.lastName}`.trim() : '',
-    );
+    if (!student) {
+      this.searchQuery.set('');
+    } else {
+      const isAr = this.translationService.currentLang() === 'ar';
+      if (isAr && student.user.firstNameInArabic) {
+        this.searchQuery.set(`${student.user.firstNameInArabic} ${student.user.lastNameInArabic || ''}`.trim());
+      } else {
+        this.searchQuery.set(`${student.user.firstName} ${student.user.lastName}`.trim());
+      }
+    }
     this.page.set(0);
   }
 
@@ -291,7 +299,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   // ---------- Helpers ----------
   getStudentFullName(record: MedicalCase): string {
     const user = record?.student?.studentResponse?.user;
-    return user ? `${user.firstName} ${user.lastName}`.trim() : 'Unknown Student';
+    if (!user) return 'Unknown Student';
+    if (this.translationService.currentLang() === 'ar' && user.firstNameInArabic) {
+      return `${user.firstNameInArabic} ${user.lastNameInArabic || ''}`.trim();
+    }
+    return `${user.firstName} ${user.lastName}`.trim();
   }
 
   getClassName(record: MedicalCase): string {

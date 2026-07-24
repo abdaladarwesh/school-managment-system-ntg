@@ -138,7 +138,7 @@
             <label class="form-label">{{ 'Student' | translate }}</label>
             <select [(ngModel)]="formStudentId" name="student" class="form-select" required>
               <option *ngFor="let s of students()" [ngValue]="s.id">
-                {{ s.user.firstName }} {{ s.user.lastName }} — {{ s.studentClass?.name ? (s.studentClass!.name | translate) : ('No class' | translate) }}
+                {{ (s.user.firstName + ' ' + s.user.lastName) | localizeName: (s.user.firstNameInArabic + ' ' + s.user.lastNameInArabic) }} — {{ s.studentClass?.name ? (s.studentClass!.name | translate) : ('No class' | translate) }}
               </option>
             </select>
           </div>

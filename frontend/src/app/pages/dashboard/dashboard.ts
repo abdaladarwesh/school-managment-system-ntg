@@ -1,20 +1,18 @@
 import { Component, computed, inject } from '@angular/core';
 import { AttendanceChartComponent } from './components/attendance-chart/attendance-chart';
-import { DashboardService } from './service/dashboard-service';
-import Swal from 'sweetalert2';
+import { DashboardService, DASHBOARD_INITIAL } from './service/dashboard-service';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
-import { DASHBOARD_INITIAL } from './service/dashboard-service';
-import { ViolationChartComponent } from './components/violation-chart/violation-chart';
 import { AbsenceChartComponent } from './components/absence-chart-component/absence-chart-component';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
   imports: [
-    AttendanceChartComponent,
     AttendanceChartComponent,
     AbsenceChartComponent,
     RouterLink,
@@ -24,28 +22,19 @@ import { TranslationService } from '../../core/services/translation.service';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
-  private dashboardService = inject(DashboardService);
-  private router = inject(Router);
-  private translationService = inject(TranslationService);
+  private readonly dashboardService = inject(DashboardService);
+  private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
 
-  // ── Single source of truth: the raw signal from the service ───────────────
   private readonly _data = toSignal(
     this.dashboardService.getDashboardItem().pipe(
       catchError((err) => {
         if (err.status === 401) {
-          Swal.fire({
-            title: this.translationService.translate('Your session expired'),
-            text: this.translationService.translate('Please login again to continue using the application'),
-            icon: 'error',
-            confirmButtonText: this.translationService.translate('Continue'),
-          }).then(() => this.router.navigate(['/login']));
+          this.notificationService.handle401();
+          this.router.navigate(['/login']);
         } else {
-          Swal.fire({
-            title: this.translationService.translate('Unexpected error — please try again later'),
-            text: this.translationService.translate('We are sorry, please try again later'),
-            icon: 'error',
-            confirmButtonText: this.translationService.translate('Try again'),
-          });
+          this.notificationService.handleHttpStatus(err.status || 500);
         }
         return of(DASHBOARD_INITIAL);
       }),
@@ -53,7 +42,6 @@ export class Dashboard {
     { initialValue: DASHBOARD_INITIAL },
   );
 
-  // ── Stat-card signals (computed from the single data signal) ──────────────
   readonly totalStudent = computed(() => this._data().totalStudents);
   readonly totalClasses = computed(() => this._data().totalClasses);
   readonly totalAttendance = computed(() => this._data().todayAttendance);
@@ -61,7 +49,6 @@ export class Dashboard {
   readonly leaveRequests = computed(() => this._data().leaveRequests);
   readonly totalComplaints = computed(() => this._data().totalComplaints);
 
-  // ── Chart signals ─────────────────────────────────────────────────────────
   readonly attendanceWeeklyLabels = computed(() => this._data().attendanceWeeklyLabels);
   readonly attendanceWeeklyData = computed(() => this._data().attendanceWeeklyData);
 

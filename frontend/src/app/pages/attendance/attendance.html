@@ -69,7 +69,7 @@
             <div class="student-info">
               <div class="avatar">{{ row.initials }}</div>
               <span class="name">
-                {{ row.fullName.split(' ')[0] }} {{ row.fullName.split(' ')[1] }}
+                {{ row.fullName | localizeName: row.fullNameAr }}
               </span>
             </div>
           </td>

@@ -12,7 +12,7 @@
       @for (parent of filteredParents(); track parent.id) {
         <li (click)="selectParent(parent)">
           <div class="parent-info">
-            <span class="parent-name">{{ parent.user.firstName }} {{ parent.user.lastName }}</span>
+            <span class="parent-name">{{ (parent.user.firstName + ' ' + parent.user.lastName) | localizeName: (parent.user.firstNameInArabic + ' ' + parent.user.lastNameInArabic) }}</span>
             <span class="parent-id">ID: {{ parent.user.nationalNumber }}</span>
           </div>
         </li>

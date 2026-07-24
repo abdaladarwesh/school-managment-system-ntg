@@ -1,0 +1,85 @@
+.global-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeInOverlay 0.2s ease-in-out;
+}
+
+.loading-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 24px 36px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 160px;
+}
+
+.loading-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--maroon, #620000);
+  letter-spacing: 0.5px;
+}
+
+/* Spinner Ring Animation */
+.spinner-ring {
+  display: inline-block;
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.spinner-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: 4px;
+  border: 4px solid var(--maroon, #620000);
+  border-radius: 50%;
+  animation: spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: var(--maroon, #620000) transparent transparent transparent;
+}
+
+.spinner-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.spinner-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.spinner-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes spinner-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

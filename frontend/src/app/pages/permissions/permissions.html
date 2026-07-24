@@ -63,7 +63,7 @@
           <td>
             <div class="student-cell">
               <span class="avatar">{{ item.student.user.firstName.charAt(0) }}</span>
-              <span class="student-name">{{ item.student.user.firstName }}</span>
+              <span class="student-name">{{ (item.student.user.firstName + ' ' + item.student.user.lastName) | localizeName: (item.student.user.firstNameInArabic + ' ' + item.student.user.lastNameInArabic) }}</span>
             </div>
           </td>
           <td><span class="badge-class">{{ item.student.studentClass?.grade?.name }} - {{

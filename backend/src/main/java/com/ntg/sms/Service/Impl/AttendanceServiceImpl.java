@@ -209,6 +209,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             rows.add(StudentAttendanceRowResponse.builder()
                     .studentId(student.getId())
                     .fullName(buildFullName(student))
+                    .fullNameAr(buildFullNameAr(student))
                     .initials(buildInitials(student))
                     .className(classRoom.getName())
                     .sessions(sessionResponses)
@@ -310,6 +311,13 @@ public class AttendanceServiceImpl implements AttendanceService {
         User user = student.getUser();
         String first = user.getFirstName() != null ? user.getFirstName() : "";
         String last = user.getLastName() != null ? user.getLastName() : "";
+        return (first + " " + last).trim();
+    }
+
+    private String buildFullNameAr(Student student) {
+        User user = student.getUser();
+        String first = user.getFirstNameInArabic() != null ? user.getFirstNameInArabic() : "";
+        String last = user.getLastNameInArabic() != null ? user.getLastNameInArabic() : "";
         return (first + " " + last).trim();
     }
 

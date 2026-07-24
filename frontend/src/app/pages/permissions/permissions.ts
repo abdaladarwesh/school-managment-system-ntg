@@ -1,45 +1,31 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { PermissionRequest, PermissionResponse, PermissionService } from './service/permission-service';
-import { AsyncPipe } from '@angular/common';
-import Swal from 'sweetalert2';
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-permission',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe],
+  imports: [FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe, LocalizeNamePipe],
   templateUrl: './permissions.html',
   styleUrl: './permissions.css',
 })
 export class PermissionComponent implements OnInit {
-  ngOnInit(): void {
-    this.permissionService.getAllPermissions().subscribe({
-      error: (err) => {
-        console.error('Failed to load permissions', err);
-      },
-      next: (res) => {
-        this.permission.set(res);
-      },
-    });
-    this.studentService.getAllStudents().subscribe({
-      error: (err) => {
-        console.error('Failed to load students', err);
-      },
-      next: (res) => {
-        this.students.set(res);
-      },
-    });
-  }
-  permissionService = inject(PermissionService);
-  studentService = inject(StudentService);
+  private readonly permissionService = inject(PermissionService);
+  private readonly studentService = inject(StudentService);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   students = signal<StudentResponse[]>([]);
 
   showPopup = false;
-
   searchQuery = '';
   selectedGrade = '';
   selectedClass = '';
@@ -51,6 +37,31 @@ export class PermissionComponent implements OnInit {
   });
 
   selectedStudentForRequest: StudentResponse | null = null;
+  permission = signal<PermissionResponse[]>([]);
+
+  ngOnInit(): void {
+    this.permissionService.getAllPermissions()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (err) => {
+          console.error('Failed to load permissions', err);
+        },
+        next: (res) => {
+          this.permission.set(res);
+        },
+      });
+
+    this.studentService.getAllStudents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (err) => {
+          console.error('Failed to load students', err);
+        },
+        next: (res) => {
+          this.students.set(res);
+        },
+      });
+  }
 
   onStudentSelected(student: StudentResponse) {
     this.selectedStudentForRequest = student;
@@ -67,8 +78,6 @@ export class PermissionComponent implements OnInit {
     this.selectedStudentForRequest = null;
   }
 
-  permission = signal<PermissionResponse[]>([]);
-
   classes = computed(() => {
     const allNames = this.permission().map((p) => p.student.studentClass?.name);
     return [...new Set(allNames)];
@@ -81,7 +90,11 @@ export class PermissionComponent implements OnInit {
 
   get filteredPermission() {
     return this.permission().filter((item) => {
-      const matchesSearch = item.student.user.firstName
+      const isAr = this.translationService.currentLang() === 'ar';
+      const searchName = isAr && item.student.user.firstNameInArabic
+        ? `${item.student.user.firstNameInArabic} ${item.student.user.lastNameInArabic || ''}`
+        : `${item.student.user.firstName} ${item.student.user.lastName}`;
+      const matchesSearch = searchName
         .toLowerCase()
         .includes(this.searchQuery.toLowerCase());
       const matchesGrade = this.selectedGrade
@@ -101,35 +114,30 @@ export class PermissionComponent implements OnInit {
   saveRequest() {
     if (this.requestForm.invalid) {
       this.requestForm.markAllAsTouched();
-      Swal.fire({
-        title: 'Validation Error!',
-        text: 'Please fill all required fields correctly.',
-        icon: 'warning',
-        confirmButtonText: 'OK',
-      });
+      this.notificationService.warning(
+        'Please fill all required fields correctly.',
+        'Validation Error!'
+      );
       return;
     }
 
     const requestData: PermissionRequest = {
       studentId: this.requestForm.value.studentId!,
       reason: this.requestForm.value.reason!,
-      notes: this.requestForm.value.notes! || ""
+      notes: this.requestForm.value.notes! || ''
     };
 
-    this.permissionService.createPermission(requestData).subscribe({
-      next: (res) => {
-        this.permission.update(permissions => [res, ...permissions]);
-        this.closePopup();
-        Swal.fire({
-          title: 'Success!',
-          text: 'Leave permission requested successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK'
-        });
-      },
-      error: (err) => {
-        console.error('Failed to create permission request', err);
-      },
-    });
+    this.permissionService.createPermission(requestData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.permission.update(permissions => [res, ...permissions]);
+          this.closePopup();
+          this.notificationService.handle201('Leave permission requested successfully.');
+        },
+        error: (err) => {
+          console.error('Failed to create permission request', err);
+        },
+      });
   }
 }

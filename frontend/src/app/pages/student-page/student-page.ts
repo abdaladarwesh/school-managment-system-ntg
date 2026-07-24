@@ -1,17 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { StudentResponse, StudentService } from './service/student-service';
-import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
+
 export type StudentStatus = 'Active' | 'Probation' | 'Suspended';
 
 export interface Student {
   id: string;
   initials: string;
   name: string;
+  nameAr?: string;
   email: string;
   grade: string;
   class: string;
@@ -20,27 +24,32 @@ export interface Student {
   status: StudentStatus;
 }
 type StatusFilter = 'All' | StudentStatus;
+
 @Component({
   selector: 'app-student-page',
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  standalone: true,
+  imports: [CommonModule, FormsModule, TranslatePipe, LocalizeNamePipe],
   templateUrl: './student-page.html',
   styleUrl: './student-page.css',
 })
 export class StudentPage implements OnInit {
-  studentService = inject(StudentService);
-  router = inject(Router);
+  private readonly studentService = inject(StudentService);
+  private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   loadStudents() {
-    this.studentService.getAllStudents().subscribe({
-      error: (err) => {
-        console.error('Failed to load students', err);
-      },
-      next: (req) => {
-        console.log(req);
-        this.originalStudents.set(req);
-        this.students.set(req.map((s) => this.studentService.toStudent(s)));
-      },
-    });
+    this.studentService.getAllStudents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (err) => {
+          console.error('Failed to load students', err);
+        },
+        next: (req) => {
+          this.originalStudents.set(req);
+          this.students.set(req.map((s) => this.studentService.toStudent(s)));
+        },
+      });
   }
 
   ngOnInit(): void {
@@ -48,23 +57,19 @@ export class StudentPage implements OnInit {
   }
 
   originalStudents = signal<StudentResponse[]>([]);
-
   students = signal<Student[]>([]);
 
-  // ---- Logged-in user (sidebar footer) -------------------------------------
   currentUser = {
     name: 'NTG',
     role: 'Affairs Director',
   };
 
-  // ---- Page footer -------------------------------------------------------
   lastUpdated = new Date().toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
   });
 
-  // ---- Filter state -------------------------------------------------------
   searchTerm = signal('');
   statusFilter = signal<StatusFilter>('All');
   gradeFilter = signal<string>('All Grades');
@@ -73,12 +78,6 @@ export class StudentPage implements OnInit {
 
   statusTabs: StatusFilter[] = ['All', 'Active', 'Probation', 'Suspended'];
 
-  // grades = computed(() => ['All Grades', ...new Set(this.students().map((s) => s.grade))]);
-  // classes = computed(() => ['All Classes', ...new Set(this.students().map((s) => s.class))]);
-  // years = computed(() => [
-  //   'All Academic Years',
-  //   ...new Set(this.students().map((s) => s.academicYear)),
-  // ]);
   grades = computed(() => [
     'All Grades',
     ...new Set(this.students().map((s) => this.normalize(s.grade))),
@@ -94,13 +93,11 @@ export class StudentPage implements OnInit {
     ...new Set(this.students().map((s) => this.normalize(s.academicYear))),
   ]);
 
-  // ---- Derived counts -------------------------------------------------------
   totalEnrolled = computed(() => this.students().length);
   activeCount = computed(() => this.students().filter((s) => s.status === 'Active').length);
   probationCount = computed(() => this.students().filter((s) => s.status === 'Probation').length);
   suspendedCount = computed(() => this.students().filter((s) => s.status === 'Suspended').length);
 
-  // ---- Filtered list -------------------------------------------------------
   filteredStudents = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const status = this.statusFilter();
@@ -125,12 +122,10 @@ export class StudentPage implements OnInit {
 
   resultCount = computed(() => this.filteredStudents().length);
 
-  // ---- Pagination -------------------------------------------------------
   pageSize = 20;
   currentPage = signal(1);
 
   totalPages = computed(() => Math.max(1, Math.ceil(this.resultCount() / this.pageSize)));
-
   pageNumbers = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
 
   pagedStudents = computed(() => {
@@ -139,13 +134,11 @@ export class StudentPage implements OnInit {
     return this.filteredStudents().slice(start, start + this.pageSize);
   });
 
-  // Range shown in "Showing X-Y of Z students"
   rangeStart = computed(() =>
     this.resultCount() === 0 ? 0 : (this.currentPage() - 1) * this.pageSize + 1,
   );
   rangeEnd = computed(() => Math.min(this.currentPage() * this.pageSize, this.resultCount()));
 
-  // ---- UI actions -------------------------------------------------------
   setStatusFilter(status: StatusFilter) {
     this.statusFilter.set(status);
     this.currentPage.set(1);
@@ -185,7 +178,6 @@ export class StudentPage implements OnInit {
   }
 
   logout() {
-    // Hook up to your real auth/logout flow.
     console.log('Logout clicked');
   }
 
@@ -204,16 +196,10 @@ export class StudentPage implements OnInit {
     const data = this.filteredStudents();
 
     if (!data.length) {
-      Swal.fire({
-        title: 'Nothing to export',
-        text: 'There are no students matching the current filters.',
-        icon: 'info',
-        confirmButtonText: 'OK',
-      });
+      this.notificationService.info('There are no students matching the current filters.', 'Nothing to export');
       return;
     }
 
-    // Shape rows into a clean, human-readable table (avoid dumping raw object keys)
     const rows = data.map((s) => ({
       'Student ID': s.id,
       Name: s.name,
@@ -227,7 +213,6 @@ export class StudentPage implements OnInit {
 
     const worksheet = XLSX.utils.json_to_sheet(rows);
 
-    // Auto-size columns roughly based on content length
     const colWidths = Object.keys(rows[0]).map((key) => ({
       wch: Math.max(key.length, ...rows.map((r) => String((r as any)[key] ?? '').length)) + 2,
     }));

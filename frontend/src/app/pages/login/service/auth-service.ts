@@ -38,15 +38,12 @@ export class AuthService {
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
-  saveRole(role: string) {
-    localStorage.setItem('role', role);
-  }
 
   get token() {
     return localStorage.getItem('token');
   }
 
-  getEmail() {
+  get email() {
     const token = localStorage.getItem('token');
 
     if (!token) return null;
@@ -54,6 +51,34 @@ export class AuthService {
     try {
       const decoded = jwtDecode<TokenPayload>(token);
       return decoded.sub;
+    } catch (error) {
+      console.error('Invalid token:', error);
+      return null;
+    }
+  }
+
+  get role(){
+    const token = localStorage.getItem('token');
+
+    if (!token) return null;
+
+    try {
+      const decoded = jwtDecode<TokenPayload>(token);
+      return decoded.role;
+    } catch (error) {
+      console.error('Invalid token:', error);
+      return null;
+    }
+  }
+
+  get userId(){
+    const token = localStorage.getItem('token');
+
+    if (!token) return null;
+
+    try {
+      const decoded = jwtDecode<TokenPayload>(token);
+      return decoded.userId;
     } catch (error) {
       console.error('Invalid token:', error);
       return null;

@@ -20,6 +20,7 @@ import lombok.Data;
 public class StudentAttendanceRowResponse {
     private Long studentId;
     private String fullName;
+    private String fullNameAr;
     private String initials;
     private String className;
     private List<SessionAttendanceResponse> sessions;

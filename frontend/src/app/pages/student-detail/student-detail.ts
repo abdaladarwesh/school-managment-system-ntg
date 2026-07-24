@@ -1,27 +1,31 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   StudentService,
   StudentDetailResponse,
-  ParentResponse,
 } from '../student-page/service/student-service';
-import Swal from 'sweetalert2';
 import { RegulateTextPipe } from '../../core/pipes/regulate-text-pipe';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-student-detail',
-  imports: [CommonModule, RegulateTextPipe, TranslatePipe],
+  standalone: true,
+  imports: [CommonModule, RegulateTextPipe, TranslatePipe, LocalizeNamePipe],
   templateUrl: './student-detail.html',
   styleUrl: './student-detail.css',
 })
 export class StudentDetail implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private studentService = inject(StudentService);
-  private translationService = inject(TranslationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly studentService = inject(StudentService);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   data = signal<StudentDetailResponse | null>(null);
   loading = true;
@@ -36,35 +40,32 @@ export class StudentDetail implements OnInit {
       return;
     }
     this.id.set(id);
-    this.studentService.getStudentById(id).subscribe({
-      next: (res) => {
-        this.data.set(this.applyDraftIfPresent(res, id));
-        this.loading = false;
-        console.log(res);
-      },
-      error: (err) => {
-        console.log(err);
-
-        this.error = true;
-        this.loading = false;
-      },
-    });
+    this.studentService.getStudentById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.data.set(this.applyDraftIfPresent(res, id));
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.error = true;
+          this.loading = false;
+        },
+      });
   }
 
   generatePassword(userId: number) {
-    this.studentService.generatePassword(userId).subscribe({
-      error: (err) => {
-        console.error('Failed to generate password', err);
-      },
-      next: (res) => {
-        // Standard SweetAlert2 Success Example
-        Swal.fire({
-          title: this.translationService.translate('Done'),
-          text: this.translationService.translate('Your data has been saved successfully.'),
-          icon: 'success',
-        });
-      },
-    });
+    this.studentService.generatePassword(userId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (err) => {
+          console.error('Failed to generate password', err);
+        },
+        next: () => {
+          this.notificationService.handle200('Your data has been saved successfully.');
+        },
+      });
   }
 
   goBack() {
@@ -145,21 +146,18 @@ export class StudentDetail implements OnInit {
       minute: '2-digit',
     });
   }
+
   deleteStudent() {
-    this.studentService.deleteStudent(this.id()).subscribe({
-      error: (err) => {
-        console.error('Failed to delete student', err);
-      },
-      next: () => {
-        Swal.fire({
-          title: this.translationService.translate('Done'),
-          text: this.translationService.translate('Student has been deleted successfully'),
-          icon: 'success',
-          confirmButtonText: this.translationService.translate('Ok'),
-        }).then(() => {
+    this.studentService.deleteStudent(this.id())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (err) => {
+          console.error('Failed to delete student', err);
+        },
+        next: () => {
+          this.notificationService.handle200('Student has been deleted successfully');
           this.router.navigate(['/students']);
-        });
-      },
-    });
+        },
+      });
   }
 }

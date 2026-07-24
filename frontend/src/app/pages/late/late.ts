@@ -1,5 +1,6 @@
-import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, HostListener, OnInit, computed, inject, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule, DatePipe } from '@angular/common';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -11,21 +12,24 @@ import { DelayService } from './service/DelayService';
 import { BackendDelay, LateRecord } from './service/delay.models';
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
-import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-late',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe, LocalizeNamePipe, DatePipe],
   templateUrl: './late.html',
   styleUrls: ['./late.css'],
 })
 export class LateComponent implements OnInit {
-  private delayService = inject(DelayService);
-  private studentService = inject(StudentService);
-  private translationService = inject(TranslationService);
+  private readonly delayService = inject(DelayService);
+  private readonly studentService = inject(StudentService);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Signals
   students = signal<LateRecord[]>([]);
@@ -39,7 +43,6 @@ export class LateComponent implements OnInit {
   activeDropdownIndex: number | null = null;
   currentEditId: number | null = null;
 
-  // Reactive Form updated for datetime-local
   lateForm = new FormGroup({
     studentId: new FormControl<number>(0, [Validators.required, Validators.min(1)]),
     timeOfArrival: new FormControl<string>('', [Validators.required]),
@@ -53,55 +56,55 @@ export class LateComponent implements OnInit {
     this.fetchAllStudents();
   }
 
-  // --- API DATA FETCHING ---
-
   fetchDelays() {
-    this.delayService.getDelays().subscribe({
-      next: (data: BackendDelay[]) => {
-        this.students.set(data.map((item) => this.mapBackendToFrontend(item)));
-      },
-      error: (err) => {
-        console.error('Failed to fetch late arrival records', err);
-      },
-    });
+    this.delayService.getDelays()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: BackendDelay[]) => {
+          this.students.set(data.map((item) => this.mapBackendToFrontend(item)));
+        },
+        error: (err) => {
+          console.error('Failed to fetch late arrival records', err);
+        },
+      });
   }
 
   fetchAllStudents() {
-    this.studentService.getAllStudents().subscribe({
-      next: (res) => this.studentsList.set(res),
-      error: () => console.error('Failed to load students list'),
-    });
+    this.studentService.getAllStudents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.studentsList.set(res),
+        error: () => console.error('Failed to load students list'),
+      });
   }
 
   private mapBackendToFrontend(item: BackendDelay): LateRecord {
-    // Split "2026-07-03T09:00:00" into clean visual parts
-    const rawTime = item.timeOfArrival || '';
-    const [datePart, timeStr] = rawTime.split('T');
-    const timeParts = timeStr ? timeStr.substring(0, 5) : '00:00';
+    const arrivalDate = item.timeOfArrival ? new Date(item.timeOfArrival) : new Date();
+    const hours = arrivalDate.getHours();
+    const minutes = arrivalDate.getMinutes();
 
-    const status: 'Very Late' | 'Late' = timeParts > '08:30' ? 'Very Late' : 'Late';
+    const isVeryLate = hours > 8 || (hours === 8 && minutes > 30);
+    const status: 'Very Late' | 'Late' = isVeryLate ? 'Very Late' : 'Late';
 
     return {
       id: item.id,
       studentId: item.student?.id,
       name: `${item.student?.user?.firstName || ''} ${item.student?.user?.lastName || ''}`.trim(),
+      nameAr: `${item.student?.user?.firstNameInArabic || ''} ${item.student?.user?.lastNameInArabic || ''}`.trim(),
       class: item.student?.studentClass?.name || 'N/A',
-      date: datePart || item.date || '',
-      arrivalTime: timeParts,
+      date: item.date || '',
+      arrivalTime: arrivalDate,
       reason: 'Delay',
       notes: item.notes || '',
       status: status,
     };
   }
 
-  // --- FORM & MODAL ACTIONS ---
-
   onStudentSelected(student: StudentResponse) {
     this.selectedStudentForRecord = student;
     this.lateForm.patchValue({ studentId: student.id });
   }
 
-  // Helper to format Date for <input type="datetime-local"> (YYYY-MM-DDTHH:mm)
   private getCurrentDateTimeLocal(): string {
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -129,7 +132,6 @@ export class LateComponent implements OnInit {
     this.selectedStudentForRecord =
       this.studentsList().find((s) => s.id === record.studentId) || null;
 
-    // Format UI back to datetime-local string
     const formattedDateTime = `${record.date}T${record.arrivalTime}`;
 
     this.lateForm.patchValue({
@@ -149,18 +151,15 @@ export class LateComponent implements OnInit {
   saveRecord() {
     if (this.lateForm.invalid) {
       this.lateForm.markAllAsTouched();
-      Swal.fire({
-        title: this.translationService.translate('Validation Error!'),
-        text: this.translationService.translate('Please select a student and specify the arrival date & time.'),
-        icon: 'warning',
-        confirmButtonText: this.translationService.translate('OK'),
-      });
+      this.notificationService.warning(
+        'Please select a student and specify the arrival date & time.',
+        'Validation Error!'
+      );
       return;
     }
 
     const val = this.lateForm.value;
 
-    // Ensure exact backend expected string format: YYYY-MM-DDTHH:mm:ss
     let formattedTime = val.timeOfArrival!;
     if (formattedTime && formattedTime.length === 16) {
       formattedTime += ':00';
@@ -174,34 +173,33 @@ export class LateComponent implements OnInit {
         notes: val.notes || '',
       };
 
-      this.delayService.updateDelay(updatePayload).subscribe({
-        next: () => {
-          this.fetchDelays();
-          this.closeLateArrivalModal();
-          Swal.fire({ title: this.translationService.translate('Updated!'), text: this.translationService.translate('Record updated successfully.'), icon: 'success' });
-        },
-        error: (err) => console.error('Failed to update late arrival record', err),
-      });
+      this.delayService.updateDelay(updatePayload)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.fetchDelays();
+            this.closeLateArrivalModal();
+            this.notificationService.handle200('Record updated successfully.');
+          },
+          error: (err) => console.error('Failed to update late arrival record', err),
+        });
     } else {
-      // Exact payload requested by your backend
       const createPayload = {
         studentId: val.studentId!,
         timeOfArrival: formattedTime,
         notes: val.notes || '',
       };
 
-      this.delayService.createDelay(createPayload).subscribe({
-        next: () => {
-          this.fetchDelays();
-          this.closeLateArrivalModal();
-          Swal.fire({
-            title: this.translationService.translate('Success!'),
-            text: this.translationService.translate('Late arrival registered successfully.'),
-            icon: 'success',
-          });
-        },
-        error: (err) => console.error('Failed to register late arrival', err),
-      });
+      this.delayService.createDelay(createPayload)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.fetchDelays();
+            this.closeLateArrivalModal();
+            this.notificationService.handle201('Late arrival registered successfully.');
+          },
+          error: (err) => console.error('Failed to register late arrival', err),
+        });
     }
   }
 
@@ -212,24 +210,17 @@ export class LateComponent implements OnInit {
 
     if (!record?.id) return;
 
-    Swal.fire({
-      title: this.translationService.translate('Are you sure?'),
-      text: this.translationService.translate('Do you want to delete this late arrival record?'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#e53e3e',
-      confirmButtonText: this.translationService.translate('Yes, delete it!'),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.delayService.deleteDelay(record.id!).subscribe({
+    if (confirm(this.translationService.translate('Are you sure you want to delete this late arrival record?'))) {
+      this.delayService.deleteDelay(record.id!)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
           next: () => {
             this.students.update((list) => list.filter((_, i) => i !== index));
-            Swal.fire(this.translationService.translate('Deleted!'), this.translationService.translate('Record has been deleted.'), 'success');
+            this.notificationService.handle200('Record has been deleted.');
           },
           error: (err) => console.error('Could not delete late arrival record', err),
         });
-      }
-    });
+    }
   }
 
   @HostListener('document:click')
@@ -241,8 +232,6 @@ export class LateComponent implements OnInit {
     event.stopPropagation();
     this.activeDropdownIndex = this.activeDropdownIndex === index ? null : index;
   }
-
-  // --- COMPUTED / GETTERS ---
 
   classes = computed(() => {
     const all = this.students().map((s) => s.class);

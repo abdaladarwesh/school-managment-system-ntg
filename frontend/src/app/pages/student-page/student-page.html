@@ -96,7 +96,7 @@
                   <div class="d-flex align-items-center gap-2">
                     <span class="avatar-circle">{{ student.initials }}</span>
                     <div>
-                      <p class="mb-0 fw-semibold small">{{ student.name }}</p>
+                      <p class="mb-0 fw-semibold small">{{ student.name | localizeName: student.nameAr }}</p>
                       <p class="mb-0 text-muted" style="font-size: 0.775rem;">{{ student.email }}</p>
                     </div>
                   </div>

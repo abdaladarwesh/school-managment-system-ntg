@@ -1,6 +1,6 @@
 package com.ntg.sms.Dtos.Response;
 
-import com.ntg.sms.Entities.EducationLevel;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -18,5 +18,5 @@ public class ParentResponse{
     UserResponse user;
     @Size(max = 60)
     String jobName;
-    EducationLevel educationLevel;
+    String educationLevel;
 }

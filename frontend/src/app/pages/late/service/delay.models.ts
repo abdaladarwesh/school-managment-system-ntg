@@ -17,7 +17,7 @@ export interface BackendDelay {
       name: string;
     };
   };
-  timeOfArrival: string; // e.g., "2026-07-03T09:00:00"
+  timeOfArrival: Date; // e.g., "2026-07-03T09:00:00"
   notes: string;
   date: string; // e.g., "2026-07-03"
 }
@@ -26,9 +26,10 @@ export interface LateRecord {
   id?: number; // Added to track backend ID
   studentId?: number; // Added to send updates back to API
   name: string;
+  nameAr?: string;
   class: string;
   date: string;
-  arrivalTime: string;
+  arrivalTime: Date;
   reason: string;
   notes: string;
   status: 'Very Late' | 'Late';

@@ -29,6 +29,7 @@ export interface ViolationRecordUI {
   studentUserId: number;
   date: string;
   studentName: string;
+  studentNameAr?: string;
   class: string;
   violation: string;
   parentalSummons: boolean; // mapped from `ismeeting`

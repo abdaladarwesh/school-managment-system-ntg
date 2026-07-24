@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -11,35 +12,35 @@ import { ViolationService } from './service/violation.service';
 import { BackendViolation, ViolationRecordUI } from './service/violation.models';
 import { StudentResponse, StudentService } from '../student-page/service/student-service';
 import { StudentSearchComponent } from '../../components/student-search/student-search.component';
-import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
 import { forkJoin } from 'rxjs';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-violations',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, StudentSearchComponent, TranslatePipe, LocalizeNamePipe],
   templateUrl: './violations.html',
   styleUrls: ['./violations.css'],
 })
 export class ViolationsComponent implements OnInit {
-  private violationService = inject(ViolationService);
-  private studentService = inject(StudentService);
-  private translationService = inject(TranslationService);
+  private readonly violationService = inject(ViolationService);
+  private readonly studentService = inject(StudentService);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  // Signals for dynamic data
   violations = signal<ViolationRecordUI[]>([]);
   studentsList = signal<StudentResponse[]>([]);
   searchText = signal('');
   selectedGrade = signal('All Grades');
   selectedClass = signal('All Classes');
 
-  // UI States
   isModalOpen = signal(false);
   isSuccessModalOpen = signal(false);
 
-  // Reactive Form specifically mapping your requested inputs
   violationForm = new FormGroup({
     studentId: new FormControl<number>(0, [Validators.required, Validators.min(1)]),
     violation: new FormControl<string>('', [Validators.required]),
@@ -55,46 +56,49 @@ export class ViolationsComponent implements OnInit {
     this.fetchAllStudents();
   }
 
-  // --- API FETCH METHODS ---
-
   fetchViolations() {
-    this.violationService.getViolations().subscribe({
-      next: (data: BackendViolation[]) => {
-        this.violations.set(data.map((item) => this.mapBackendToFrontend(item)));
-      },
-      error: (err) => {
-        console.error('Failed to load violations', err);
-      },
-    });
+    this.violationService.getViolations()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: BackendViolation[]) => {
+          this.violations.set(data.map((item) => this.mapBackendToFrontend(item)));
+        },
+        error: (err) => {
+          console.error('Failed to load violations', err);
+        },
+      });
   }
 
   fetchAllStudents() {
-    this.studentService.getAllStudents().subscribe({
-      next: (res) => this.studentsList.set(res),
-      error: () => console.error('Failed to load student list'),
-    });
+    this.studentService.getAllStudents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => this.studentsList.set(res),
+        error: () => console.error('Failed to load student list'),
+      });
   }
 
   private mapBackendToFrontend(item: BackendViolation): ViolationRecordUI {
     const fullName =
       `${item.student?.user?.firstName || ''} ${item.student?.user?.lastName || ''}`.trim();
+    const fullNameAr =
+      `${item.student?.user?.firstNameInArabic || ''} ${item.student?.user?.lastNameInArabic || ''}`.trim();
     return {
       id: item.id,
       studentId: item.student?.id || 0,
       studentUserId: item.student?.user?.id || 0,
       date: item.date ? item.date.split('T')[0] : 'N/A',
       studentName: fullName || 'Unknown Student',
+      studentNameAr: fullNameAr,
       class: item.student?.studentClass?.name || 'N/A',
       violation: item.violation,
-      parentalSummons: item.ismeeting, // Map ismeeting -> parentalSummons UI
+      parentalSummons: item.ismeeting,
       notes: item.notes,
       nameOfViolator: item.nameOfViolator,
       applicableProcedure: item.applicableProcedure,
       referringAuthority: item.referringAuthority,
     };
   }
-
-  // --- ACTIONS ---
 
   onStudentSelected(student: StudentResponse) {
     this.violationForm.patchValue({ studentId: student.id });
@@ -112,14 +116,15 @@ export class ViolationsComponent implements OnInit {
     });
     this.isModalOpen.set(true);
   }
- 
+
   closeModal() {
     this.isModalOpen.set(false);
   }
- 
+
   triggerSuccessMessage() {
     this.isSuccessModalOpen.set(true);
   }
+
   closeSuccessModal() {
     this.isSuccessModalOpen.set(false);
   }
@@ -127,13 +132,10 @@ export class ViolationsComponent implements OnInit {
   saveViolation() {
     if (this.violationForm.invalid) {
       this.violationForm.markAllAsTouched();
-      Swal.fire({
-        title: this.translationService.translate('Validation Error!'),
-        text: this.translationService.translate(
-          'Please fill in all required fields and select a student.',
-        ),
-        icon: 'warning',
-      });
+      this.notificationService.warning(
+        'Please fill in all required fields and select a student.',
+        'Validation Error!'
+      );
       return;
     }
 
@@ -148,23 +150,19 @@ export class ViolationsComponent implements OnInit {
       notes: val.notes || '',
     };
 
-    this.violationService.createViolation(payload).subscribe({
-      next: () => {
-        this.fetchViolations();
-        this.closeModal();
-        Swal.fire(
-          this.translationService.translate('Success!'),
-          this.translationService.translate('Violation recorded successfully.'),
-          'success',
-        );
-      },
-      error: (err) => {
-        console.error('Failed to save violation', err);
-      },
-    });
+    this.violationService.createViolation(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.fetchViolations();
+          this.closeModal();
+          this.notificationService.handle201('Violation recorded successfully.');
+        },
+        error: (err) => {
+          console.error('Failed to save violation', err);
+        },
+      });
   }
-
-  // --- COMPUTED GETTERS ---
 
   classesList = computed(() => {
     const classes = this.violations()
@@ -192,7 +190,7 @@ export class ViolationsComponent implements OnInit {
   }
 
   get thisMonthCount(): number {
-    const currentYearMonth = new Date().toISOString().slice(0, 7); // e.g. "2026-07"
+    const currentYearMonth = new Date().toISOString().slice(0, 7);
     return this.violations().filter((v) => v.date && v.date.startsWith(currentYearMonth)).length;
   }
 
@@ -205,67 +203,51 @@ export class ViolationsComponent implements OnInit {
 
   sendNotificationToParent(record: ViolationRecordUI) {
     if (!record.studentId) {
-      Swal.fire({
-        title: this.translationService.translate('Error'),
-        text: this.translationService.translate('Student ID not found.'),
-        icon: 'error',
-      });
+      this.notificationService.error('Student ID not found.');
       return;
     }
 
-    this.studentService.getStudentById(record.studentId).subscribe({
-      next: (res) => {
-        if (!res.parentsResponse || res.parentsResponse.length === 0) {
-          Swal.fire({
-            title: this.translationService.translate('Error'),
-            text: this.translationService.translate('No parents found for this student.'),
-            icon: 'error',
-          });
-          return;
-        }
+    this.studentService.getStudentById(record.studentId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          if (!res.parentsResponse || res.parentsResponse.length === 0) {
+            this.notificationService.error('No parents found for this student.');
+            return;
+          }
 
-        const requests = res.parentsResponse.map((parent) => {
-          return this.violationService.createNotification({
-            title: 'Parent Summoning notification',
-            body: record.violation,
-            priority: 'HIGH',
-            type: 'PARENT_SUMMON',
-            receiverId: parent.user.id,
-          });
-        });
-
-        forkJoin(requests).subscribe({
-          next: () => {
-            this.triggerSuccessMessage();
-          },
-          error: (err) => {
-            console.error('Failed to send notifications to parents', err);
-            Swal.fire({
-              title: this.translationService.translate('Error'),
-              text: this.translationService.translate('Failed to send notification to one or more parents.'),
-              icon: 'error',
+          const requests = res.parentsResponse.map((parent) => {
+            return this.violationService.createNotification({
+              title: 'Parent Summoning notification',
+              body: record.violation,
+              priority: 'HIGH',
+              type: 'PARENT_SUMMON',
+              receiverId: parent.user.id,
             });
-          },
-        });
-      },
-      error: (err) => {
-        console.error('Failed to fetch student details', err);
-        Swal.fire({
-          title: this.translationService.translate('Error'),
-          text: this.translationService.translate('Failed to retrieve parent information.'),
-          icon: 'error',
-        });
-      },
-    });
+          });
+
+          forkJoin(requests)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
+              next: () => {
+                this.triggerSuccessMessage();
+              },
+              error: (err) => {
+                console.error('Failed to send notifications to parents', err);
+                this.notificationService.error('Failed to send notification to one or more parents.');
+              },
+            });
+        },
+        error: (err) => {
+          console.error('Failed to fetch student details', err);
+          this.notificationService.error('Failed to retrieve parent information.');
+        },
+      });
   }
 
   sendNotificationToStudent(record: ViolationRecordUI) {
     if (!record.studentUserId) {
-      Swal.fire({
-        title: this.translationService.translate('Error'),
-        text: this.translationService.translate('Student user ID not found.'),
-        icon: 'error',
-      });
+      this.notificationService.error('Student user ID not found.');
       return;
     }
 
@@ -277,17 +259,14 @@ export class ViolationsComponent implements OnInit {
         type: 'STUDENT_VIOLATION',
         receiverId: record.studentUserId,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.triggerSuccessMessage();
         },
         error: (err) => {
           console.error('Failed to send notification to student', err);
-          Swal.fire({
-            title: this.translationService.translate('Error'),
-            text: this.translationService.translate('Failed to send notification to student.'),
-            icon: 'error',
-          });
+          this.notificationService.error('Failed to send notification to student.');
         },
       });
   }

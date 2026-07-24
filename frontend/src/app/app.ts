@@ -1,9 +1,16 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeEg from '@angular/common/locales/ar-EG';
+import { LoadingComponent } from './components/loading/loading.component';
+
+// Register the Egyptian Arabic locale data
+registerLocaleData(localeEg);
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, LoadingComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

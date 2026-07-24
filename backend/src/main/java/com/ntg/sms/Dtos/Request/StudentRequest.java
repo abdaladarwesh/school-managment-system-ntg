@@ -1,6 +1,6 @@
 package com.ntg.sms.Dtos.Request;
 
-import com.ntg.sms.Entities.EducationLevel;
+
 import com.ntg.sms.Entities.Student;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -131,7 +131,7 @@ public class StudentRequest {
         @Size(max = 60, message = "Job name must not exceed 60 characters!")
         private String jobName;
 
-        private EducationLevel educationLevel;
+        private String educationLevel;
     }
 }
 

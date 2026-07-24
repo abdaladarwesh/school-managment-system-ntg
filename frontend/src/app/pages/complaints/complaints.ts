@@ -1,22 +1,26 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComplaintService } from './service/complaint.service';
 import { BackendComplaint, ComplaintUI } from './service/complaint.models';
-import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-complaints',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, LocalizeNamePipe, DatePipe],
   templateUrl: './complaints.html',
   styleUrls: ['./complaints.css'],
 })
 export class ComplaintsComponent implements OnInit {
-  private complaintService = inject(ComplaintService);
-  private translationService = inject(TranslationService);
+  private readonly complaintService = inject(ComplaintService);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   // Signals
   complaints = signal<ComplaintUI[]>([]);
@@ -32,27 +36,31 @@ export class ComplaintsComponent implements OnInit {
     this.fetchComplaints();
   }
 
-  // --- API FETCH ---
-
   fetchComplaints() {
-    this.complaintService.getComplaints().subscribe({
-      next: (data: BackendComplaint[]) => {
-        console.log(data);
-        this.complaints.set(data.map((item) => this.mapToUI(item)));
-      },
-      error: (err) => {
-        console.error('Failed to load complaints', err);
-      },
-    });
+    this.complaintService.getComplaints()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: BackendComplaint[]) => {
+          this.complaints.set(data.map((item) => this.mapToUI(item)));
+        },
+        error: (err) => {
+          console.error('Failed to load complaints', err);
+        },
+      });
   }
 
   private mapToUI(item: BackendComplaint): ComplaintUI {
     const firstName = item.user?.firstName || '';
     const lastName = item.user?.lastName || '';
     const fullName = `${firstName} ${lastName}`.trim() || 'Unknown User';
+
+    const firstNameAr = item.user?.firstNameInArabic || '';
+    const lastNameAr = item.user?.lastNameInArabic || '';
+    const fullNameAr = `${firstNameAr} ${lastNameAr}`.trim();
     return {
       id: item.complaintId,
       submitterName: fullName,
+      submitterNameAr: fullNameAr,
       date: item.submittedAt || 'N/A',
       title: item.title,
       description: item.description,
@@ -61,8 +69,6 @@ export class ComplaintsComponent implements OnInit {
       response: item.response,
     };
   }
-
-  // --- FILTERS / COMPUTED ---
 
   filteredComplaints = computed(() => {
     return this.complaints().filter((c) => {
@@ -92,8 +98,6 @@ export class ComplaintsComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
-  // --- MODAL / REPLY ---
-
   openReplyModal(complaint: ComplaintUI) {
     this.selectedComplaint = complaint;
     this.replyText = complaint.response || '';
@@ -111,23 +115,18 @@ export class ComplaintsComponent implements OnInit {
 
     this.complaintService
       .respondToComplaint(this.selectedComplaint.id, { response: this.replyText.trim() })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.fetchComplaints();
           this.closeReplyModal();
-          Swal.fire(
-            this.translationService.translate('Success!'),
-            this.translationService.translate('Reply submitted successfully.'),
-            'success'
-          );
+          this.notificationService.handle200('Reply submitted successfully.');
         },
         error: (err) => {
           console.error('Failed to submit reply', err);
         },
       });
   }
-
-  // --- HELPERS ---
 
   getInitials(name: string): string {
     if (!name) return '??';

@@ -1,11 +1,13 @@
 import { Component, input, output, computed, signal, HostListener, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StudentResponse } from '../../pages/student-page/service/student-service';
+import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
 
 @Component({
   selector: 'app-student-search',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, LocalizeNamePipe],
   templateUrl: './student-search.component.html',
   styleUrl: './student-search.component.css'
 })
@@ -24,11 +26,12 @@ export class StudentSearchComponent {
     }
     return this.students().filter(s => {
       const fullName = `${s.user.firstName} ${s.user.lastName}`.toLowerCase();
-      return fullName.includes(query);
+      const fullNameAr = `${s.user.firstNameInArabic || ''} ${s.user.lastNameInArabic || ''}`.toLowerCase();
+      return fullName.includes(query) || fullNameAr.includes(query);
     });
   });
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, private translationService: TranslationService) {}
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
@@ -39,7 +42,12 @@ export class StudentSearchComponent {
 
   selectStudent(student: StudentResponse) {
     this.selectedStudent.set(student);
-    this.searchQuery.set(`${student.user.firstName} ${student.user.lastName}`);
+    const isAr = this.translationService.currentLang() === 'ar';
+    if (isAr && student.user.firstNameInArabic) {
+      this.searchQuery.set(`${student.user.firstNameInArabic} ${student.user.lastNameInArabic || ''}`.trim());
+    } else {
+      this.searchQuery.set(`${student.user.firstName} ${student.user.lastName}`.trim());
+    }
     this.studentSelected.emit(student);
     this.isOpen.set(false);
   }

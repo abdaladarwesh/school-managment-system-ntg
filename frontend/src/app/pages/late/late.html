@@ -67,11 +67,11 @@
           <tr>
             <td class="student-cell">
               <div class="avatar">{{ getInitials(student.name) }}</div>
-              <span class="student-name">{{ student.name }}</span>
+              <span class="student-name">{{ student.name | localizeName: student.nameAr }}</span>
             </td>
             <td><span class="class-badge">{{ student.class | translate }}</span></td>
-            <td><div class="date-container"><span class="calendar-icon">📅</span> {{ student.date }}</div></td>
-            <td><div class="time-container"><span class="time-icon">🕒</span> {{ student.arrivalTime }}</div></td>
+            <td><div class="date-container"><span class="calendar-icon">📅</span> {{ student.date   }}</div></td>
+            <td><div class="time-container"><span class="time-icon">🕒</span> {{ student.arrivalTime | date:'hh:mm a':'':'ar-EG' }}</div></td>
             <td class="notes-text">{{ (student.notes || "No Notes") | translate }}</td>
             <td>
               <div class="status-action-row">

@@ -3,13 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Student } from '../student-page';
 
-export type EducationLevel =
-  | 'UNIVERSITY'
-  | 'ABOVE_INTERMEDIATE'
-  | 'INTERMEDIATE'
-  | 'BELOW_INTERMEDIATE'
-  | 'POSTGRADUATE';
-
+export type EducationLevel = string;
 
 export interface UserPayload {
   firstName: string;
@@ -53,7 +47,6 @@ export interface CreateStudentRequest {
   } | null;
 }
 
-
 interface UserResponse {
   id: number;
   firstName: string;
@@ -77,9 +70,8 @@ export interface ParentResponse {
   id: number;
   user: UserResponse;
   jobName: string;
-  educationLevel: EducationLevel | null;
+  educationLevel: string | null;
 }
-
 
 export interface StudentDetailResponse {
   parentsResponse: ParentResponse[];
@@ -104,8 +96,8 @@ export interface StudentResponse {
         {
           term: number;
           year: number;
-        }
-      ]
+        },
+      ];
     };
     name: string;
     capacity: number;
@@ -128,26 +120,28 @@ export class StudentService {
     return this.http.get<StudentDetailResponse>(`${this.url}/${id}`);
   }
 
-  getParents(): Observable<ParentResponse[]>{
-    return this.http.get<ParentResponse[]>("http://localhost:8080/api/v1/parents");
+  getParents(): Observable<ParentResponse[]> {
+    return this.http.get<ParentResponse[]>('http://localhost:8080/api/v1/parents');
   }
 
   toStudent(student: StudentResponse): Student {
     const firstName = student.user.firstName;
     const lastName = student.user.lastName;
 
-
     return {
       id: student.id.toString(),
       initials: `${firstName[0]}${lastName[0]}`.toUpperCase(),
-      name: `${firstName} ${lastName}`,
+      name: `${firstName} ${lastName}`.trim(),
+      nameAr:
+        `${student.user.firstNameInArabic || ''} ${student.user.lastNameInArabic || ''}`.trim(),
       email: student.user.email,
-      grade: student.studentClass == null ? "" : student.studentClass.grade.name,
-      class: student.studentClass == null ? "" : student.studentClass.name,
-      academicYear: student.studentClass == null ? "" : student.studentClass.grade.terms[0].year.toString(),
+      grade: student.studentClass == null ? '' : student.studentClass.grade.name,
+      class: student.studentClass == null ? '' : student.studentClass.name,
+      academicYear:
+        student.studentClass == null ? '' : student.studentClass.grade.terms[0].year.toString(),
       gender: student.user.gender === 'M' ? 'Male' : 'Female',
 
-      status: student.user.isDeleted ? 'Probation' : "Active",
+      status: student.user.isDeleted ? 'Probation' : 'Active',
     };
   }
 
@@ -157,7 +151,7 @@ export class StudentService {
 
   updateStudent(id: number, data: CreateStudentRequest): Observable<StudentDetailResponse> {
     return this.http.put<StudentDetailResponse>(`${this.url}/${id}`, data);
-}
+  }
 
   getStudentDraft(id: number): Partial<CreateStudentRequest> | null {
     const raw = localStorage.getItem(`${this.draftPrefix}${id}`);
@@ -177,16 +171,15 @@ export class StudentService {
     localStorage.removeItem(`${this.draftPrefix}${id}`);
   }
 
-  deleteStudent(studentId : number): Observable<any>{
+  deleteStudent(studentId: number): Observable<any> {
     return this.http.delete(`${this.url}/${studentId}`);
-
   }
 
-  generatePassword(userId:number): Observable<GeneratePasswordResponse> {
+  generatePassword(userId: number): Observable<GeneratePasswordResponse> {
     return this.http.post<GeneratePasswordResponse>(`${this.url}/generate-password/${userId}`, {});
   }
 }
 
-interface GeneratePasswordResponse{
+interface GeneratePasswordResponse {
   password: string;
 }

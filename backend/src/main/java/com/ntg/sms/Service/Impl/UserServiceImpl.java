@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private static String TOKEN = "092d26fefbcc9b8a17fe12162379b4ac";
 
-    private void sendPasswordEmail(String password, String email){
+    private void sendPasswordEmail(String password, User user){
         final MailtrapConfig config = new MailtrapConfig.Builder()
                 .token(TOKEN)
                 .build();
@@ -38,9 +39,15 @@ public class UserServiceImpl implements UserService {
 
         final MailtrapMail mail = MailtrapMail.builder()
                 .from(new Address("ntgsms.noreply@demomailtrap.co", "NTG School Management System"))
-                .to(List.of(new Address(email)))
-                .subject("Password Reset")
-                .text("Your new Password is \"" + password + "\" make sure to change it as soon as possible as the system will not let you in until you changed")
+                .to(List.of(new Address(user.getEmail())))
+                    .templateUuid("c7cfa536-156c-4241-a835-a6fc4f5dea3b")
+                .templateVariables(Map.of(
+                        "name", user.getFirstName(),
+                        "temporary_password", password,
+                        "login_url", "http://localhost:4200/",
+                        "user_email", user.getEmail(),
+                        "pass_reset_link", "blank"
+                ))
                 .build();
 
         try {
@@ -73,7 +80,7 @@ public class UserServiceImpl implements UserService {
         String generatedPassword = secureGenerator.generate(16);
         user.setPassword(passwordEncoder.encode(generatedPassword));
         userRepository.saveAndFlush(user);
-        sendPasswordEmail(generatedPassword, user.getEmail());
+        sendPasswordEmail(generatedPassword, user);
         return generatedPassword;
     }
 }

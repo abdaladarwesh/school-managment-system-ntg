@@ -1,27 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormGroup,
-  FormControl,
-  FormArray,
-  Validators,
-  AbstractControl,
-} from '@angular/forms';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  StudentService,
   CreateStudentRequest,
-  UserPayload,
-  StudentDetailResponse,
   ParentResponse,
-  EducationLevel,
+  StudentDetailResponse,
+  StudentService,
+  UserPayload
 } from '../student-page/service/student-service';
 
 import { ParentSearchComponent } from '../../components/parent-search/parent-search.component';
-import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../core/pipes/translate.pipe';
 import { TranslationService } from '../../core/services/translation.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-add-student',
@@ -31,24 +24,15 @@ import { TranslationService } from '../../core/services/translation.service';
   styleUrl: './add-student.css',
 })
 export class AddStudent implements OnInit {
-  private studentService = inject(StudentService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private translationService = inject(TranslationService);
-  private editStudentId = null as number | null;
   isEditMode = false;
-
   // --- Parent Search State ---
   fatherMode = signal<'new' | 'existing'>('new');
   motherMode = signal<'new' | 'existing'>('new');
   guardianMode = signal<'new' | 'existing'>('new');
-
   selectedFather = signal<ParentResponse | null>(null);
   selectedMother = signal<ParentResponse | null>(null);
   selectedGuardian = signal<ParentResponse | null>(null);
-
   allParents = signal<ParentResponse[]>([]);
-  // ---------------------------
 
   form = new FormGroup({
     studentUser: new FormGroup({
@@ -106,7 +90,7 @@ export class AddStudent implements OnInit {
         birthYear: new FormControl('', Validators.required),
       }),
       jobName: new FormControl('', Validators.required),
-      educationLevel: new FormControl<EducationLevel | null>(null),
+      educationLevel: new FormControl<string | null>(null),
     }),
     mother: new FormGroup({
       user: new FormGroup({
@@ -133,7 +117,7 @@ export class AddStudent implements OnInit {
         birthYear: new FormControl('', Validators.required),
       }),
       jobName: new FormControl('', Validators.required),
-      educationLevel: new FormControl<EducationLevel | null>(null),
+      educationLevel: new FormControl<string | null>(null),
     }),
     guardianType: new FormControl('FATHER', Validators.required),
     guardian: new FormGroup({
@@ -155,86 +139,41 @@ export class AddStudent implements OnInit {
         birthYear: new FormControl(''),
       }),
       jobName: new FormControl(''),
-      educationLevel: new FormControl<EducationLevel | null>(null),
+      educationLevel: new FormControl<string | null>(null),
     }),
   });
 
   days = Array.from({ length: 31 }, (_, i) => i + 1);
   months = Array.from({ length: 12 }, (_, i) => i + 1);
   years = Array.from({ length: 70 }, (_, i) => 2026 - i);
-
   genders = [
     { value: 'M', label: 'Male' },
     { value: 'F', label: 'Female' },
   ];
-
   religions = ['Muslim', 'Christianity', 'Other'];
   maritalStatuses = ['MARRIED', 'DIVORCED'];
   guardianTypes = ['FATHER', 'MOTHER', 'OTHER'];
-
-  educationLevels: { value: EducationLevel; label: string }[] = [
-    { value: 'POSTGRADUATE',        label: 'Postgraduate (e.g. Master/PhD)' },
-    { value: 'UNIVERSITY',          label: 'University Degree' },
-    { value: 'ABOVE_INTERMEDIATE',  label: 'Above Intermediate' },
-    { value: 'INTERMEDIATE',        label: 'Intermediate' },
-    { value: 'BELOW_INTERMEDIATE',  label: 'Below Intermediate' },
-  ];
-
   governorates = [
-    'Cairo',
-    'Alexandria',
-    'Giza',
-    'Qalyubia',
-    'Sharqia',
-    'Gharbia',
-    'Monufia',
-    'Beheira',
-    'Kafr El Sheikh',
-    'Dakahlia',
-    'Damietta',
-    'Port Said',
-    'Ismailia',
-    'Suez',
-    'North Sinai',
-    'South Sinai',
-    'Beni Suef',
-    'Fayoum',
-    'Minya',
-    'Asyut',
-    'Sohag',
-    'Qena',
-    'Luxor',
-    'Aswan',
-    'Red Sea',
-    'New Valley',
-    'Matrouh',
+    'Cairo', 'Alexandria', 'Giza', 'Qalyubia', 'Sharqia', 'Gharbia',
+    'Monufia', 'Beheira', 'Kafr El Sheikh', 'Dakahlia', 'Damietta',
+    'Port Said', 'Ismailia', 'Suez', 'North Sinai', 'South Sinai',
+    'Beni Suef', 'Fayoum', 'Minya', 'Asyut', 'Sohag', 'Qena',
+    'Luxor', 'Aswan', 'Red Sea', 'New Valley', 'Matrouh',
+  ];
+  nationalities = [
+    'Egyptian', 'American', 'British', 'French', 'German', 'Saudi',
+    'Emirati', 'Kuwaiti', 'Jordanian', 'Palestinian', 'Iraqi', 'Syrian',
+    'Lebanese', 'Libyan', 'Sudanese', 'Moroccan', 'Tunisian', 'Algerian',
+    'Turkish', 'Indian', 'Pakistani', 'Filipino', 'Other',
   ];
 
-  nationalities = [
-    'Egyptian',
-    'American',
-    'British',
-    'French',
-    'German',
-    'Saudi',
-    'Emirati',
-    'Kuwaiti',
-    'Jordanian',
-    'Palestinian',
-    'Iraqi',
-    'Syrian',
-    'Lebanese',
-    'Libyan',
-    'Sudanese',
-    'Moroccan',
-    'Tunisian',
-    'Algerian',
-    'Turkish',
-    'Indian',
-    'Pakistani',
-    'Filipino',
-    'Other',
-  ];
+  private readonly studentService = inject(StudentService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
+  private editStudentId = null as number | null;
 
   get studentUser() {
     return this.form.get('studentUser') as FormGroup;
@@ -260,6 +199,15 @@ export class AddStudent implements OnInit {
   get motherJobName() {
     return this.mother.get('jobName') as FormControl;
   }
+  get motherEducation() {
+    return this.mother.get('educationLevel') as FormControl;
+  }
+  get fatherEducation() {
+    return this.father.get('educationLevel') as FormControl;
+  }
+  get guardianEducation() {
+    return this.guardian.get('educationLevel') as FormControl;
+  }
   get guardianJobName() {
     return this.guardian.get('jobName') as FormControl;
   }
@@ -282,13 +230,13 @@ export class AddStudent implements OnInit {
   }
 
   ngOnInit(): void {
-    // --- Fetch parents for the search component ---
-    // Make sure 'getParents()' or the equivalent method exists in your StudentService
     if ((this.studentService as any).getParents) {
-      (this.studentService as any).getParents().subscribe({
-        next: (res: ParentResponse[]) => this.allParents.set(res),
-        error: (err: any) => console.error('Failed to fetch parents:', err),
-      });
+      (this.studentService as any).getParents()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (res: ParentResponse[]) => this.allParents.set(res),
+          error: (err: any) => console.error('Failed to fetch parents:', err),
+        });
     }
 
     const idParam = Number(this.route.snapshot.paramMap.get('id'));
@@ -298,13 +246,14 @@ export class AddStudent implements OnInit {
       this.loadEditData(idParam);
     }
 
-    this.form.get('guardianType')?.valueChanges.subscribe((type) => {
-      this.toggleGuardianValidators(type);
-    });
+    this.form.get('guardianType')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((type) => {
+        this.toggleGuardianValidators(type);
+      });
     this.toggleGuardianValidators(this.guardianType.value);
   }
 
-  // --- Parent Selection Handlers ---
   setMode(type: 'father' | 'mother' | 'guardian', mode: 'new' | 'existing') {
     if (type === 'father') this.fatherMode.set(mode);
     if (type === 'mother') this.motherMode.set(mode);
@@ -313,28 +262,150 @@ export class AddStudent implements OnInit {
 
   onParentSelected(parent: ParentResponse, type: 'father' | 'mother' | 'guardian') {
     if (type === 'father') {
-      console.log(parent);
       this.selectedFather.set(parent);
-      // Remove the 4th argument so it uses the normalized 'user' fallbacks
-      this.patchParentGroup(this.father, parent.user as any, parent.jobName || '');
+      this.patchParentGroup(this.father, parent.user as any, parent.jobName || '', null, parent.educationLevel!);
     } else if (type === 'mother') {
-      console.log(parent);
       this.selectedMother.set(parent);
-      this.patchParentGroup(this.mother, parent.user as any, parent.jobName || '');
+      this.patchParentGroup(this.mother, parent.user as any, parent.jobName || '', null, parent.educationLevel!);
     } else if (type === 'guardian') {
       this.selectedGuardian.set(parent);
-      this.patchParentGroup(this.guardian, parent.user as any, parent.jobName || '');
+      this.patchParentGroup(this.guardian, parent.user as any, parent.jobName || '', null, parent.educationLevel!);
     }
-  } // ---------------------------------
+  }
+
+  addPhoneNumber(type: 'student' | 'father' | 'mother' | 'guardian') {
+    const arr = this.getPhoneArray(type);
+    if (arr.length < 3) {
+      const validators =
+        type === 'guardian' && this.guardianType.value !== 'OTHER'
+          ? []
+          : [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)];
+      arr.push(new FormControl('', validators));
+    }
+  }
+
+  removePhoneNumber(type: 'student' | 'father' | 'mother' | 'guardian', index: number) {
+    const arr = this.getPhoneArray(type);
+    if (arr.length > 1) {
+      arr.removeAt(index);
+    }
+  }
+
+  formatPhoneInput(event: Event, control: AbstractControl) {
+    const input = event.target as HTMLInputElement;
+    let raw = input.value.replace(/\D/g, '');
+    if (raw.length > 11) raw = raw.slice(0, 11);
+    control.setValue(raw, { emitEvent: false });
+    input.value = raw;
+  }
+
+  getPhoneDisplay(control: AbstractControl): string {
+    const raw = control.value || '';
+    if (raw.length <= 3) return raw;
+    if (raw.length <= 7) return raw.slice(0, 3) + ' ' + raw.slice(3);
+    return raw.slice(0, 3) + ' ' + raw.slice(3, 7) + ' ' + raw.slice(7);
+  }
+
+  submit() {
+    this.form.markAllAsTouched();
+    if (this.form.invalid) {
+      this.notificationService.warning(
+        'Please fill in all required fields correctly.',
+        'Validation Error'
+      );
+      return;
+    }
+
+    const medicalText = this.form.get('student.medicalHistoryText')?.value || '';
+    const medicalHistory = medicalText
+      ? medicalText
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter((s: string) => s.length > 0)
+      : [];
+
+    const payload: CreateStudentRequest = {
+      studentUser: this.buildUserPayload(this.studentUser),
+      student: {
+        governorate: this.student.get('governorate')?.value || '',
+        academicScoreInMiddleSchool: parseInt(
+          this.student.get('academicScoreInMiddleSchool')?.value || '0',
+          10,
+        ),
+        placeOfBirth: this.student.get('placeOfBirth')?.value || '',
+        medicalHistory,
+        martialParentsStatus: this.student.get('martialParentsStatus')?.value || '',
+      },
+      father: {
+        user: this.buildUserPayload(this.father.get('user') as FormGroup),
+        jobName: this.father.get('jobName')?.value || '',
+        educationLevel: this.father.get('educationLevel')?.value || null,
+      },
+      mother: {
+        user: this.buildUserPayload(this.mother.get('user') as FormGroup),
+        jobName: this.mother.get('jobName')?.value || '',
+        educationLevel: this.mother.get('educationLevel')?.value || null,
+      },
+      guardianType: this.guardianType.value as 'FATHER' | 'MOTHER' | 'OTHER',
+      guardian: null,
+    };
+
+    if (this.guardianType.value === 'OTHER') {
+      payload.guardian = {
+        user: this.buildUserPayload(this.guardian.get('user') as FormGroup),
+        jobName: this.guardian.get('jobName')?.value || '',
+        educationLevel: this.guardian.get('educationLevel')?.value || null,
+      };
+    }
+
+    if (this.isEditMode && this.editStudentId) {
+      this.studentService.updateStudent(this.editStudentId, payload)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.studentService.clearStudentDraft(this.editStudentId!);
+            this.notificationService.handle200('Student information has been updated successfully.');
+            this.router.navigate(['/students', this.editStudentId]);
+          }
+        });
+      return;
+    }
+
+    this.studentService.createStudent(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.notificationService.handle201('Student has been registered successfully.');
+          this.router.navigate(['/students']);
+        }
+      });
+  }
+
+  cancel() {
+    if (this.isEditMode && this.editStudentId) {
+      this.router.navigate(['/students', this.editStudentId]);
+      return;
+    }
+    this.router.navigate(['/students']);
+  }
+
+  controlInvalid(control: AbstractControl | null): boolean {
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getError(control: AbstractControl | null, errorKey: string): boolean {
+    return !!(control && control.hasError(errorKey) && control.touched);
+  }
 
   private loadEditData(id: number) {
-    this.studentService.getStudentById(id).subscribe({
-      next: (data) => this.patchFormFromDetail(data, id),
-      error: (err) => {
-        console.error('Failed to load student data', err);
-        this.router.navigate(['/students', id]);
-      },
-    });
+    this.studentService.getStudentById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => this.patchFormFromDetail(data, id),
+        error: () => {
+          this.router.navigate(['/students', id]);
+        },
+      });
   }
 
   private patchFormFromDetail(data: StudentDetailResponse, id: number) {
@@ -355,7 +426,6 @@ export class AddStudent implements OnInit {
       lastNameInArabic: merged?.studentUser?.lastNameInArabic ?? studentUser.lastNameInArabic,
       gender: merged?.studentUser?.gender ?? studentUser.gender,
       religion: merged?.studentUser?.religion ?? studentUser.religion,
-
       nationality: merged?.studentUser?.nationality ?? studentUser.nationality,
       birthDay: draftAny?.studentUser?.birthDay ?? this.extractDay(studentUser.birthDate),
       birthMonth: draftAny?.studentUser?.birthMonth ?? this.extractMonth(studentUser.birthDate),
@@ -386,6 +456,7 @@ export class AddStudent implements OnInit {
         father.user,
         father.jobName,
         draftAny?.father ?? merged?.father,
+        father.educationLevel!
       );
     }
     if (mother) {
@@ -394,13 +465,14 @@ export class AddStudent implements OnInit {
         mother.user,
         mother.jobName,
         draftAny?.mother ?? merged?.mother,
+        mother.educationLevel!
       );
     }
 
     const guardian = draftAny?.guardian ?? merged?.guardian;
     if (guardian?.user?.firstName || guardian?.jobName) {
       this.guardianType.setValue('OTHER');
-      this.patchParentGroup(this.guardian, guardian.user as any, guardian.jobName || '', guardian);
+      this.patchParentGroup(this.guardian, guardian.user as any, guardian.jobName || '', guardian, guardian.educationLevel);
       this.toggleGuardianValidators('OTHER');
     } else if (merged?.guardianType) {
       this.guardianType.setValue(merged.guardianType);
@@ -475,9 +547,9 @@ export class AddStudent implements OnInit {
     group: FormGroup,
     user: StudentDetailResponse['studentResponse']['user'],
     jobName: string,
-    draft?: any,
+    draft: any,
+    educationLevel: string | null
   ) {
-    console.log(user);
     const userGroup = group.get('user') as FormGroup;
     userGroup.patchValue({
       firstName: draft?.user?.firstName ?? user.firstName,
@@ -499,7 +571,7 @@ export class AddStudent implements OnInit {
       draft?.user?.phoneNumbers ?? user.phoneNumbers.map((phone) => this.normalizePhone(phone)),
     );
     group.get('jobName')?.setValue(draft?.jobName ?? jobName);
-    group.get('educationLevel')?.setValue(draft?.educationLevel ?? null);
+    group.get('educationLevel')?.setValue(draft?.educationLevel ?? educationLevel);
   }
 
   private replacePhoneNumbers(array: FormArray, values: number[] | string[]) {
@@ -517,9 +589,11 @@ export class AddStudent implements OnInit {
   private extractDay(date: string | Date): string {
     return String(new Date(date).getDate());
   }
+
   private extractMonth(date: string | Date): string {
     return String(new Date(date).getMonth() + 1);
   }
+
   private extractYear(date: string | Date): string {
     return String(new Date(date).getFullYear());
   }
@@ -575,24 +649,6 @@ export class AddStudent implements OnInit {
     }
   }
 
-  addPhoneNumber(type: 'student' | 'father' | 'mother' | 'guardian') {
-    const arr = this.getPhoneArray(type);
-    if (arr.length < 3) {
-      const validators =
-        type === 'guardian' && this.guardianType.value !== 'OTHER'
-          ? []
-          : [Validators.required, Validators.pattern(/^0(10|11|12|15)\d{8}$/)];
-      arr.push(new FormControl('', validators));
-    }
-  }
-
-  removePhoneNumber(type: 'student' | 'father' | 'mother' | 'guardian', index: number) {
-    const arr = this.getPhoneArray(type);
-    if (arr.length > 1) {
-      arr.removeAt(index);
-    }
-  }
-
   private getPhoneArray(type: 'student' | 'father' | 'mother' | 'guardian'): FormArray {
     switch (type) {
       case 'student':
@@ -604,21 +660,6 @@ export class AddStudent implements OnInit {
       case 'guardian':
         return this.guardianPhoneNumbers;
     }
-  }
-
-  formatPhoneInput(event: Event, control: AbstractControl) {
-    const input = event.target as HTMLInputElement;
-    let raw = input.value.replace(/\D/g, '');
-    if (raw.length > 11) raw = raw.slice(0, 11);
-    control.setValue(raw, { emitEvent: false });
-    input.value = raw;
-  }
-
-  getPhoneDisplay(control: AbstractControl): string {
-    const raw = control.value || '';
-    if (raw.length <= 3) return raw;
-    if (raw.length <= 7) return raw.slice(0, 3) + ' ' + raw.slice(3);
-    return raw.slice(0, 3) + ' ' + raw.slice(3, 7) + ' ' + raw.slice(7);
   }
 
   private buildDate(userGroup: FormGroup): string {
@@ -653,134 +694,19 @@ export class AddStudent implements OnInit {
     };
   }
 
-  submit() {
-    this.form.markAllAsTouched();
-    if (this.form.invalid) {
-      Swal.fire({
-        title: this.translationService.translate('Validation Error'),
-        text: this.translationService.translate('Please fill in all required fields correctly.'),
-        icon: 'warning',
-        confirmButtonText: this.translationService.translate('OK'),
-      });
-      return;
-    }
-
-    const medicalText = this.form.get('student.medicalHistoryText')?.value || '';
-    const medicalHistory = medicalText
-      ? medicalText
-          .split(',')
-          .map((s: string) => s.trim())
-          .filter((s: string) => s.length > 0)
-      : [];
-
-    const payload: CreateStudentRequest = {
-      studentUser: this.buildUserPayload(this.studentUser),
-      student: {
-        governorate: this.student.get('governorate')?.value || '',
-        academicScoreInMiddleSchool: parseInt(
-          this.student.get('academicScoreInMiddleSchool')?.value || '0',
-          10,
-        ),
-        placeOfBirth: this.student.get('placeOfBirth')?.value || '',
-        medicalHistory,
-        martialParentsStatus: this.student.get('martialParentsStatus')?.value || '',
-      },
-      father: {
-        user: this.buildUserPayload(this.father.get('user') as FormGroup),
-        jobName: this.father.get('jobName')?.value || '',
-        educationLevel: this.father.get('educationLevel')?.value || null,
-      },
-      mother: {
-        user: this.buildUserPayload(this.mother.get('user') as FormGroup),
-        jobName: this.mother.get('jobName')?.value || '',
-        educationLevel: this.mother.get('educationLevel')?.value || null,
-      },
-      guardianType: this.guardianType.value as 'FATHER' | 'MOTHER' | 'OTHER',
-      guardian: null,
-    };
-
-    if (this.guardianType.value === 'OTHER') {
-      payload.guardian = {
-        user: this.buildUserPayload(this.guardian.get('user') as FormGroup),
-        jobName: this.guardian.get('jobName')?.value || '',
-        educationLevel: this.guardian.get('educationLevel')?.value || null,
-      };
-    }
-
-    if (this.isEditMode && this.editStudentId) {
-      this.studentService.updateStudent(this.editStudentId, payload).subscribe({
-        next: () => {
-          this.studentService.clearStudentDraft(this.editStudentId!);
-          Swal.fire({
-            title: this.translationService.translate('Updated!'),
-            text: this.translationService.translate('Student information has been updated successfully.'),
-            icon: 'success',
-            confirmButtonText: this.translationService.translate('OK'),
-          }).then(() => {
-            this.router.navigate(['/students', this.editStudentId]);
-          });
-        },
-        error: (err) => {
-          console.error('Failed to update student info', err);
-        },
-      });
-      return;
-    }
-
-    this.studentService.createStudent(payload).subscribe({
-      next: () => {
-        Swal.fire({
-          title: this.translationService.translate('Done!'),
-          text: this.translationService.translate('Student has been registered successfully.'),
-          icon: 'success',
-          confirmButtonText: this.translationService.translate('OK'),
-        }).then(() => {
-          this.router.navigate(['/students']);
-        });
-      },
-      error: (err) => {
-        console.error('Failed to create student', err);
-      },
-    });
-  }
-
-  cancel() {
-    if (this.isEditMode && this.editStudentId) {
-      this.router.navigate(['/students', this.editStudentId]);
-      return;
-    }
-    this.router.navigate(['/students']);
-  }
-
-  controlInvalid(control: AbstractControl | null): boolean {
-    return !!(control && control.invalid && control.touched);
-  }
-
-  getError(control: AbstractControl | null, errorKey: string): boolean {
-    return !!(control && control.hasError(errorKey) && control.touched);
-  }
-
   private normalizePhone(phone: number | string): string {
-    if (!phone) return ''; // Safeguard against null/undefined
-
+    if (!phone) return '';
     let s = String(phone);
-
-    // Handle numbers saved with the '20' country code (e.g., 201200000002 -> 12 digits)
     if (s.length === 12 && s.startsWith('20')) {
       s = '0' + s.slice(2);
-    }
-    // Handle numbers saved as integers that lost their leading zero (e.g., 1200000002 -> 10 digits)
-    else if (s.length === 10 && /^(10|11|12|15)/.test(s)) {
+    } else if (s.length === 10 && /^(10|11|12|15)/.test(s)) {
       s = '0' + s;
     }
-
     return s;
   }
 
-  // Add this helper method to your class
   private matchOption(dbValue: string, options: string[]): string {
     if (!dbValue) return '';
-    // Find a match ignoring case, e.g., "ISLAM" matches "Islam"
     const match = options.find((opt) => opt.toLowerCase() === dbValue.toLowerCase());
     return match || dbValue;
   }

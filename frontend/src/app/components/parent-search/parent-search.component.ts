@@ -9,11 +9,13 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ParentResponse } from '../../pages/student-page/service/student-service';
+import { TranslationService } from '../../core/services/translation.service';
+import { LocalizeNamePipe } from '../../core/pipes/localize-name.pipe';
 
 @Component({
   selector: 'app-parent-search',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, LocalizeNamePipe],
   templateUrl: './parent-search.component.html',
   styleUrl: './parent-search.component.css',
 })
@@ -32,12 +34,13 @@ export class ParentSearchComponent {
     }
     return this.parents().filter((p) => {
       const fullName = `${p.user.firstName} ${p.user.lastName}`.toLowerCase();
+      const fullNameAr = `${p.user.firstNameInArabic || ''} ${p.user.lastNameInArabic || ''}`.toLowerCase();
       const nationalId = p.user.nationalNumber?.toString() || '';
-      return fullName.includes(query) || nationalId.includes(query);
+      return fullName.includes(query) || fullNameAr.includes(query) || nationalId.includes(query);
     });
   });
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, private translationService: TranslationService) {}
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
@@ -48,7 +51,12 @@ export class ParentSearchComponent {
 
   selectParent(parent: ParentResponse) {
     this.selectedParent.set(parent);
-    this.searchQuery.set(`${parent.user.firstName} ${parent.user.lastName}`);
+    const isAr = this.translationService.currentLang() === 'ar';
+    if (isAr && parent.user.firstNameInArabic) {
+      this.searchQuery.set(`${parent.user.firstNameInArabic} ${parent.user.lastNameInArabic || ''}`.trim());
+    } else {
+      this.searchQuery.set(`${parent.user.firstName} ${parent.user.lastName}`.trim());
+    }
     this.parentSelected.emit(parent);
     this.isOpen.set(false);
   }
